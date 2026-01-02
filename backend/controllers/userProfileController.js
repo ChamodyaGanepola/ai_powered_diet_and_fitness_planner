@@ -94,3 +94,21 @@ exports.getProfileByUserId = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Delete profile by user_id
+exports.deleteProfile = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const profile = await UserProfile.findOneAndDelete({ user_id });
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.status(200).json({ message: "Profile deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
