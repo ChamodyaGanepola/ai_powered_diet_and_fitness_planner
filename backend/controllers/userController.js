@@ -1,36 +1,59 @@
 const User = require("../models/User");
 
-// Create new user
+// CREATE USER
 exports.createUser = async (req, res) => {
   try {
-    const { username, email, role } = req.body;
+    const { username, email, password, role } = req.body;
 
-    // Validate request
-    if (!username || !email) {
-      return res.status(400).json({ message: "Username and email are required" });
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        message: "Username, email, and password are required"
+      });
     }
-    // Check if username exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
+
+    const usernameExists = await User.findOne({ username });
+    if (usernameExists) {
       return res.status(400).json({ message: "Username already exists" });
     }
-    // Create user
-    const user = new User({ username, email, role });
+
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    const user = new User({
+      username,
+      email,
+      password,
+      role
+    });
+
     await user.save();
-    res.status(201).json({ message: "User created successfully", user });
-  } catch (err) {
-    console.error(err);
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Get all users
+// GET ALL USERS (WITHOUT PASSWORD)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}); // Get all users from DB
+    const users = await User.find().select("-password");
     res.status(200).json(users);
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -6,17 +6,18 @@ const {
   getProfileByUserId,
   deleteProfile
 } = require("../controllers/userProfileController");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // POST → create profile
-router.post("/", createProfile);
+router.post("/", authMiddleware,createProfile);
 
 // PATCH → update profile by user_id
-router.patch("/:user_id", updateProfile);
+router.patch("/:user_id", authMiddleware,updateProfile);
 
 // GET → profile by user_id
-router.get("/:user_id", getProfileByUserId);
+router.get("/:user_id", authMiddleware, getProfileByUserId);
 
 // DELETE → delete profile by user_id
-router.delete("/:user_id", deleteProfile);
+router.delete("/:user_id", authMiddleware, deleteProfile);
 
 module.exports = router;

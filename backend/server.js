@@ -4,14 +4,17 @@ require("dotenv").config();
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const userProfileRoutes = require("./routes/userProfileRoutes");
-
+const authRoutes = require("./routes/authRoutes");
 const app = express();
 
 //  Middleware to parse JSON
 app.use(express.json());
+
 app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/user-profiles", userProfileRoutes);
+app.use("/api/auth", authRoutes);
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
