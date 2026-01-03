@@ -1,0 +1,52 @@
+:root {
+  --yellow: #f5c32c;
+  --orange: #fca61f;
+  --black: #242d49;
+  --gray: rgba(36, 45, 73, 0.65);
+  --cardColor: rgba(255, 255, 255, 0.64);
+  --buttonBg: #89267B;
+  --inputColor: rgba(40, 52, 62, 0.07);
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.App {
+  min-height: 100vh;
+  background: #f3f3f3;
+  color: var(--black);
+}
+
+/* Button Utility */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--buttonBg);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: transparent;
+  color: var(--orange);
+  border: 2px solid var(--orange);
+}
+
+.button:disabled {
+  background: silver;
+  pointer-events: none;
+}
+
+/* Scrollbar hidden */
+::-webkit-scrollbar {
+  display: none;
+}
