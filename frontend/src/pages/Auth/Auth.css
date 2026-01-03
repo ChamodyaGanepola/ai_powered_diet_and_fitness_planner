@@ -13,7 +13,7 @@
 }
 
 .a-left {
-  background: linear-gradient(135deg, #89267B, #b8329e);
+  background: linear-gradient(135deg, #01280d, #03491e);
   color: white;
   text-align: center;
 }
@@ -29,7 +29,7 @@
 
 .pinkChampsText {
   font-size: 32px;
-  color: #ff69b4;
+  color: #058d39;
 }
 
 .helloText {
@@ -60,7 +60,7 @@
 }
 
 .authForm button {
-  background: #89267B;
+  background: #01280d;
   color: white;
   border: none;
   padding: 0.7rem;
@@ -69,14 +69,14 @@
 }
 
 .authForm button:hover {
-  background: #732063;
+  background: #03491e;
 }
 
 .toggle {
   text-align: center;
   font-size: 13px;
   cursor: pointer;
-  color: #89267B;
+  color: #03491e;
   text-decoration: underline;
 }
 

@@ -66,7 +66,7 @@ const Auth = () => {
       </div>
 
       <div className="a-right">
-        <h1 className="pinkChampsTopic">PinkChamps</h1>
+        <h1 className="pinkChampsTopic">HealthPilot</h1>
         <form className="infoForm authForm" onSubmit={handleSubmit}>
           <h2>{isSignUp ? "Register" : "Login"}</h2>
 
