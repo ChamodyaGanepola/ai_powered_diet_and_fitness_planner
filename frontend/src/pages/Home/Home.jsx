@@ -4,20 +4,21 @@ import "./Home.css";
 import { useAuth } from "../../context/authContext.jsx";
 import { useEffect, useState } from "react";
 import { getProfileByUserId } from "./../../api/userProfileApi.jsx";
-
+import ProfileCard from "../../component/ProfileCard.jsx";
 const Home = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showProfileCard, setShowProfileCard] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (user) {
         try {
-          console.log("id",user.id);
-          console.log("data",user);
+          console.log("id", user.id);
+          console.log("data", user);
           const data = await getProfileByUserId(user.id);
-          
+
           setProfile(data);
         } catch (err) {
           setProfile(null); // profile doesn't exist
@@ -48,9 +49,18 @@ const Home = () => {
 
           <div>
             {profile ? (
-              <button className="primary-btn"> Edit Your Profile for better recommendations </button>
+              <button className="primary-btn">
+                {" "}
+                Edit Your Profile for better recommendations{" "}
+              </button>
             ) : (
-              <button className="primary-btn"> Get Started - Set Up Your Profile </button>
+              <button
+                className="primary-btn"
+                onClick={() => setShowProfileCard(true)}
+              >
+                {" "}
+                Get Started - Set Up Your Profile{" "}
+              </button>
             )}
           </div>
         </section>
@@ -74,6 +84,9 @@ const Home = () => {
             <p>Monitor your journey with detailed analytics and insights</p>
           </div>
         </section>
+        {showProfileCard && (
+          <ProfileCard onClose={() => setShowProfileCard(false)} />
+        )}
       </main>
       <Footer />
     </>

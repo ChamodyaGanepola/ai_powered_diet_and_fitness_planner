@@ -29,11 +29,12 @@ const userProfileSchema = new mongoose.Schema({
   },
   fitnessGoal: { 
     type: String, 
-    default: "" 
+    required: true 
+    
   },
   activityLevel: { 
     type: String, 
-    default: "" 
+    required: true 
   },
   dietaryRestrictions: { 
     type: [String], 

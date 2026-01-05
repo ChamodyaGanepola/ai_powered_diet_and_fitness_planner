@@ -1,6 +1,7 @@
 .Auth {
   display: flex;
   height: 100vh;
+  padding: 0;
 }
 
 .a-left, .a-right {
@@ -9,7 +10,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  
 }
 
 .a-left {
