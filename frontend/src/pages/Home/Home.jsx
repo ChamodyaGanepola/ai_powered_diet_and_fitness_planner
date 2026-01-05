@@ -3,7 +3,7 @@ import Footer from "../../component/Footer.jsx";
 import "./Home.css";
 import { useAuth } from "../../context/authContext.jsx";
 import { useEffect, useState } from "react";
-import { getProfileByUserId } from "./../../api/userProfileApi.jsx";
+import { getProfileByUserId } from "./../../api/userProfileApi.js";
 import ProfileCard from "../../component/ProfileCard.jsx";
 const Home = () => {
   const { user } = useAuth();
@@ -31,7 +31,7 @@ const Home = () => {
     };
 
     fetchProfile();
-  }, [user]);
+  });
 
   if (loading) return <p>Loading...</p>;
 
