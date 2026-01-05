@@ -8,6 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // NEW: trigger to refresh profile data
+  const [profileUpdated, setProfileUpdated] = useState(0);
+  const markProfileUpdated = () => setProfileUpdated(prev => prev + 1);
+
   // LOGIN
   const logIn = async (data) => {
     try {
@@ -38,15 +42,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-const logOut = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  setUser(null);
-};
-
+  const logOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, setError, logIn, signUp, logOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        setError,
+        logIn,
+        signUp,
+        logOut,
+        profileUpdated,      // expose trigger state
+        markProfileUpdated,  // expose function to update it
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

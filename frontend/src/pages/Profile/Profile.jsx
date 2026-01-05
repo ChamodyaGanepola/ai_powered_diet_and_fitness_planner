@@ -19,24 +19,24 @@ import Footer from "../../component/Footer.jsx";
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+const { user, profileUpdated } = useAuth();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user?.id) return; // Prevent API call if user not loaded
-      try {
-        console.log("user.id", user.id);
-        const data = await getProfileByUserId(user.id);
-        console.log("profile data", data);
-        setProfile(data);
-      } catch (err) {
-        console.error("Failed to load profile", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [user?.id]);
+useEffect(() => {
+  const fetchProfile = async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const data = await getProfileByUserId(user.id);
+      setProfile(data);
+    } catch (err) {
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchProfile();
+}, [user?.id, profileUpdated]); //  refresh whenever profileUpdated changes
+
 
   if (loading) return <p className="loading">Loading profile...</p>;
   if (!profile) return <p className="loading">No profile found</p>;

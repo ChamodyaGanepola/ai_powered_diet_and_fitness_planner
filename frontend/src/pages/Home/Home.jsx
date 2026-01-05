@@ -1,39 +1,41 @@
+import { useEffect, useState } from "react";
 import Header from "../../component/Header.jsx";
 import Footer from "../../component/Footer.jsx";
-import "./Home.css";
-import { useAuth } from "../../context/authContext.jsx";
-import { useEffect, useState } from "react";
-import { getProfileByUserId } from "./../../api/userProfileApi.js";
 import ProfileCard from "../../component/ProfileCard.jsx";
+import { useAuth } from "../../context/authContext.jsx";
+import { getProfileByUserId } from "../../api/userProfileApi.js";
+import "./Home.css";
+
 const Home = () => {
-  const { user } = useAuth();
+  const { user, profileUpdated } = useAuth(); // listen to global profile updates
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
 
+  // Fetch profile reactively
   useEffect(() => {
     const fetchProfile = async () => {
-      if (user) {
-        try {
-          console.log("id", user.id);
-          console.log("data", user);
-          const data = await getProfileByUserId(user.id);
+      if (!user?.id) {
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
 
-          setProfile(data);
-        } catch (err) {
-          setProfile(null); // profile doesn't exist
-        } finally {
-          setLoading(false);
-        }
-      } else {
+      setLoading(true);
+      try {
+        const data = await getProfileByUserId(user.id);
+        console.log("Fetched profile data in Home:", data);
+        setProfile(data);
+      } catch (err) {
+        console.error("Failed to fetch profile in Home:", err);
+        setProfile(null);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  });
-
-  if (loading) return <p>Loading...</p>;
+  }, [user?.id, profileUpdated]); // refetch whenever user changes or profileUpdated triggers
 
   return (
     <>
@@ -48,18 +50,14 @@ const Home = () => {
           <p>Your personalized health and fitness assistant powered by AI</p>
 
           <div>
-            {profile ? (
-              <button className="primary-btn">
-                {" "}
-                Edit Your Profile for better recommendations{" "}
-              </button>
-            ) : (
+            {!loading && (
               <button
                 className="primary-btn"
                 onClick={() => setShowProfileCard(true)}
               >
-                {" "}
-                Get Started - Set Up Your Profile{" "}
+                {profile
+                  ? "Edit Your Profile for better recommendations"
+                  : "Get Started - Set Up Your Profile"}
               </button>
             )}
           </div>
@@ -84,10 +82,16 @@ const Home = () => {
             <p>Monitor your journey with detailed analytics and insights</p>
           </div>
         </section>
+
+        {/* Profile Modal */}
         {showProfileCard && (
-          <ProfileCard onClose={() => setShowProfileCard(false)} />
+          <ProfileCard
+            onClose={() => setShowProfileCard(false)}
+            edit={!!profile}
+          />
         )}
       </main>
+
       <Footer />
     </>
   );
