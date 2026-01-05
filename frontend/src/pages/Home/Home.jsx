@@ -1,8 +1,9 @@
 import Header from "../../component/Header.jsx";
 import Footer from "../../component/Footer.jsx";
 import "./Home.css";
-
+import { useAuth } from "../../context/authContext.jsx";
 const Home = () => {
+  const { user } = useAuth(); 
   return (
     <>
       <Header />
@@ -10,7 +11,7 @@ const Home = () => {
       <main className="home">
      
         <section className="hero">
-          <h1>Welcome to Your AI Diet Fitness Planner</h1>
+          <h1>Welcome {user ? `, ${user.username}` : ""} to Your AI Diet Fitness Planner</h1>
           <p>
             Your personalized health and fitness assistant powered by AI
           </p>
