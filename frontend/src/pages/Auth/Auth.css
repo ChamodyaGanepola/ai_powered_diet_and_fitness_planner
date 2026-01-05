@@ -79,6 +79,25 @@
   color: #03491e;
   text-decoration: underline;
 }
+/* Desktop nav hover */
+.nav-links span:hover {
+  color: #407b57;
+}
+
+/* Mobile sidebar nav hover */
+.side-navbar span:hover {
+  color: #407b57;
+}
+
+/* Menu icon hover */
+.menu-icon:hover {
+  color: #407b57;
+}
+
+/* Close button hover */
+.close-btn:hover {
+  color: #407b57;
+}
 
 @media (max-width: 768px) {
   .Auth { flex-direction: column; height: auto; }

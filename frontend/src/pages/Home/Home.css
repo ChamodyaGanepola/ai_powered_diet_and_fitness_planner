@@ -1,0 +1,39 @@
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== PAGE CONTAINER ===== */
+.home-container {
+  min-height: calc(100vh - 64px); /* header height */
+  padding: 24px;
+  background: #f6f8f7;
+  overflow-x: hidden; /* FIX left-side overflow */
+}
+
+/* ===== WELCOME TEXT ===== */
+.home-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #01280d;
+  margin-bottom: 16px;
+}
+
+/* ===== SUBTEXT ===== */
+.home-subtitle {
+  font-size: 16px;
+  color: #555;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 16px;
+  }
+
+  .home-title {
+    font-size: 22px;
+  }
+}

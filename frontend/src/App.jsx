@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth/Auth.jsx";
-import Chat from "./pages/Chat/Chat.jsx";
+import Home from "./pages/Home/Home.jsx";
 import { useAuth } from "./context/authContext.jsx";
 
 function App() {
@@ -10,11 +10,11 @@ function App() {
     <Routes>
       <Route
         path="/"
-        element={user ? <Navigate to="/chat" /> : <Auth />}
+        element={user ? <Navigate to="/home" /> : <Auth />}
       />
       <Route
-        path="/chat"
-        element={user ? <Chat /> : <Navigate to="/" />}
+        path="/home"
+        element={user ? <Home /> : <Navigate to="/" />}
       />
     </Routes>
   );
