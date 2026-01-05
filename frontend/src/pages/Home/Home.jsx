@@ -1,4 +1,5 @@
 import Header from "../../component/Header.jsx";
+import Footer from "../../component/Footer.jsx";
 import "./Home.css";
 
 const Home = () => {
@@ -43,6 +44,7 @@ const Home = () => {
           </div>
         </section>
       </main>
+       <Footer />
     </>
   );
 };
