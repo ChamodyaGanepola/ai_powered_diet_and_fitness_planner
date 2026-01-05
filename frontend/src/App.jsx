@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth/Auth.jsx";
 import Home from "./pages/Home/Home.jsx";
+import Profile from "./pages/Profile/Profile.jsx";
 import { useAuth } from "./context/authContext.jsx";
 
 function App() {
@@ -15,6 +16,10 @@ function App() {
       <Route
         path="/home"
         element={user ? <Home /> : <Navigate to="/" />}
+      />
+      <Route
+        path="/profile"
+        element={user ? <Profile /> : <Navigate to="/" />}
       />
     </Routes>
   );

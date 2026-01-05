@@ -1,0 +1,104 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.profile-page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px;
+  background: #f3f3f3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.profile-avatar {
+  font-size: 70px;
+  color: #03491e;
+}
+
+.profile-header h2 {
+  margin: 10px 0 4px;
+}
+
+.profile-header p {
+  color: #666;
+  font-size: 14px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 30px;
+}
+
+.profile-item {
+  display: flex;
+  gap: 14px;
+  background: #f8f9fb;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.profile-item .icon {
+  font-size: 22px;
+  color: #03491e;
+}
+
+.label {
+  font-size: 13px;
+  color: #777;
+}
+
+.value {
+  font-weight: 600;
+  color: #242d49;
+}
+
+.profile-section {
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 25px;
+}
+
+.profile-section h3 {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  background: rgba(3, 73, 30, 0.1);
+  color: #03491e;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.empty {
+  color: #999;
+  font-size: 14px;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 50px;
+}
