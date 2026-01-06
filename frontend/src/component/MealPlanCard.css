@@ -1,7 +1,7 @@
 .mealplan-card {
   background: #ffffff;
   border-radius: 18px;
-  padding: 28px;              /* ⬅ more breathing space */
+  padding: 28px;              /*  more breathing space */
   margin-bottom: 32px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
@@ -10,13 +10,46 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;        /* ⬅ clearer separation */
+  margin-bottom: 28px;        /*  clearer separation */
 }
 
 .mealplan-card .meals-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;                  /* ⬅ spacing between meals */
+  gap: 20px;                  /* spacing between meals */
+}
+.add-icon {
+  color: #28a745; /* your theme green */
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: transform 0.2s ease;
+}
+
+.add-icon:hover {
+  transform: scale(1.2);
+}
+
+.datepicker-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-button {
+  background-color: #28a745; /* green theme */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+ 
+}
+
+.add-button:hover {
+  background-color: #1e7e34; /* darker green on hover */
 }
 
 /* Mobile */
@@ -27,6 +60,6 @@
 
   .mealplan-card .meals-grid {
     grid-template-columns: 1fr;
-    gap: 14px;               /* ⬅ SMALL GAP BETWEEN MEALS */
+    gap: 14px;               /* SMALL GAP BETWEEN MEALS */
   }
 }

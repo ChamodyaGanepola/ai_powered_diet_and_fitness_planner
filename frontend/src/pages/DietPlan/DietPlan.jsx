@@ -15,7 +15,39 @@ const mockMealPlans = [
         items: [
           { name: "Smoked salmon", calories: 140, protein: 16, fat: 5 },
           { name: "Whole wheat toast", calories: 120, protein: 6, fat: 2 }
-          
+        ]
+      },
+      {
+        mealType: "Lunch",
+        items: [
+          { name: "Grilled chicken", calories: 300, protein: 35, fat: 6 }
+        ]
+      },
+      {
+        mealType: "Snack",
+        items: [
+          { name: "Greek yogurt", calories: 150, protein: 15, fat: 4 }
+        ]
+      },
+      {
+        mealType: "Dinner",
+        items: [
+          { name: "Salmon & veggies", calories: 400, protein: 30, fat: 12 }
+        ]
+      }
+    ]
+  },
+  {
+    _id: "2",
+    startDate: "2026-01-02",
+    totalCalories: 2100,
+    totalProtein: 120,
+    meals: [
+      {
+        mealType: "Breakfast",
+        items: [
+          { name: "Smoked salmon", calories: 140, protein: 16, fat: 5 },
+          { name: "Whole wheat toast", calories: 120, protein: 6, fat: 2 }
         ]
       },
       {
