@@ -6,21 +6,30 @@ import { useAuth } from "./context/authContext.jsx";
 
 function App() {
   const { user } = useAuth();
+  const token = localStorage.getItem("token"); // 🔑 token check
 
   return (
     <Routes>
+      {/* AUTH PAGE */}
       <Route
         path="/"
-        element={user ? <Navigate to="/home" /> : <Auth />}
+        element={token ? <Navigate to="/home" replace /> : <Auth />}
       />
+
+      {/* HOME */}
       <Route
         path="/home"
-        element={user ? <Home /> : <Navigate to="/" />}
+        element={token ? <Home /> : <Navigate to="/" replace />}
       />
+
+      {/* PROFILE */}
       <Route
         path="/profile"
-        element={user ? <Profile /> : <Navigate to="/" />}
+        element={token ? <Profile /> : <Navigate to="/" replace />}
       />
+
+      {/* CATCH ALL */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

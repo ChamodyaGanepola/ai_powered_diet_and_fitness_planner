@@ -8,63 +8,125 @@ import {
   FaBullseye,
   FaRunning,
   FaUtensils,
-  FaHeart
+  FaHeart,
 } from "react-icons/fa";
-import { getProfileByUserId } from "../../api/userProfileApi";
+import { getProfileByUserId, deleteProfile } from "../../api/userProfileApi";
 import "./Profile.css";
 import { useAuth } from "../../context/authContext.jsx";
 import Header from "../../component/Header.jsx";
 import Footer from "../../component/Footer.jsx";
 
 const Profile = () => {
+  const { user, markProfileUpdated } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-const { user, profileUpdated } = useAuth();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
-useEffect(() => {
+  useEffect(() => {
+    fetchProfile();
+  }, [user?.id]);
+
   const fetchProfile = async () => {
     if (!user?.id) return;
     setLoading(true);
     try {
       const data = await getProfileByUserId(user.id);
       setProfile(data);
-    } catch (err) {
+    } catch {
       setProfile(null);
     } finally {
       setLoading(false);
     }
   };
-  fetchProfile();
-}, [user?.id, profileUpdated]); //  refresh whenever profileUpdated changes
 
+  const handleDeleteProfile = async () => {
+    try {
+      await deleteProfile(user.id);
+      setProfile(null);
+      markProfileUpdated(); // 🔔 notify whole app
+      setSuccessMsg("Successfully deleted your profile");
+
+      setTimeout(() => {
+        setShowConfirm(false);
+        setSuccessMsg("");
+      }, 1500);
+    } catch (err) {
+      console.error("Profile delete failed", err);
+    }
+  };
 
   if (loading) return <p className="loading">Loading profile...</p>;
-  if (!profile) return <p className="loading">No profile found</p>;
 
   return (
     <>
       <Header />
+
       <div className="profile-page">
+        {/* HEADER */}
         <div className="profile-header">
           <FaUser className="profile-avatar" />
-          <h2>{profile.user_id?.username}</h2>
-          <p>{profile.user_id?.email}</p>
+          <h2>{user?.username}</h2>
+          <p>{user?.email}</p>
+
+          {/* DELETE BUTTON */}
+          {profile && (
+            <button
+              className="delete-profile-btn"
+              onClick={() => setShowConfirm(true)}
+            >
+              Delete Profile Details
+            </button>
+          )}
         </div>
 
-        <div className="profile-grid">
-          <ProfileItem icon={<FaBirthdayCake />} label="Age" value={`${profile.age} yrs`} />
-          <ProfileItem icon={<FaVenusMars />} label="Gender" value={profile.gender} />
-          <ProfileItem icon={<FaWeight />} label="Weight" value={`${profile.weight} kg`} />
-          <ProfileItem icon={<FaRulerVertical />} label="Height" value={`${profile.height} cm`} />
-          <ProfileItem icon={<FaBullseye />} label="Fitness Goal" value={profile.fitnessGoal} />
-          <ProfileItem icon={<FaRunning />} label="Activity Level" value={profile.activityLevel} />
-        </div>
+        {/* PROFILE DATA */}
+        {profile ? (
+          <>
+            <div className="profile-grid">
+              <ProfileItem icon={<FaBirthdayCake />} label="Age" value={`${profile.age} yrs`} />
+              <ProfileItem icon={<FaVenusMars />} label="Gender" value={profile.gender} />
+              <ProfileItem icon={<FaWeight />} label="Weight" value={`${profile.weight} kg`} />
+              <ProfileItem icon={<FaRulerVertical />} label="Height" value={`${profile.height} cm`} />
+              <ProfileItem icon={<FaBullseye />} label="Fitness Goal" value={profile.fitnessGoal} />
+              <ProfileItem icon={<FaRunning />} label="Activity Level" value={profile.activityLevel} />
+            </div>
 
-        <Section title="Dietary Restrictions" icon={<FaUtensils />} items={profile.dietaryRestrictions} />
-        <Section title="Health Conditions" icon={<FaHeart />} items={profile.healthConditions} />
-        <Section title="Preferences" icon={<FaUser />} items={profile.preferences} />
-        <Section title="Cultural Dietary Patterns" icon={<FaUtensils />} items={profile.culturalDietaryPatterns} />
+            <Section title="Dietary Restrictions" icon={<FaUtensils />} items={profile.dietaryRestrictions} />
+            <Section title="Health Conditions" icon={<FaHeart />} items={profile.healthConditions} />
+            <Section title="Preferences" icon={<FaUser />} items={profile.preferences} />
+          </>
+        ) : (
+          <p className="empty">No data available</p>
+        )}
       </div>
+
+      {/* CONFIRM MODAL */}
+      {showConfirm && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            {successMsg ? (
+              <p className="success">{successMsg}</p>
+            ) : (
+              <>
+                <p>Are you sure you want to delete your profile details?</p>
+                <div className="confirm-actions">
+                  <button className="danger-btn" onClick={handleDeleteProfile}>
+                    Yes
+                  </button>
+                  <button
+                    className="secondary-btn"
+                    onClick={() => setShowConfirm(false)}
+                  >
+                    No
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );
@@ -83,10 +145,10 @@ const ProfileItem = ({ icon, label, value }) => (
 const Section = ({ title, icon, items }) => (
   <div className="profile-section">
     <h3>{icon} {title}</h3>
-    {items && items.length > 0 ? (
+    {items?.length ? (
       <div className="chip-container">
-        {items.map((item, index) => (
-          <span key={index} className="chip">{item}</span>
+        {items.map((item, i) => (
+          <span key={i} className="chip">{item}</span>
         ))}
       </div>
     ) : (
