@@ -220,3 +220,59 @@ body {
 .delete-profile-btn:hover {
   background: #b81f1f;
 }
+/* ===== MOBILE STYLES ===== */
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 20px 10px;
+  }
+
+  .profile-avatar {
+    font-size: 50px;
+  }
+
+  .profile-header h2 {
+    font-size: 18px;
+  }
+
+  .profile-header p {
+    font-size: 12px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .profile-item {
+    padding: 12px;
+  }
+
+  .profile-section h3 {
+    font-size: 14px;
+    gap: 6px;
+  }
+
+  .chip {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+
+  .delete-profile-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .confirm-box {
+    padding: 20px;
+  }
+
+  .confirm-box p {
+    font-size: 14px;
+  }
+
+  .danger-btn,
+  .secondary-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+}

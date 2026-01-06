@@ -28,8 +28,31 @@ function App() {
         element={token ? <Profile /> : <Navigate to="/" replace />}
       />
 
-      {/* CATCH ALL */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+       {/* PROFILE */}
+      <Route
+        path="/profile"
+        element={token ? <Profile /> : <Navigate to="/" replace />}
+      />
+       {/* DASHBOARD */}
+      <Route
+        path="/dashboard"
+        element={token ? <Profile /> : <Navigate to="/" replace />}
+      />
+       {/* DIETPLANS */}
+      <Route
+        path="/dietplans"
+        element={token ? <Profile /> : <Navigate to="/" replace />}
+      />
+       {/* WORKOUTS */}
+      <Route
+        path="/workouts"
+        element={token ? <Profile /> : <Navigate to="/" replace />}
+      />
+       {/* PROGRESS */}
+      <Route
+        path="/progress"
+        element={token ? <Profile /> : <Navigate to="/" replace />}
+      />
     </Routes>
   );
 }

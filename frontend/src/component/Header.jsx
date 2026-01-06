@@ -25,7 +25,7 @@ const Header = () => {
         <nav className="nav-links">
           <span onClick={() => navigate("/home")}>Home</span>
           <span onClick={() => navigate("/dashboard")}>Dashboard</span>
-          <span onClick={() => navigate("/chat")}>Diet Plan</span>
+          <span onClick={() => navigate("/dietplans")}>Diet Plan</span>
           <span onClick={() => navigate("/workouts")}>Workouts</span>
           <span onClick={() => navigate("/progress")}>Progress</span>
           <span onClick={() => navigate("/profile")}>Profile</span>
@@ -46,7 +46,7 @@ const Header = () => {
 
         <span onClick={() => { navigate("/home"); setOpen(false); }}>Home</span>
         <span onClick={() => { navigate("/dashboard"); setOpen(false); }}>Dashboard</span>
-        <span onClick={() => { navigate("/chat"); setOpen(false); }}>Diet Plan</span>
+        <span onClick={() => { navigate("/dietplans"); setOpen(false); }}>Diet Plan</span>
         <span onClick={() => { navigate("/workouts"); setOpen(false); }}>Workouts</span>
         <span onClick={() => { navigate("/progress"); setOpen(false); }}>Progress</span>
         <span onClick={() => { navigate("/profile"); setOpen(false); }}>Profile</span>

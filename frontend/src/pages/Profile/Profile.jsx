@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   FaUser,
+  FaMale,
+  FaFemale,
   FaBirthdayCake,
   FaVenusMars,
   FaWeight,
@@ -39,6 +41,21 @@ const Profile = () => {
       setLoading(false);
     }
   };
+  const renderAvatar = () => {
+  if (!profile?.gender) return <FaUser className="profile-avatar" />;
+
+  const gender = profile.gender.toLowerCase();
+
+  if (gender === "female") {
+    return <FaFemale className="profile-avatar" />;
+  }
+
+  if (gender === "male") {
+    return <FaMale className="profile-avatar" />;
+  }
+
+  return <FaUser className="profile-avatar" />;
+};
 
   const handleDeleteProfile = async () => {
     try {
@@ -65,7 +82,8 @@ const Profile = () => {
       <div className="profile-page">
         {/* HEADER */}
         <div className="profile-header">
-          <FaUser className="profile-avatar" />
+          <div className="avatar-wrapper">{renderAvatar()}</div>
+
           <h2>{user?.username}</h2>
           <p>{user?.email}</p>
 
@@ -84,17 +102,53 @@ const Profile = () => {
         {profile ? (
           <>
             <div className="profile-grid">
-              <ProfileItem icon={<FaBirthdayCake />} label="Age" value={`${profile.age} yrs`} />
-              <ProfileItem icon={<FaVenusMars />} label="Gender" value={profile.gender} />
-              <ProfileItem icon={<FaWeight />} label="Weight" value={`${profile.weight} kg`} />
-              <ProfileItem icon={<FaRulerVertical />} label="Height" value={`${profile.height} cm`} />
-              <ProfileItem icon={<FaBullseye />} label="Fitness Goal" value={profile.fitnessGoal} />
-              <ProfileItem icon={<FaRunning />} label="Activity Level" value={profile.activityLevel} />
+              <ProfileItem
+                icon={<FaBirthdayCake />}
+                label="Age"
+                value={`${profile.age} yrs`}
+              />
+              <ProfileItem
+                icon={<FaVenusMars />}
+                label="Gender"
+                value={profile.gender}
+              />
+              <ProfileItem
+                icon={<FaWeight />}
+                label="Weight"
+                value={`${profile.weight} kg`}
+              />
+              <ProfileItem
+                icon={<FaRulerVertical />}
+                label="Height"
+                value={`${profile.height} cm`}
+              />
+              <ProfileItem
+                icon={<FaBullseye />}
+                label="Fitness Goal"
+                value={profile.fitnessGoal}
+              />
+              <ProfileItem
+                icon={<FaRunning />}
+                label="Activity Level"
+                value={profile.activityLevel}
+              />
             </div>
 
-            <Section title="Dietary Restrictions" icon={<FaUtensils />} items={profile.dietaryRestrictions} />
-            <Section title="Health Conditions" icon={<FaHeart />} items={profile.healthConditions} />
-            <Section title="Preferences" icon={<FaUser />} items={profile.preferences} />
+            <Section
+              title="Dietary Restrictions"
+              icon={<FaUtensils />}
+              items={profile.dietaryRestrictions}
+            />
+            <Section
+              title="Health Conditions"
+              icon={<FaHeart />}
+              items={profile.healthConditions}
+            />
+            <Section
+              title="Preferences"
+              icon={<FaUser />}
+              items={profile.preferences}
+            />
           </>
         ) : (
           <p className="empty">No data available</p>
@@ -144,11 +198,15 @@ const ProfileItem = ({ icon, label, value }) => (
 
 const Section = ({ title, icon, items }) => (
   <div className="profile-section">
-    <h3>{icon} {title}</h3>
+    <h3>
+      {icon} {title}
+    </h3>
     {items?.length ? (
       <div className="chip-container">
         {items.map((item, i) => (
-          <span key={i} className="chip">{item}</span>
+          <span key={i} className="chip">
+            {item}
+          </span>
         ))}
       </div>
     ) : (
