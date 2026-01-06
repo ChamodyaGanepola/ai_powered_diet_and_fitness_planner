@@ -1,0 +1,32 @@
+.mealplan-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px;              /* ⬅ more breathing space */
+  margin-bottom: 32px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.mealplan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;        /* ⬅ clearer separation */
+}
+
+.mealplan-card .meals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;                  /* ⬅ spacing between meals */
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .mealplan-card {
+    padding: 20px;
+  }
+
+  .mealplan-card .meals-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;               /* ⬅ SMALL GAP BETWEEN MEALS */
+  }
+}

@@ -1,0 +1,44 @@
+.meal-card {
+  border-radius: 16px;
+  padding: 18px;
+  min-height: unset;          /* ⬅ important */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;                  /* ⬅ spacing inside meal */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.meal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* Hover effect */
+.meal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+}
+
+
+.meal-title {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* 🎨 Meal Colors */
+.meal-card.breakfast {
+  background: linear-gradient(135deg, #fff4d2, #ffe8a3);
+}
+
+.meal-card.lunch {
+  background: linear-gradient(135deg, #e6f6ff, #cceaff);
+}
+
+.meal-card.snack {
+  background: linear-gradient(135deg, #f3e8ff, #e0cfff);
+}
+
+.meal-card.dinner {
+  background: linear-gradient(135deg, #e8f8ef, #c8eed9);
+}

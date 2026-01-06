@@ -283,7 +283,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
             {loading
               ? "Saving..."
               : edit
-              ? "💾 Update Profile"
+              ? "💾 Update Profile & Continue"
               : "💾 Save Profile & Continue"}
           </button>
         </form>

@@ -1,0 +1,12 @@
+.diet-page {
+  padding: 32px;
+  background: #f4f6fa;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .diet-page {
+    padding: 16px;
+  }
+}
+

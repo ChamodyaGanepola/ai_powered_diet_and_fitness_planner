@@ -1,0 +1,25 @@
+.food-item-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.10);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.food-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+}
+
+.food-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.food-macros {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555;
+}

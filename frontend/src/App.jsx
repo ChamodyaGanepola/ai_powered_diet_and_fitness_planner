@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./pages/Auth/Auth.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
+import DietPlan from "./pages/DietPlan/DietPlan.jsx";
 import { useAuth } from "./context/authContext.jsx";
 
 function App() {
@@ -22,11 +23,6 @@ function App() {
         element={token ? <Home /> : <Navigate to="/" replace />}
       />
 
-      {/* PROFILE */}
-      <Route
-        path="/profile"
-        element={token ? <Profile /> : <Navigate to="/" replace />}
-      />
 
        {/* PROFILE */}
       <Route
@@ -38,10 +34,10 @@ function App() {
         path="/dashboard"
         element={token ? <Profile /> : <Navigate to="/" replace />}
       />
-       {/* DIETPLANS */}
+       {/* DIETPLAN */}
       <Route
-        path="/dietplans"
-        element={token ? <Profile /> : <Navigate to="/" replace />}
+        path="/dietplan"
+        element={token ? <DietPlan /> : <Navigate to="/" replace />}
       />
        {/* WORKOUTS */}
       <Route
