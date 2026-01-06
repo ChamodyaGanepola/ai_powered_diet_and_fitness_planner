@@ -79,9 +79,10 @@ export default function DietPlan() {
     <>
     <Header />
     <div className="diet-page">
-      <h1>{user.username} Welcome to Your Diet Plan</h1>
-      {mockMealPlans.map(plan => (
-        <MealPlanCard key={plan._id} plan={plan} />
+      <h1>{user.username} Welcome to Your Diet Plans</h1>
+        {mockMealPlans.map((plan, index) => (
+          // Pass index to MealPlanCard
+          <MealPlanCard key={plan._id} plan={plan} index={index} />
       ))}
     </div>
     <Footer />

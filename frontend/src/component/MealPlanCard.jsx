@@ -5,13 +5,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./MealPlanCard.css";
 
-export default function MealPlanCard({ plan }) {
+export default function MealPlanCard({ plan, index }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const handleAddClick = () => {
-    setShowDatePicker(!showDatePicker);
-  };
+  const handleAddClick = () => setShowDatePicker(!showDatePicker);
 
   const handleAddPlan = () => {
     if (selectedDate) {
@@ -21,14 +19,13 @@ export default function MealPlanCard({ plan }) {
     }
   };
 
-  // Get tomorrow's date
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   return (
     <div className="mealplan-card">
       <div className="mealplan-header">
-        <h2>Day Plan</h2>
+        <h2>Diet Plan #{index + 1}</h2> {/* <-- Use index here */}
         <div className="macros">
           <span>{plan.totalCalories} kcal</span>
           <span>{plan.totalProtein}g protein</span>
@@ -46,7 +43,7 @@ export default function MealPlanCard({ plan }) {
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
             placeholderText="Select a date"
-            minDate={tomorrow} // Only allow selecting tomorrow or later
+            minDate={tomorrow} // Only allow tomorrow or later
           />
           <button className="add-button" onClick={handleAddPlan}>
             Add

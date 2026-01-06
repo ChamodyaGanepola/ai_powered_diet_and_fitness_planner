@@ -11,7 +11,7 @@ const Home = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
-
+  const token = localStorage.getItem("token");
   // Fetch profile reactively
   useEffect(() => {
     const fetchProfile = async () => {
@@ -35,7 +35,7 @@ const Home = () => {
     };
 
     fetchProfile();
-  }, [user?.id, profileUpdated]); // refetch whenever user changes or profileUpdated triggers
+  }, [user?.id, profileUpdated, token]); // refetch whenever user changes or profileUpdated triggers
 
   return (
     <>

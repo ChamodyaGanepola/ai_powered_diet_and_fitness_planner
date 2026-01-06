@@ -3,6 +3,7 @@ import Auth from "./pages/Auth/Auth.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import DietPlan from "./pages/DietPlan/DietPlan.jsx";
+import Progress from "./pages/Progress/Progress.jsx";     
 import { useAuth } from "./context/authContext.jsx";
 
 function App() {
@@ -47,7 +48,7 @@ function App() {
        {/* PROGRESS */}
       <Route
         path="/progress"
-        element={token ? <Profile /> : <Navigate to="/" replace />}
+        element={token ? <Progress /> : <Navigate to="/" replace />}
       />
     </Routes>
   );

@@ -1,0 +1,41 @@
+.meal-row {
+  background: #fff;
+  padding: 18px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Completed meal */
+.meal-row.completed {
+  opacity: 0.6;
+}
+
+/* Circle checkbox */
+.circle-checkbox {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #28a745;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Checked state */
+.circle-checkbox.checked {
+  background: #28a745;
+  color: #fff;
+}
+
+/* Disabled future dates */
+.circle-checkbox.disabled {
+  border-color: #ccc;
+  background: #f2f2f2;
+  cursor: not-allowed;
+  color: #aaa;
+}
