@@ -3,7 +3,9 @@ import Auth from "./pages/Auth/Auth.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import DietPlan from "./pages/DietPlan/DietPlan.jsx";
-import Progress from "./pages/Progress/Progress.jsx";     
+import Progress from "./pages/Progress/Progress.jsx";  
+import Dashboard from "./pages/Dashboard/Dashboard.jsx";
+import Workouts from "./pages/Workouts/Workouts.jsx";          
 import { useAuth } from "./context/authContext.jsx";
 
 function App() {
@@ -33,7 +35,7 @@ function App() {
        {/* DASHBOARD */}
       <Route
         path="/dashboard"
-        element={token ? <Profile /> : <Navigate to="/" replace />}
+        element={token ? <Dashboard /> : <Navigate to="/" replace />}
       />
        {/* DIETPLAN */}
       <Route
@@ -43,7 +45,7 @@ function App() {
        {/* WORKOUTS */}
       <Route
         path="/workouts"
-        element={token ? <Profile /> : <Navigate to="/" replace />}
+        element={token ? <Workouts /> : <Navigate to="/" replace />}
       />
        {/* PROGRESS */}
       <Route

@@ -32,7 +32,6 @@ const mealsData = [
           { name: "Salmon & veggies", calories: 400, protein: 30, fat: 12 }
         ]
       }];
-
 export default function Progress() {
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(today);

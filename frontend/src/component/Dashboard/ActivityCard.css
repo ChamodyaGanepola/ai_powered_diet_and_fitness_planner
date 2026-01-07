@@ -1,0 +1,21 @@
+.activity-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 18px;
+}
+
+.activity-card h4 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.activity-card p {
+    margin: 6px 0 10px;
+    font-size: 13px;
+    color: #777;
+}
+
+.activity-card .avg {
+    font-size: 11px;
+    color: #999;
+}
