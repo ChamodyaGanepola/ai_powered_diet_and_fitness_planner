@@ -5,6 +5,8 @@ const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const userProfileRoutes = require("./routes/userProfileRoutes");
 const authRoutes = require("./routes/authRoutes");
+const mealPlanRoutes = require("./routes/mealPlanRoutes.js");
+
 const app = express();
 
 //  Middleware to parse JSON
@@ -14,6 +16,7 @@ app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/user-profiles", userProfileRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/meal-plan", mealPlanRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
