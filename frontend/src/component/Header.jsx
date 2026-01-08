@@ -10,7 +10,7 @@ const Header = () => {
 
   const handleLogout = () => {
     logOut();
-    navigate("/auth");
+    navigate("/");
     setOpen(false);
   };
 

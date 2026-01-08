@@ -14,3 +14,8 @@ export const loginUser = (data) => {
   return API.post("/auth/login", data);
 };
 
+export const forgotPassword = (email) =>
+  API.post("/auth/forgot-password", { email });
+
+export const resetPassword = (token, data) =>
+  API.patch(`/auth/reset-password/${token}`, data);

@@ -104,3 +104,14 @@
   .Auth { flex-direction: column; height: auto; }
   .a-left, .a-right { width: 100%; min-height: auto; }
 }
+.forgot-password {
+  text-align: center;
+  font-size: 13px;
+  color: #03491e;
+  cursor: pointer;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+  color: #058d39;
+}

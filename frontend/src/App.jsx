@@ -1,59 +1,64 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Auth from "./pages/Auth/Auth.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import DietPlan from "./pages/DietPlan/DietPlan.jsx";
-import Progress from "./pages/Progress/Progress.jsx";  
+import Progress from "./pages/Progress/Progress.jsx";
 import Dashboard from "./pages/Dashboard/Dashboard.jsx";
-import Workouts from "./pages/Workouts/Workouts.jsx";          
+import Workouts from "./pages/Workouts/Workouts.jsx";
+import ForgotPassword from "./component/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
 import { useAuth } from "./context/authContext.jsx";
 
+
 function App() {
-  const { user } = useAuth();
-  const token = localStorage.getItem("token"); // 🔑 token check
+  const { user } = useAuth(); // ✅ reactive
 
   return (
     <Routes>
       {/* AUTH PAGE */}
       <Route
         path="/"
-        element={token ? <Navigate to="/home" replace /> : <Auth />}
+        element={user ? <Navigate to="/home" replace /> : <Auth />}
+      />
+      <Route
+        path="/forgot-password"
+        element={user ? <Navigate to="/home" replace /> : <ForgotPassword />}
+      />
+      <Route
+        path="/reset-password/:token"
+        element={user ? <Navigate to="/home" replace /> : <ResetPassword />}
       />
 
       {/* HOME */}
       <Route
         path="/home"
-        element={token ? <Home /> : <Navigate to="/" replace />}
+        element={user ? <Home /> : <Navigate to="/" replace />}
       />
-
-
-       {/* PROFILE */}
       <Route
         path="/profile"
-        element={token ? <Profile /> : <Navigate to="/" replace />}
+        element={user ? <Profile /> : <Navigate to="/" replace />}
       />
-       {/* DASHBOARD */}
       <Route
         path="/dashboard"
-        element={token ? <Dashboard /> : <Navigate to="/" replace />}
+        element={user ? <Dashboard /> : <Navigate to="/" replace />}
       />
-       {/* DIETPLAN */}
       <Route
         path="/dietplan"
-        element={token ? <DietPlan /> : <Navigate to="/" replace />}
+        element={user ? <DietPlan /> : <Navigate to="/" replace />}
       />
-       {/* WORKOUTS */}
       <Route
         path="/workouts"
-        element={token ? <Workouts /> : <Navigate to="/" replace />}
+        element={user ? <Workouts /> : <Navigate to="/" replace />}
       />
-       {/* PROGRESS */}
       <Route
         path="/progress"
-        element={token ? <Progress /> : <Navigate to="/" replace />}
+        element={user ? <Progress /> : <Navigate to="/" replace />}
       />
     </Routes>
   );
 }
+
 
 export default App;
