@@ -13,6 +13,8 @@ import {
   FaHeart,
 } from "react-icons/fa";
 import { getProfileByUserId, deleteProfile } from "../../api/userProfileApi";
+import { createNotification } from "../../api/notificationApi.js";
+
 import "./Profile.css";
 import { useAuth } from "../../context/authContext.jsx";
 import Header from "../../component/Header.jsx";
@@ -61,9 +63,10 @@ const Profile = () => {
     try {
       await deleteProfile(user.id);
       setProfile(null);
-      markProfileUpdated(); // 🔔 notify whole app
+      markProfileUpdated(); //  notify whole app
       setSuccessMsg("Successfully deleted your profile");
-
+      //  Create delete notification
+      await createNotification(user.id, `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`);
       setTimeout(() => {
         setShowConfirm(false);
         setSuccessMsg("");

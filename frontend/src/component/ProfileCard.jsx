@@ -4,6 +4,8 @@ import {
   updateProfile,
   getProfileByUserId,
 } from "../api/userProfileApi.js";
+import { createNotification } from "../api/notificationApi.js";
+
 import "./ProfileCard.css";
 import { useAuth } from "../context/authContext.jsx";
 
@@ -92,20 +94,23 @@ const ProfileCard = ({ onClose, edit = false }) => {
           ? formData.culturalDietaryPatterns.split(",").map((i) => i.trim())
           : [],
       };
-
+      let actionType = "";
       if (edit) {
         await updateProfile(user.id, payload);
+        actionType = "updated";
       } else {
         await createProfile(payload);
+        actionType = "created";
+
       }
 
       setLoading(false);
 
       setSuccess(true);
 
-      // 🔹 Trigger global profile refresh
+      // Trigger global profile refresh
       markProfileUpdated();
-
+      await createNotification(user.id, `Hi ${user.username}, your user profile details have been successfully ${actionType} !🙂`);
       setTimeout(() => {
         onClose();
       }, 1000);
