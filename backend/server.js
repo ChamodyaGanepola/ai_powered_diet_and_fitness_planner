@@ -9,7 +9,7 @@ import userProfileRoutes from "./routes/userProfileRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import mealPlanRoutes from "./routes/mealPlanRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-
+import workoutPlanRoutes from "./routes/workoutPlanRoutes.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
@@ -47,7 +47,7 @@ app.use("/api/user-profiles", userProfileRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/meal-plan", mealPlanRoutes);
 app.use("/api/notifications", notificationRoutes);
-
+app.use("/api/workout-plan", workoutPlanRoutes);
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)

@@ -9,15 +9,14 @@
 }
 
 .profile-card {
-  background: #ffffff;
+  background: #fff;
   width: 440px;
   border-radius: 16px;
   padding: 26px 24px;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 45px rgba(0,0,0,0.2);
   position: relative;
-  overflow-y: auto;  
-  max-height: 85vh; 
-
+  overflow-y: auto;
+  max-height: 85vh;
 }
 
 .profile-card h2 {
@@ -32,57 +31,24 @@
   margin-bottom: 20px;
 }
 
-.profile-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.form-row {
-  display: flex;
-  gap: 12px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.form-group label {
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-.form-group input,
-.form-group select {
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #01280d;
-}
+.profile-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: flex; gap: 12px; }
+.form-group { display: flex; flex-direction: column; flex: 1; }
+.form-group label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.form-group input, .form-group select { padding: 9px 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #01280d; }
 
 .primary-btn {
   margin-top: 10px;
   padding: 10px;
-  background: linear-gradient(135deg, #01280d, #295339);
+  background: linear-gradient(135deg,#01280d,#295339);
   color: #fff;
   border: none;
   border-radius: 10px;
   font-size: 15px;
   cursor: pointer;
 }
-
-.primary-btn:hover {
-  opacity: 0.95;
-}
+.primary-btn:hover { opacity: 0.95; }
 
 .close-btn {
   position: absolute;
@@ -94,41 +60,28 @@
   cursor: pointer;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .profile-card {
-    width: 90%;
-    max-width: 420px;
-    padding: 22px 18px;
-    max-height: 85vh;        /* fit inside viewport */
-    overflow-y: auto;        /* enable scrolling */
-  }
+/* BMI card + spinner */
+.bmi-spinner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
 
-  /* smoother scrolling */
-  .profile-card::-webkit-scrollbar {
-    width: 6px;
-  }
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0,0,0,0.1);
+  border-top-color: #01280d;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 10px 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  .profile-card::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .profile-card h2 {
-    font-size: 18px;
-  }
-
-  .profile-card p {
-    font-size: 13px;
-  }
-
-  .primary-btn {
-    font-size: 14px;
-    padding: 10px;
-  }
+/* Responsive */
+@media(max-width: 900px) {
+  .profile-card { width: 90%; padding: 22px 18px; max-height: 85vh; }
+  .form-row { flex-direction: column; gap: 10px; }
 }

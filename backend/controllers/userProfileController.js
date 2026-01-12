@@ -1,6 +1,7 @@
 const UserProfile = require("../models/UserProfile");
+const { calculateBMI, getBMICategory } = require("../utils/bmi");
 
-//  Create profile (only if it does not exist)
+// Create profile
 exports.createProfile = async (req, res) => {
   try {
     const {
@@ -17,18 +18,19 @@ exports.createProfile = async (req, res) => {
       culturalDietaryPatterns
     } = req.body;
 
-    // Validate required fields
     if (!user_id || !age || !gender || !weight || !height) {
       return res.status(400).json({ message: "user_id, age, gender, weight, and height are required" });
     }
 
-    // Check if profile already exists
     const existingProfile = await UserProfile.findOne({ user_id });
     if (existingProfile) {
       return res.status(400).json({ message: "Profile already exists for this user", profile: existingProfile });
     }
 
-    // Create new profile
+    // Calculate BMI and category
+    const bmi = calculateBMI(weight, height);
+    const bmiCategory = getBMICategory(bmi);
+
     const profile = new UserProfile({
       user_id,
       age,
@@ -40,7 +42,9 @@ exports.createProfile = async (req, res) => {
       dietaryRestrictions: dietaryRestrictions || [],
       healthConditions: healthConditions || [],
       preferences: preferences || [],
-      culturalDietaryPatterns: culturalDietaryPatterns || []
+      culturalDietaryPatterns: culturalDietaryPatterns || [],
+      bmi,
+      bmiCategory
     });
 
     await profile.save();
@@ -53,23 +57,32 @@ exports.createProfile = async (req, res) => {
   }
 };
 
-// Update profile by user_id
+// Update profile
 exports.updateProfile = async (req, res) => {
   try {
     const { user_id } = req.params;
     const updateData = req.body;
 
-    const profile = await UserProfile.findOneAndUpdate(
+    // If weight or height provided, recalc BMI
+    if (updateData.weight || updateData.height) {
+      const profile = await UserProfile.findOne({ user_id });
+      const weight = updateData.weight || profile.weight;
+      const height = updateData.height || profile.height;
+      updateData.bmi = calculateBMI(weight, height);
+      updateData.bmiCategory = getBMICategory(updateData.bmi);
+    }
+
+    const updatedProfile = await UserProfile.findOneAndUpdate(
       { user_id },
       updateData,
-      { new: true, runValidators: true } // returns updated 
+      { new: true, runValidators: true }
     );
 
-    if (!profile) {
+    if (!updatedProfile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
-    res.status(200).json({ message: "Profile updated successfully", profile });
+    res.status(200).json({ message: "Profile updated successfully", profile: updatedProfile });
 
   } catch (err) {
     console.error(err);
