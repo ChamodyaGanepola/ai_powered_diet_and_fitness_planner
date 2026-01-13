@@ -1,16 +1,17 @@
-import { useState } from "react";
+//import { useState } from "react";
 import MealSection from "./MealSection";
-import { FaPlus } from "react-icons/fa";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./MealPlanCard.css";
+//import { FaPlus } from "react-icons/fa";
+//import DatePicker from "react-datepicker";
+
 
 export default function MealPlanCard({ plan, index }) {
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  //const [showDatePicker, setShowDatePicker] = useState(false);
+  //const [selectedDate, setSelectedDate] = useState(null);
 
-  const handleAddClick = () => setShowDatePicker(!showDatePicker);
-
+  //const handleAddClick = () => setShowDatePicker(!showDatePicker);
+/*
   const handleAddPlan = () => {
     if (selectedDate) {
       alert(`New plan added for ${selectedDate.toLocaleDateString()}`);
@@ -18,9 +19,9 @@ export default function MealPlanCard({ plan, index }) {
       setShowDatePicker(false);
     }
   };
-
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+*/
+  //const tomorrow = new Date();
+  //tomorrow.setDate(tomorrow.getDate() + 1);
 
   return (
     <div className="mealplan-card">
@@ -30,7 +31,7 @@ export default function MealPlanCard({ plan, index }) {
           <span>{plan.totalCalories} kcal</span>
           <span>{plan.totalProtein}g protein</span>
         </div>
-        <FaPlus
+ {/*       <FaPlus
           className="add-icon"
           onClick={handleAddClick}
           title="Add new meal plan"
@@ -50,6 +51,8 @@ export default function MealPlanCard({ plan, index }) {
           </button>
         </div>
       )}
+        */}
+         </div>
 
       <div className="meals-grid">
         {plan.meals.map((meal) => (
@@ -57,5 +60,6 @@ export default function MealPlanCard({ plan, index }) {
         ))}
       </div>
     </div>
+   
   );
 }

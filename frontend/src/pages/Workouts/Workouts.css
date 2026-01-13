@@ -1,0 +1,47 @@
+.workouts-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #1e3a8a;
+}
+
+.plan-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.plan-summary span {
+  margin-left: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.workouts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .workouts-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}

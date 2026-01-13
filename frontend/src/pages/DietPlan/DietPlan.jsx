@@ -1,91 +1,76 @@
-import MealPlanCard from "../../component/MealPlanCard.jsx";
-import "./DietPlan.css";
+import { useState, useEffect } from "react";
 import Header from "../../component/Header.jsx";
 import Footer from "../../component/Footer.jsx";
+import MealPlanCard from "../../component/MealPlanCard.jsx";
 import { useAuth } from "../../context/authContext.jsx";
-const mockMealPlans = [
-  {
-    _id: "1",
-    startDate: "2026-01-01",
-    totalCalories: 2100,
-    totalProtein: 120,
-    meals: [
-      {
-        mealType: "Breakfast",
-        items: [
-          { name: "Smoked salmon", calories: 140, protein: 16, fat: 5 },
-          { name: "Whole wheat toast", calories: 120, protein: 6, fat: 2 }
-        ]
-      },
-      {
-        mealType: "Lunch",
-        items: [
-          { name: "Grilled chicken", calories: 300, protein: 35, fat: 6 }
-        ]
-      },
-      {
-        mealType: "Snack",
-        items: [
-          { name: "Greek yogurt", calories: 150, protein: 15, fat: 4 }
-        ]
-      },
-      {
-        mealType: "Dinner",
-        items: [
-          { name: "Salmon & veggies", calories: 400, protein: 30, fat: 12 }
-        ]
-      }
-    ]
-  },
-  {
-    _id: "2",
-    startDate: "2026-01-02",
-    totalCalories: 2100,
-    totalProtein: 120,
-    meals: [
-      {
-        mealType: "Breakfast",
-        items: [
-          { name: "Smoked salmon", calories: 140, protein: 16, fat: 5 },
-          { name: "Whole wheat toast", calories: 120, protein: 6, fat: 2 }
-        ]
-      },
-      {
-        mealType: "Lunch",
-        items: [
-          { name: "Grilled chicken", calories: 300, protein: 35, fat: 6 }
-        ]
-      },
-      {
-        mealType: "Snack",
-        items: [
-          { name: "Greek yogurt", calories: 150, protein: 15, fat: 4 }
-        ]
-      },
-      {
-        mealType: "Dinner",
-        items: [
-          { name: "Salmon & veggies", calories: 400, protein: 30, fat: 12 }
-        ]
-      }
-    ]
-  }
-];
-
+import { getLatestMealPlan } from "../../api/mealPlanApi.js";
+import "./DietPlan.css";
 
 export default function DietPlan() {
-  const { user} = useAuth();
+  const { user } = useAuth();
+  const [mealPlans, setMealPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchMealPlans();
+  }, []);
+
+  const fetchMealPlans = async () => {
+    setLoading(true);
+    try {
+      const res = await getLatestMealPlan(user.id);
+      if (res.success && res.mealPlan?.length) {
+        // Transform backend meal plan into the shape MealPlanCard expects
+        const transformedPlan = {
+          meals: res.mealPlan.map((m) => ({
+            mealType: m.mealType,
+            items: (m.foods || []).map((f) => ({
+              name: f.name,
+              calories: f.calories,
+              protein: f.protein,
+              fat: f.fat,
+            })),
+          })),
+        };
+
+        // Compute total calories and protein
+        transformedPlan.totalCalories = transformedPlan.meals.reduce(
+          (sum, meal) =>
+            sum + meal.items.reduce((acc, f) => acc + (f.calories || 0), 0),
+          0
+        );
+        transformedPlan.totalProtein = transformedPlan.meals.reduce(
+          (sum, meal) =>
+            sum + meal.items.reduce((acc, f) => acc + (f.protein || 0), 0),
+          0
+        );
+
+        setMealPlans([transformedPlan]); // Wrap in array for MealPlanCard mapping
+      }
+    } catch (err) {
+      console.error("Error fetching meal plans:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
-    <Header />
-    <div className="diet-page">
-      <h1>{user.username} Welcome to Your Diet Plans</h1>
-        {mockMealPlans.map((plan, index) => (
-          // Pass index to MealPlanCard
-          <MealPlanCard key={plan._id} plan={plan} index={index} />
-      ))}
-    </div>
-    <Footer />
+      <Header />
+      <div className="diet-page">
+        <h1>{user.username}, welcome to your Diet Plans</h1>
+
+        {loading ? (
+          <p>Loading meal plans...</p>
+        ) : mealPlans.length === 0 ? (
+          <p>No meal plans available.</p>
+        ) : (
+          mealPlans.map((plan, index) => (
+            <MealPlanCard key={index} plan={plan} index={index} />
+          ))
+        )}
+      </div>
+      <Footer />
     </>
   );
 }
