@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import Workouts from "./pages/Workouts/Workouts.jsx";
 import ForgotPassword from "./component/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
+import "./App.css";
+import DailyProgress from "./pages/DailyProgress/DailyProgress.jsx";
 import { useAuth } from "./context/authContext.jsx";
 
 
@@ -51,6 +53,10 @@ function App() {
       <Route
         path="/workouts"
         element={user ? <Workouts /> : <Navigate to="/" replace />}
+      />
+       <Route
+        path="/dailyprogress"
+        element={user ? <DailyProgress /> : <Navigate to="/" replace />}
       />
       <Route
         path="/progress"

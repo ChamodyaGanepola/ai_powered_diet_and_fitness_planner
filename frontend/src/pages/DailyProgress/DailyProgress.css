@@ -1,0 +1,118 @@
+/* Make the container take full viewport height and use flex */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full height */
+}
+
+/* Make progress page expand to fill space */
+.progress-page {
+  flex: 1; /* takes remaining space between header and footer */
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
+}
+
+h2 {
+  text-align: center;
+  color: #1e3a8a;
+}
+
+.date-picker {
+  display: block;
+  margin: 0 auto 20px auto;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.meal-card, .workout-card {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  color: #000;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.workout-card {
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+}
+
+h3 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+h4 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.meal-item, .workout-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.meal-name, .workout-name, .meal-calories, .workout-sets, .workout-reps, .workout-calories {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.meal-total {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.submit-day {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 25px;
+  background: #16a34a;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.submit-day:hover {
+  background: #15803d;
+}
+
+.done {
+  text-align: center;
+  font-weight: bold;
+  color: #059669;
+  font-size: 18px;
+}
+
+/* ----- MOBILE ----- */
+@media (max-width: 768px) {
+  .meal-item, .workout-card {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .meal-card, .workout-card {
+    padding: 10px;
+  }
+
+  .submit-day {
+    width: 90%;
+  }
+}

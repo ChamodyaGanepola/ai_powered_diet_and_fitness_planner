@@ -106,7 +106,7 @@ const Header = () => {
           <span onClick={() => navigate("/dashboard")}>Dashboard</span>
           <span onClick={() => navigate("/dietplan")}>Diet Plan</span>
           <span onClick={() => navigate("/workouts")}>Workouts</span>
-          <span onClick={() => navigate("/progress")}>Progress</span>
+          <span onClick={() => navigate("/dailyprogress")}>Progress</span>
 
           <div className="icon-group">
             {/* Notifications */}
@@ -166,7 +166,7 @@ const Header = () => {
         <span onClick={() => { navigate("/dashboard"); setOpen(false); }}>Dashboard</span>
         <span onClick={() => { navigate("/dietplan"); setOpen(false); }}>Diet Plan</span>
         <span onClick={() => { navigate("/workouts"); setOpen(false); }}>Workouts</span>
-        <span onClick={() => { navigate("/progress"); setOpen(false); }}>Progress</span>
+        <span onClick={() => { navigate("/dailyprogress"); setOpen(false); }}>Progress</span>
         {/* Trigger Mobile Notifications */}
         <span onClick={() => { setNotifOpen(true); setOpen(false); }}>Notifications</span>
         <span onClick={() => { navigate("/profile"); setOpen(false); }}>Profile</span>

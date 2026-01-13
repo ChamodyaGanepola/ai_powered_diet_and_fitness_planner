@@ -149,3 +149,27 @@ Format:
     });
   }
 };
+
+
+// Fetch latest AI meal plan for a user
+export const getLatestMealPlan = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) return res.status(400).json({ message: "user_id is required" });
+
+    const mealPlan = await MealPlan.findOne({ user_id }).sort({ createdAt: -1 });
+    if (!mealPlan) return res.json({ success: false, message: "No meal plan found", meals: [] });
+
+    const meals = await Meal.find({ mealplan_id: mealPlan._id });
+    const mealWithItems = [];
+    for (const m of meals) {
+      const foods = await FoodItem.find({ meal_id: m._id });
+      mealWithItems.push({ ...m.toObject(), foods });
+    }
+
+    res.json({ success: true, mealPlan: mealWithItems });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch meal plan", error: err.message });
+  }
+};

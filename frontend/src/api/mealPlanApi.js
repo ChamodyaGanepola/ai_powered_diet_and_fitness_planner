@@ -24,3 +24,9 @@ export const createMealPlan = async (userProfile) => {
     throw err;
   }
 };
+export const getLatestMealPlan = async (userId) => {
+  const res = await axios.get(`${API_URL}/latest`, {
+    params: { user_id: userId },
+  });
+  return res.data;
+}

@@ -24,3 +24,11 @@ export const createWorkoutPlan = async (userProfile) => {
     throw err;
   }
 };
+
+// ---------------- GET LATEST workout plan ----------------
+export const getLatestWorkoutPlan = async (userId) => {
+  const res = await axios.get(`${API_URL}/latest`, {
+    params: { user_id: userId },
+  });
+  return res.data;
+};

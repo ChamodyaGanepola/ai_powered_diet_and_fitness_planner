@@ -164,3 +164,22 @@ Format:
     });
   }
 };
+
+
+// Fetch latest AI workout plan for a user
+export const getLatestWorkoutPlan = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) return res.status(400).json({ message: "user_id is required" });
+
+    const workoutPlan = await WorkoutPlan.findOne({ user_id }).sort({ createdAt: -1 });
+    if (!workoutPlan) return res.json({ success: false, message: "No workout plan found", exercises: [] });
+
+    const exercises = await Exercise.find({ workoutplan_id: workoutPlan._id });
+
+    res.json({ success: true, workoutPlan: exercises });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch workout plan", error: err.message });
+  }
+};
