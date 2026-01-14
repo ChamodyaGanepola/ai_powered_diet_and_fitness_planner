@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 const workoutPlanSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "UserProfile", required: true },
+    userProfile_id: {   
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "UserProfile",
+          required: true,
+        },
     fitnessGoal: {
       type: String,
       enum: ["Weight Loss", "Muscle Gain", "Maintain Fitness", "Improve Endurance"],
@@ -15,6 +20,11 @@ const workoutPlanSchema = new mongoose.Schema(
     },
     totalCaloriesBurned: { type: Number, default: 0 },
     duration: { type: Number, default: 0 }, // total minutes
+    status: {
+      type: String,
+      enum: ["active", "completed", "account-updated", "account-deleted", "not-suitable"],
+      default: "active"
+    }
   },
   { timestamps: true }
 );

@@ -30,6 +30,8 @@ export default function MealPlanCard({ plan, index }) {
         <div className="macros">
           <span>{plan.totalCalories} kcal</span>
           <span>{plan.totalProtein}g protein</span>
+          <span>{plan.totalFat}g fat </span>
+          <span>{plan.totalCarbs}g Carbs </span>
         </div>
  {/*       <FaPlus
           className="add-icon"

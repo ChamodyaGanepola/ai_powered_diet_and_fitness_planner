@@ -16,43 +16,41 @@ export default function DietPlan() {
   }, []);
 
   const fetchMealPlans = async () => {
-    setLoading(true);
-    try {
-      const res = await getLatestMealPlan(user.id);
-      if (res.success && res.mealPlan?.length) {
-        // Transform backend meal plan into the shape MealPlanCard expects
-        const transformedPlan = {
-          meals: res.mealPlan.map((m) => ({
-            mealType: m.mealType,
-            items: (m.foods || []).map((f) => ({
-              name: f.name,
-              calories: f.calories,
-              protein: f.protein,
-              fat: f.fat,
-            })),
+  setLoading(true);
+  try {
+    const res = await getLatestMealPlan(user.id);
+    console.log(res.mealPlan); // This is an object
+
+    if (res.success && res.mealPlan) {
+      const plan = res.mealPlan;
+
+      // Transform backend meal plan into the shape MealPlanCard expects
+      const transformedPlan = {
+        meals: (plan.meals || []).map((m) => ({
+          mealType: m.mealType,
+          items: (m.foods || []).map((f) => ({
+            name: f.name,
+            calories: f.calories,
+            protein: f.protein,
+            fat: f.fat,
           })),
-        };
+        })),
+        totalCalories: plan.totalCalories,
+        totalProtein: plan.totalProtein,
+        totalCarbs: plan.totalCarbs,
+        totalFat: plan.totalFat,
+      };
 
-        // Compute total calories and protein
-        transformedPlan.totalCalories = transformedPlan.meals.reduce(
-          (sum, meal) =>
-            sum + meal.items.reduce((acc, f) => acc + (f.calories || 0), 0),
-          0
-        );
-        transformedPlan.totalProtein = transformedPlan.meals.reduce(
-          (sum, meal) =>
-            sum + meal.items.reduce((acc, f) => acc + (f.protein || 0), 0),
-          0
-        );
+      console.log("Transformed Meal Plan:", transformedPlan);
 
-        setMealPlans([transformedPlan]); // Wrap in array for MealPlanCard mapping
-      }
-    } catch (err) {
-      console.error("Error fetching meal plans:", err);
-    } finally {
-      setLoading(false);
+      setMealPlans([transformedPlan]); // wrap in array for mapping
     }
-  };
+  } catch (err) {
+    console.error("Error fetching meal plans:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>

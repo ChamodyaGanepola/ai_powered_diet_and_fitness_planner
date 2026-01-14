@@ -7,6 +7,11 @@ const mealPlanSchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
+    userProfile_id: {   
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserProfile",
+      required: true,
+    },
 
     startDate: {
       type: Date,
@@ -44,7 +49,7 @@ const mealPlanSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["active", "completed"],
+      enum: ["active", "completed", "account-updated", "account-deleted", "not-suitable"],
       default: "active"
     }
   },

@@ -38,10 +38,13 @@ export const createWorkoutPlan = async (req, res) => {
     }
 
     // 1️⃣ Get user profile
-    const userProfile = await UserProfile.findOne({ user_id });
-    if (!userProfile) {
-      return res.status(404).json({ message: "User profile not found" });
-    }
+   const userProfile = await UserProfile.findOne({ user_id, status: "active" });
+     if (!userProfile) {
+       return res.status(404).json({
+         success: false,
+         message: "Active User profile not found",
+       });
+     }
 
     const {
       age,
@@ -122,8 +125,10 @@ Format:
     // 5️⃣ Create Workout Plan
     const workoutPlan = await WorkoutPlan.create({
       user_id,
+      userProfile_id: userProfile._id,
       fitnessGoal,
       difficulty: mapActivityLevelToDifficulty(activityLevel),
+      status: "active",
     });
 
     let totalCalories = 0;
@@ -172,7 +177,7 @@ export const getLatestWorkoutPlan = async (req, res) => {
     const { user_id } = req.query;
     if (!user_id) return res.status(400).json({ message: "user_id is required" });
 
-    const workoutPlan = await WorkoutPlan.findOne({ user_id }).sort({ createdAt: -1 });
+    const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active", }).sort({ createdAt: -1 });
     if (!workoutPlan) return res.json({ success: false, message: "No workout plan found", exercises: [] });
 
     const exercises = await Exercise.find({ workoutplan_id: workoutPlan._id });

@@ -13,8 +13,14 @@ const userProfileSchema = new mongoose.Schema({
   preferences: { type: [String], default: [] },
   culturalDietaryPatterns: { type: [String], default: [] },
 
-  bmi: { type: Number }, // new
-  bmiCategory: { type: String } // new
+  bmi: { type: Number },
+  bmiCategory: { type: String }, 
+  
+  status: {
+      type: String,
+      enum: ["active", "updated"],
+      default: "active"
+    }
 }, { timestamps: true });
 
 const UserProfile = mongoose.model("UserProfile", userProfileSchema);
