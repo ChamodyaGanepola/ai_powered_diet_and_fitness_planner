@@ -72,7 +72,7 @@ export default function Workout() {
             return (
               <div key={plan._id || pIdx} className="plan-card">
                 <div className="plan-header">
-                  <h2>Workout Plan #{pIdx + 1}</h2>
+                  <h2>Workout Plan </h2>
                   <div className="plan-summary">
                     <span>Total Duration: {totalDuration} min</span>
                     <span>Total Calories: {totalCalories} kcal</span>

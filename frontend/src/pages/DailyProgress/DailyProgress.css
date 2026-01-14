@@ -1,88 +1,150 @@
-/* Make the container take full viewport height and use flex */
+/* ===== Container & Layout ===== */
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* full height */
+  min-height: 100vh;
+  background: #f3f4f6;
 }
 
-/* Make progress page expand to fill space */
 .progress-page {
-  flex: 1; /* takes remaining space between header and footer */
+  flex: 1;
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
   font-family: "Segoe UI", sans-serif;
-  color: #333;
+  color: #1f2937;
 }
 
 h2 {
   text-align: center;
   color: #1e3a8a;
+  margin-bottom: 20px;
 }
 
 .date-picker {
   display: block;
-  margin: 0 auto 20px auto;
-  padding: 10px;
+  margin: 0 auto 25px auto;
+  padding: 10px 15px;
   font-size: 16px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  transition: border 0.2s;
 }
 
+.date-picker:focus {
+  border-color: #3b82f6;
+}
+
+/* ===== Macro Summary ===== */
+.macro-summary {
+  background: #e0f2fe;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  text-align: center;
+  font-weight: 600;
+  color: #1e40af;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.macro-summary p {
+  margin: 4px 0;
+}
+
+/* ===== Meals & Workouts Sections ===== */
 .section {
   margin-bottom: 30px;
 }
 
 .meal-card, .workout-card {
-  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-  padding: 15px;
+  padding: 15px 20px;
   border-radius: 12px;
   margin-bottom: 15px;
-  color: #000;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  color: #111827;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.meal-card:hover, .workout-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.meal-card {
+  background: linear-gradient(135deg, #fef3c7, #fcd34d);
 }
 
 .workout-card {
-  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
 }
 
 h3 {
-  color: #333;
-  margin-bottom: 10px;
+  color: #1f2937;
+  margin-bottom: 12px;
 }
 
 h4 {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
-.meal-item, .workout-card {
+/* ===== Meal Items ===== */
+.meal-item, .workout-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
-.meal-name, .workout-name, .meal-calories, .workout-sets, .workout-reps, .workout-calories {
-  padding: 6px 8px;
+.meal-item input[type="radio"] {
+  accent-color: #16a34a;
+  cursor: pointer;
+}
+
+.meal-item input[type="text"],
+.meal-item input[type="number"],
+.workout-item input[type="text"],
+.workout-item input[type="number"] {
+  padding: 6px 10px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #cbd5e1;
+  width: 90px;
   font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
 }
 
+.meal-item input:disabled {
+  background-color: #f1f5f9;
+}
+
+.meal-item input:focus {
+  border-color: #3b82f6;
+}
+
+.selected-food {
+  font-weight: bold;
+  color: #065f46;
+  text-decoration: underline;
+}
+
+/* ===== Meal Total ===== */
 .meal-total {
   font-weight: bold;
-  margin-top: 8px;
+  margin-top: 10px;
+  color: #1f2937;
 }
 
+/* ===== Submit Button ===== */
 .submit-day {
   display: block;
-  margin: 20px auto;
-  padding: 12px 25px;
+  margin: 25px auto;
+  padding: 14px 28px;
   background: #16a34a;
   color: #fff;
-  font-weight: bold;
+  font-weight: 600;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -94,22 +156,24 @@ h4 {
   background: #15803d;
 }
 
+/* ===== Completed Notice ===== */
 .done {
   text-align: center;
   font-weight: bold;
   color: #059669;
   font-size: 18px;
+  margin-top: 15px;
 }
 
-/* ----- MOBILE ----- */
+/* ===== Mobile Styles ===== */
 @media (max-width: 768px) {
-  .meal-item, .workout-card {
+  .meal-item, .workout-item {
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
   }
 
   .meal-card, .workout-card {
-    padding: 10px;
+    padding: 12px 15px;
   }
 
   .submit-day {

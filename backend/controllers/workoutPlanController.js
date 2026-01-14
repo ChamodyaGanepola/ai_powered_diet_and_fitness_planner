@@ -3,19 +3,32 @@ import Exercise from "../models/Exercise.js";
 import UserProfile from "../models/UserProfile.js";
 import { generateWorkoutPlan } from "../services/openRouterWorkoutService.js";
 
-/**
- * Clean AI JSON response:
- * - Wrap reps ranges (e.g., 8-12) in quotes
- * - Replace NaN with 0
- */
+// Clean AI response safely
 const cleanAIResponse = (str) => {
   if (!str) return "{}";
-  str = str.replace(/(\breps\b\s*:\s*)(\d+\s*-\s*\d+)/g, '$1"$2"'); // wrap reps
-  str = str.replace(/\bNaN\b/g, "0"); // replace NaN with 0
+
+  // Remove ```json or ``` wrappers
+  str = str.trim()
+    .replace(/^```json\s*/, "")
+    .replace(/^```/, "")
+    .replace(/```$/, "");
+
+  // Wrap reps ranges in quotes: e.g., 8-12 → "8-12"
+  str = str.replace(/(\breps\b\s*:\s*)(\d+\s*-\s*\d+)/g, '$1"$2"');
+
+  // Replace NaN with 0
+  str = str.replace(/\bNaN\b/g, "0");
+
+  // Remove incomplete trailing entries after last closing brace
+  const lastBrace = str.lastIndexOf("}");
+  if (lastBrace > 0) {
+    str = str.slice(0, lastBrace + 1);
+  }
+
   return str;
 };
 
-// Map user activity level to workout difficulty
+// Map activity level to difficulty
 const mapActivityLevelToDifficulty = (activityLevel) => {
   switch (activityLevel) {
     case "Sedentary":
@@ -37,14 +50,11 @@ export const createWorkoutPlan = async (req, res) => {
       return res.status(400).json({ message: "user_id is required" });
     }
 
-    // 1️⃣ Get user profile
-   const userProfile = await UserProfile.findOne({ user_id, status: "active" });
-     if (!userProfile) {
-       return res.status(404).json({
-         success: false,
-         message: "Active User profile not found",
-       });
-     }
+    // Fetch user profile
+    const userProfile = await UserProfile.findOne({ user_id, status: "active" });
+    if (!userProfile) {
+      return res.status(404).json({ success: false, message: "Active User profile not found" });
+    }
 
     const {
       age,
@@ -56,18 +66,13 @@ export const createWorkoutPlan = async (req, res) => {
       preferences = [],
     } = userProfile;
 
-    // 2️⃣ Prepare AI prompt
-    const healthText = healthConditions.length
-      ? `Health Conditions: ${healthConditions.join(", ")}`
-      : "";
+    const healthText = healthConditions.length ? `Health Conditions: ${healthConditions.join(", ")}` : "";
+    const prefText = preferences.length ? `Preferences: ${preferences.join(", ")}` : "";
 
-    const prefText = preferences.length
-      ? `Preferences: ${preferences.join(", ")}`
-      : "";
-
+    // AI prompt
     const prompt = `
-Create a 7-day weekly workout plan in JSON ONLY.
-
+Create a 5-day weekly workout plan in JSON ONLY, each day max 4 exercises.
+Reps must be strings like "8-12". Do not truncate.
 User:
 - Age: ${age}
 - Weight: ${weight}kg
@@ -78,15 +83,13 @@ ${healthText}
 ${prefText}
 
 Rules:
-- Use Push / Pull / Legs split when suitable
+- Use Push / Pull / Legs split
 - Include Rest days
 - Safe for teens
-- Avoid exercises that may worsen user's health conditions
+- Avoid exercises worsening user's health conditions
 - No extreme workouts
-- reps MUST be a STRING like "8-12"
-- NO math expressions
-- NO explanations
-- NO trailing commas
+- reps MUST be string
+- No explanations or trailing commas
 
 Format:
 {
@@ -109,20 +112,27 @@ Format:
 }
 `;
 
-    // 3️⃣ Call AI service
+    // Call AI
     const aiRaw = await generateWorkoutPlan(prompt);
     console.log("AI Workout Response:", aiRaw);
 
-    // 4️⃣ Parse AI JSON safely
+    // Parse safely
     let workoutData;
     try {
       workoutData = JSON.parse(cleanAIResponse(aiRaw));
     } catch (err) {
-      console.error("Invalid AI workout JSON:", err.message);
-      return res.status(500).json({ message: "Invalid AI workout JSON", aiRaw });
+      // Fallback: truncate at last bracket
+      const lastBracket = aiRaw.lastIndexOf("}");
+      const lastArrayBracket = aiRaw.lastIndexOf("]");
+      const cleaned = aiRaw.substring(0, Math.max(lastBracket, lastArrayBracket) + 1);
+      try {
+        workoutData = JSON.parse(cleanAIResponse(cleaned));
+      } catch (err2) {
+        return res.status(500).json({ message: "AI workout JSON invalid", aiRaw });
+      }
     }
 
-    // 5️⃣ Create Workout Plan
+    // Create WorkoutPlan document
     const workoutPlan = await WorkoutPlan.create({
       user_id,
       userProfile_id: userProfile._id,
@@ -134,10 +144,10 @@ Format:
     let totalCalories = 0;
     let totalDuration = 0;
 
-    // 6️⃣ Save exercises for each day
+    // Save exercises per day
     for (const day of workoutData.days || []) {
       const isRest = day.split === "Rest";
-      const duration = isRest ? 0 : 45; // default per day
+      const duration = isRest ? 0 : 45; // default duration per day
       const calories = isRest ? 0 : Math.round(weight * duration * 5);
 
       totalCalories += calories;
@@ -147,10 +157,10 @@ Format:
         await Exercise.create({
           workoutplan_id: workoutPlan._id,
           name: ex.name || "Unknown Exercise",
-          targetMuscle: ex.targetMuscle || "",
-          sets: Math.min(ex.sets || 0, 5),
-          reps: ex.reps || "8-12", // store as string
-          restTime: Math.min(ex.restTime || 60, 120),
+          targetMuscle: ex.targetMuscle || "General",
+          sets: Math.min(Math.max(ex.sets || 3, 1), 5),
+          reps: ex.reps || "8-12",
+          restTime: Math.min(Math.max(ex.restTime || 60, 0), 120),
         });
       }
     }
@@ -162,22 +172,17 @@ Format:
     res.json({ success: true, workoutPlan });
   } catch (err) {
     console.error("Workout Plan Error:", err);
-    res.status(500).json({
-      success: false,
-      message: "Workout plan generation failed",
-      error: err.message,
-    });
+    res.status(500).json({ success: false, message: "Workout plan generation failed", error: err.message });
   }
 };
 
-
-// Fetch latest AI workout plan for a user
+// Fetch latest workout plan
 export const getLatestWorkoutPlan = async (req, res) => {
   try {
     const { user_id } = req.query;
     if (!user_id) return res.status(400).json({ message: "user_id is required" });
 
-    const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active", }).sort({ createdAt: -1 });
+    const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
     if (!workoutPlan) return res.json({ success: false, message: "No workout plan found", exercises: [] });
 
     const exercises = await Exercise.find({ workoutplan_id: workoutPlan._id });
@@ -188,3 +193,4 @@ export const getLatestWorkoutPlan = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch workout plan", error: err.message });
   }
 };
+

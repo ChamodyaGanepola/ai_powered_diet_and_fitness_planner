@@ -5,30 +5,41 @@ import UserProfile from "../models/UserProfile.js"; // Import your profile model
 import { calculateMacros } from "../utils/nutritionCalculator.js";
 import { generateMealPlan } from "../services/openRouterService.js";
 
-// Helper: clean AI JSON (replace NaN or invalid numbers with 0)
-const cleanAIResponse = (str) => str.replace(/\bNaN\b/g, "0");
+
+/**
+ * Clean AI JSON response
+ * - Remove ```json or ``` wrappers
+ * - Replace NaN with 0
+ */
+const cleanAIResponse = (str) => {
+  if (!str) return "{}";
+
+  // Remove ```json or ``` at start/end
+  str = str.trim()
+           .replace(/^```json\s*/, "")
+           .replace(/^```/, "")
+           .replace(/```$/, "");
+
+  // Replace NaN with 0
+  str = str.replace(/\bNaN\b/g, "0");
+
+  return str;
+};
 
 export const createMealPlan = async (req, res) => {
   try {
     const { user_id } = req.body;
 
     if (!user_id) {
-      return res.status(400).json({
-        success: false,
-        message: "user_id is required",
-      });
+      return res.status(400).json({ success: false, message: "user_id is required" });
     }
 
-    // ✅ Fetch user profile from DB
+    // Fetch user profile
     const userProfile = await UserProfile.findOne({ user_id, status: "active" });
     if (!userProfile) {
-      return res.status(404).json({
-        success: false,
-        message: "Active User profile not found",
-      });
+      return res.status(404).json({ success: false, message: "Active User profile not found" });
     }
 
-    // Prepare profile data for macros calculation
     const profileData = {
       user_id,
       age: Number(userProfile.age),
@@ -42,16 +53,43 @@ export const createMealPlan = async (req, res) => {
     };
 
     console.log("Calculating macros for user profile:", profileData);
-
-    // ✅ Calculate macros
     const macros = calculateMacros(profileData);
 
-    // ✅ AI Prompt
+    // AI Prompt
     const prompt = `
-Create a 1-day meal plan.
-Return ONLY valid JSON.
+Create a MEAL PLAN TEMPLATE (not a single-day log).
 
-Targets:
+This meal plan provides MULTIPLE OPTIONS for each meal.
+User will choose ONLY ONE food item per meal per day.
+
+STRICT RULES:
+1. Include EXACTLY these meal types:
+   - Breakfast
+   - Lunch
+   - Dinner
+   - Snack
+
+2. Each meal type MUST have:
+   - Breakfast: 3 options
+   - Lunch: 3 options
+   - Dinner: 3 options
+   - Snack: 2 options
+
+3. Each food item represents ONE COMPLETE MEAL OPTION
+   (not components to be eaten together)
+
+4. All food options within the SAME meal type must be
+   nutritionally similar (±10% calories/macros)
+
+5. Each food item MUST include these fields, all as numbers (no unit text):
+   - name
+   - calories (in kcal)
+   - protein (in g)
+   - fat (in g)
+   - unit (as string, e.g., "serving", "cup")
+
+
+DAILY TARGETS (user chooses options to match these):
 Calories: ${macros.calories}
 Protein: ${macros.protein}g
 Carbs: ${macros.carbs}g
@@ -60,19 +98,20 @@ Fat: ${macros.fat}g
 Dietary Restrictions: ${profileData.dietaryRestrictions.join(", ")}
 Preferences: ${profileData.preferences.join(", ")}
 
-Format:
+Return ONLY valid JSON.
+
+FORMAT:
 {
-  "totalCalories": number,
   "meals": [
     {
-      "mealType": "Breakfast | Lunch | Dinner | Snack",
+      "mealType": "Breakfast",
       "foods": [
         {
-          "name": "",
+          "name": "string",
           "calories": number,
           "protein": number,
           "fat": number,
-          "unit": ""
+          "unit": "string"
         }
       ]
     }
@@ -80,29 +119,35 @@ Format:
 }
 `;
 
-    // ✅ Call AI
+    // Call AI
     const aiResponseRaw = await generateMealPlan(prompt);
     console.log("AI response from OpenRouter:", aiResponseRaw);
 
-    // ✅ Parse AI response safely
+    // Parse AI response safely
     let mealPlanData;
     try {
       mealPlanData = JSON.parse(cleanAIResponse(aiResponseRaw));
     } catch (err) {
-      console.error("AI returned invalid JSON:", aiResponseRaw);
-      return res.status(500).json({
-        success: false,
-        message: "Meal plan generation failed due to invalid AI response",
-        aiResponse: aiResponseRaw,
-      });
+      // Fallback: replace single quotes with double quotes
+      try {
+        const sanitized = cleanAIResponse(aiResponseRaw).replace(/'/g, '"');
+        mealPlanData = JSON.parse(sanitized);
+      } catch (err2) {
+        console.error("AI returned invalid JSON:", aiResponseRaw);
+        return res.status(500).json({
+          success: false,
+          message: "Meal plan generation failed due to invalid AI response",
+          aiResponse: aiResponseRaw,
+        });
+      }
     }
 
-    // ✅ Ensure totalCalories is a number
+    // Ensure totalCalories is a number
     if (!mealPlanData.totalCalories || isNaN(mealPlanData.totalCalories)) {
       mealPlanData.totalCalories = macros.calories;
     }
 
-    // ✅ Save MealPlan document
+    // Save MealPlan document
     const newMealPlan = await MealPlan.create({
       user_id,
       userProfile_id: userProfile._id,
@@ -115,7 +160,7 @@ Format:
       status: "active",
     });
 
-    // ✅ Save Meals and FoodItems
+    // Save Meals and FoodItems
     for (const meal of mealPlanData.meals || []) {
       const newMeal = await Meal.create({
         mealplan_id: newMealPlan._id,
