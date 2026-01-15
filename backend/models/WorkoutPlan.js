@@ -24,7 +24,16 @@ const workoutPlanSchema = new mongoose.Schema(
       type: String,
       enum: ["active", "completed", "account-updated", "account-deleted", "not-suitable"],
       default: "active"
-    }
+    },
+     startDate: {
+      type: Date,
+      required: true
+    },
+
+    endDate: {
+      type: Date,
+      required: true
+    },
   },
   { timestamps: true }
 );

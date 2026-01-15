@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const exerciseSchema = new mongoose.Schema(
   {
     workoutplan_id: { type: mongoose.Schema.Types.ObjectId, ref: "WorkoutPlan", required: true },
+    day: { type: String, required: true }, // Monday, Tuesday, etc.
     name: { type: String, required: true },
     targetMuscle: { type: String },
     sets: { type: Number, default: 3 },

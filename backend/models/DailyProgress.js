@@ -7,9 +7,18 @@ const dailyProgressSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    
-    mealplan_id: { type: mongoose.Schema.Types.ObjectId, ref: "MealPlan", required: true },
-    workoutplan_id: { type: mongoose.Schema.Types.ObjectId, ref: "WorkoutPlan", required: false },
+
+    mealplan_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MealPlan",
+      required: true,
+    },
+
+    workoutplan_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "WorkoutPlan",
+      required: false,
+    },
 
     date: {
       type: Date,
@@ -32,7 +41,7 @@ const dailyProgressSchema = new mongoose.Schema(
       hips: { type: Number, required: true },
     },
 
-    // ---- MEALS ----
+    /* Meals consumed */
     meals: {
       type: [
         {
@@ -59,16 +68,17 @@ const dailyProgressSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ---- WORKOUTS ----
+    /* Workouts done */
     workouts: {
       type: [
         {
+          day: { type: String, required: true }, // Monday, Tuesday, etc.
           name: { type: String, required: true },
           targetMuscle: { type: String, required: true },
           sets: { type: Number, required: true },
           reps: { type: String, required: true },
+          restTime: { type: Number, required: true },
           caloriesBurned: { type: Number, required: true },
-          duration: { type: Number, required: true },
         },
       ],
       required: true,
@@ -84,10 +94,14 @@ const dailyProgressSchema = new mongoose.Schema(
       required: true,
     },
 
-    completed: {
-      type: Boolean,
-      required: true,
-    },
+    /* Adherence metrics */
+    mealAdherenceScore: { type: Number, min: 0, max: 100, required: true },
+    workoutAdherenceScore: { type: Number, min: 0, max: 100, required: true },
+
+    deviatedMealPlan: { type: Boolean, required: true },
+    deviatedWorkoutPlan: { type: Boolean, required: true },
+
+    completed: { type: Boolean, required: true },
   },
   { timestamps: true }
 );

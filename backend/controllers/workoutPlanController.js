@@ -194,3 +194,28 @@ export const getLatestWorkoutPlan = async (req, res) => {
   }
 };
 
+
+
+// Get exercises for a user on a specific date
+export const getExercisesByDate = async (req, res) => {
+  try {
+    const { userId, date } = req.query;
+    if (!userId || !date) return res.status(400).json({ message: "User ID and date are required" });
+
+    // Find active workout plan for user
+    const plan = await WorkoutPlan.findOne({ user_id: userId, status: "active" });
+    if (!plan) return res.status(404).json({ message: "No active workout plan found" });
+
+    const selectedDate = new Date(date);
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayOfWeek = dayNames[selectedDate.getDay()];
+
+    // Fetch exercises for that day
+    const exercises = await Exercise.find({ workoutplan_id: plan._id, day: dayOfWeek });
+
+    res.json({ exercises, dayOfWeek });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch exercises", error: err.message });
+  }
+};

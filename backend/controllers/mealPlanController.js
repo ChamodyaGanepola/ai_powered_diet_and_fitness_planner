@@ -5,6 +5,14 @@ import UserProfile from "../models/UserProfile.js"; // Import your profile model
 import { calculateMacros } from "../utils/nutritionCalculator.js";
 import { generateMealPlan } from "../services/openRouterService.js";
 
+/**
+ * Convert YYYY-MM-DD or Date to UTC midnight
+ * Ensures the date is valid worldwide
+ */
+const toUTCDateOnly = (dateInput) => {
+  const d = new Date(dateInput);
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+};
 
 /**
  * Clean AI JSON response
@@ -56,7 +64,7 @@ export const createMealPlan = async (req, res) => {
     const macros = calculateMacros(profileData);
 
     // AI Prompt
-    const prompt = `
+ const prompt = `
 Create a MEAL PLAN TEMPLATE (not a single-day log).
 
 This meal plan provides MULTIPLE OPTIONS for each meal.
@@ -81,13 +89,15 @@ STRICT RULES:
 4. All food options within the SAME meal type must be
    nutritionally similar (±10% calories/macros)
 
-5. Each food item MUST include these fields, all as numbers (no unit text):
+5. All food items MUST include these fields:
    - name
-   - calories (in kcal)
-   - protein (in g)
-   - fat (in g)
-   - unit (as string, e.g., "serving", "cup")
+   - calories (number, kcal)
+   - protein (number, g)
+   - fat (number, g)
+   - unit (string, e.g., "serving", "cup")
 
+6. Also, suggest the TOTAL NUMBER OF DAYS this meal plan should continue
+   based on user's profile and fitness goals.
 
 DAILY TARGETS (user chooses options to match these):
 Calories: ${macros.calories}
@@ -95,6 +105,13 @@ Protein: ${macros.protein}g
 Carbs: ${macros.carbs}g
 Fat: ${macros.fat}g
 
+User Profile:
+Age: ${profileData.age}
+Gender: ${profileData.gender}
+Weight: ${profileData.weight}kg
+Height: ${profileData.height}cm
+Activity Level: ${profileData.activityLevel}
+Fitness Goal: ${profileData.fitnessGoal}
 Dietary Restrictions: ${profileData.dietaryRestrictions.join(", ")}
 Preferences: ${profileData.preferences.join(", ")}
 
@@ -115,9 +132,15 @@ FORMAT:
         }
       ]
     }
-  ]
+  ],
+  "durationDays": number
 }
 `;
+let durationDays = 7; // default
+if (mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)) {
+  durationDays = Number(mealPlanData.durationDays);
+}
+
 
     // Call AI
     const aiResponseRaw = await generateMealPlan(prompt);
@@ -147,18 +170,22 @@ FORMAT:
       mealPlanData.totalCalories = macros.calories;
     }
 
-    // Save MealPlan document
-    const newMealPlan = await MealPlan.create({
-      user_id,
-      userProfile_id: userProfile._id,
-      startDate: new Date(),
-      endDate: new Date(),
-      totalCalories: mealPlanData.totalCalories,
-      totalProtein: macros.protein,
-      totalCarbs: macros.carbs,
-      totalFat: macros.fat,
-      status: "active",
-    });
+const startDateUTC = toUTCDateOnly(new Date());
+const endDateUTC = new Date(startDateUTC);
+endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1); // inclusive
+
+const newMealPlan = await MealPlan.create({
+  user_id,
+  userProfile_id: userProfile._id,
+  startDate: startDateUTC,
+  endDate: endDateUTC,
+  totalCalories: mealPlanData.totalCalories,
+  totalProtein: macros.protein,
+  totalCarbs: macros.carbs,
+  totalFat: macros.fat,
+  status: "active",
+});
+
 
     // Save Meals and FoodItems
     for (const meal of mealPlanData.meals || []) {

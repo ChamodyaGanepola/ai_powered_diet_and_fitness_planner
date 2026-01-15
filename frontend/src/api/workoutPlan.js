@@ -32,3 +32,16 @@ export const getLatestWorkoutPlan = async (userId) => {
   });
   return res.data;
 };
+// ---------------- GET exercises by date ----------------
+export const getExercisesByDate = async (userId, date) => {
+  try {
+    const res = await axios.get(`${API_URL}/exercises-by-date`, {
+      params: { userId, date },
+      ...getAuthHeader(),
+    });
+    return res.data; // { exercises: [...], dayOfWeek: "Monday" }
+  } catch (err) {
+    console.error("Error fetching exercises by date:", err);
+    throw err;
+  }
+};
