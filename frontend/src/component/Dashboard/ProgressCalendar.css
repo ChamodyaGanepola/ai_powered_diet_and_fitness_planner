@@ -1,28 +1,16 @@
+/* Calendar wrapper & adaptive rows */
 .progress-calendar-wrapper {
   display: grid;
-  gap: 16px; /* gap between months */
+  gap: 16px;
   margin-top: 28px;
 }
 
-/* Adaptive layout */
-.progress-calendar-wrapper.one-month {
-  grid-template-columns: 1fr;
-  justify-items: center;
-}
+.progress-calendar-wrapper.one-month { grid-template-columns: 1fr; justify-items: center; }
+.progress-calendar-wrapper.two-months { grid-template-columns: repeat(2, 1fr); }
+.progress-calendar-wrapper.three-months { grid-template-columns: repeat(3, 1fr); }
+.progress-calendar-wrapper.multi-months { grid-template-columns: repeat(3, 1fr); }
 
-.progress-calendar-wrapper.two-months {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.progress-calendar-wrapper.three-months {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.progress-calendar-wrapper.multi-months {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-/* The calendar months */
+/* Month box */
 .calendar-month {
   background: #f3f4f6;
   border-radius: 12px;
@@ -43,7 +31,7 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px; /* space between day cells */
+  gap: 4px;
 }
 
 .calendar-header {
@@ -55,7 +43,7 @@
 }
 
 .calendar-cell {
-  width: 28px; /* bigger cell */
+  width: 28px;
   height: 28px;
   background: #e5e7eb;
   border-radius: 4px;
@@ -66,50 +54,35 @@
   position: relative;
 }
 
-.calendar-cell.empty {
-  background: transparent;
+/* Empty cells */
+.calendar-cell.empty { background: transparent; }
+
+/* Start / End circle */
+.calendar-cell.start { border: 2px solid #3b82f6; border-radius: 50%; }
+.calendar-cell.end { border: 2px solid #ef4444; border-radius: 50%; }
+
+/* Completed progress */
+.calendar-cell.completed { background: #d1fae5; color: #065f46; }
+
+/* Tick mark */
+.tick { position: absolute; top: -2px; right: -2px; font-size: 10px; color: #16a34a; }
+
+/* Past days before today (from start) */
+.calendar-cell.past:not(.completed):not(.start):not(.end) {
+  background: #fef3c7; /* soft yellow */
+  color: #92400e;
 }
 
-.calendar-cell.start {
-  border: 2px solid #3b82f6;
-  border-radius: 50%;
-}
-
-.calendar-cell.end {
-  border: 2px solid #ef4444;
-  border-radius: 50%;
-}
-
-.calendar-cell.completed {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.tick {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  font-size: 10px;
-  color: #16a34a;
+/* Today */
+.calendar-cell.today:not(.start):not(.end) {
+  background: #bfdbfe; /* light blue */
+  color: #1e40af;
 }
 
 /* Mobile: 1 month per row */
 @media (max-width: 600px) {
-  .progress-calendar-wrapper {
-    grid-template-columns: 1fr !important;
-  }
-
-  .calendar-month {
-    min-width: 100%;
-  }
-
-  .calendar-cell {
-    width: 22px;
-    height: 22px;
-    font-size: 10px;
-  }
-
-  .tick {
-    font-size: 8px;
-  }
+  .progress-calendar-wrapper { grid-template-columns: 1fr !important; }
+  .calendar-month { min-width: 100%; }
+  .calendar-cell { width: 22px; height: 22px; font-size: 10px; }
+  .tick { font-size: 8px; }
 }

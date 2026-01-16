@@ -7,7 +7,9 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  // Convert date to YYYY-MM-DD string in UTC
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0); // UTC today
+
   const toUTCDateStr = (d) => {
     const year = d.getUTCFullYear();
     const month = String(d.getUTCMonth() + 1).padStart(2, "0");
@@ -17,8 +19,7 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
 
   const startStr = toUTCDateStr(start);
   const endStr = toUTCDateStr(end);
-
-  const isSameDay = (d, targetStr) => toUTCDateStr(d) === targetStr;
+  const todayStr = toUTCDateStr(today);
 
   // Generate months between start and end
   const months = [];
@@ -28,7 +29,7 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
     current.setUTCMonth(current.getUTCMonth() + 1);
   }
 
-  // Determine CSS class for adaptive rows
+  // Adaptive layout based on number of months
   const monthCount = months.length;
   let rowClass = "";
   if (monthCount === 1) rowClass = "one-month";
@@ -66,6 +67,10 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
                 const endCircle = dateStr === endStr;
                 const completed = completedDates.includes(dateStr);
 
+                // Past days (from start) and today
+                const isPast = date >= start && date < today;
+                const isToday = dateStr === todayStr;
+
                 return (
                   <div
                     key={dateStr}
@@ -73,6 +78,8 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
                       ${startCircle ? "start" : ""}
                       ${endCircle ? "end" : ""}
                       ${completed ? "completed" : ""}
+                      ${isPast ? "past" : ""}
+                      ${isToday ? "today" : ""}
                     `}
                   >
                     {i + 1}
