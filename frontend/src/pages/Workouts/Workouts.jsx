@@ -1,24 +1,59 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../component/Header.jsx";
 import Footer from "../../component/Footer.jsx";
 import WorkoutCard from "../../component/WorkoutCard.jsx";
 import { useAuth } from "../../context/authContext.jsx";
 import {
   getLatestWorkoutPlan,
-  createWorkoutPlan,
   updateWorkoutPlanStatus,
+  createWorkoutPlan,
 } from "../../api/workoutPlan.js";
+import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./Workouts.css";
 
 export default function Workout() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [profileExists, setProfileExists] = useState(true);
   const [plans, setPlans] = useState([]);
-  const [activeWorkoutPlanId, setActiveWorkoutPlanId] = useState(null);
+  const [activePlanId, setActivePlanId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchWorkoutPlans();
+    checkUserProfile();
   }, []);
+
+  // ✅ Check if user profile exists
+  const checkUserProfile = async () => {
+    try {
+      const res = await getProfileByUserId(user.id);
+      console.log("Profile check response:", res);
+
+      if (!res || !res._id) {
+        setProfileExists(false);
+        setLoading(false);
+
+        // Redirect to home after 3 seconds
+        setTimeout(() => {
+          navigate("/home");
+        }, 3000);
+
+        return;
+      }
+
+      // Profile exists → fetch workout plans
+      setProfileExists(true);
+      fetchWorkoutPlans();
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setProfileExists(false);
+      setLoading(false);
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000);
+    }
+  };
 
   const fetchWorkoutPlans = async () => {
     setLoading(true);
@@ -26,10 +61,11 @@ export default function Workout() {
       const res = await getLatestWorkoutPlan(user.id);
 
       if (res.success && res.workoutPlan?.length) {
-        const grouped = res.workoutPlan.reduce((acc, w) => {
-          const planId = w.workoutplan_id;
+        // Group workouts by workoutplan_id
+        const grouped = res.workoutPlan.reduce((acc, workout) => {
+          const planId = workout.workoutplan_id || "default";
           if (!acc[planId]) acc[planId] = [];
-          acc[planId].push(w);
+          acc[planId].push(workout);
           return acc;
         }, {});
 
@@ -39,47 +75,42 @@ export default function Workout() {
         }));
 
         setPlans(plansArr);
-        setActiveWorkoutPlanId(plansArr[0]._id);
+        setActivePlanId(plansArr[0]?._id || null);
       } else {
         setPlans([]);
-        setActiveWorkoutPlanId(null);
+        setActivePlanId(null);
       }
     } catch (err) {
       console.error("Error fetching workout plans:", err);
       setPlans([]);
-      setActiveWorkoutPlanId(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGenerateWorkoutPlan = async () => {
-    try {
-      setLoading(true);
-      await createWorkoutPlan({ user_id: user.id });
-      await fetchWorkoutPlans();
-    } catch (err) {
-      console.error("Failed to generate workout plan:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // 🔴 Delete active workout plan
   const handleDeleteWorkoutPlan = async () => {
-    if (!activeWorkoutPlanId) return;
+    if (!activePlanId) return;
     const confirmed = window.confirm(
       "Are you sure you want to delete this workout plan?"
     );
     if (!confirmed) return;
 
     try {
-      setLoading(true);
-      await updateWorkoutPlanStatus(activeWorkoutPlanId, "not-suitable");
+      await updateWorkoutPlanStatus(activePlanId, "not-suitable");
       await fetchWorkoutPlans();
     } catch (err) {
       console.error("Failed to delete workout plan:", err);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  // 🟢 Generate workout plan
+  const handleGenerateWorkoutPlan = async () => {
+    try {
+      await createWorkoutPlan({ user_id: user.id });
+      await fetchWorkoutPlans();
+    } catch (err) {
+      console.error("Failed to generate workout plan:", err);
     }
   };
 
@@ -89,14 +120,23 @@ export default function Workout() {
       <div className="workouts-page">
         {loading ? (
           <p className="loading-text">Loading workout plans...</p>
+        ) : !profileExists ? (
+          <div className="centered-card">
+            <h2 className="greeting">
+              Hey {user.username}, first create your profile
+            </h2>
+            <p className="no-plan-text">Redirecting to home...</p>
+          </div>
         ) : plans.length === 0 ? (
-          <div className="no-plan-wrapper">
-            <h1 className="no-plan-greeting">Hey {user.username},</h1>
+          <div className="centered-card">
+            <h2 className="greeting">
+              Hey {user.username}, no active workout plan
+            </h2>
             <p className="no-plan-text">
-              No workout plan for you. You can generate one based on your profile.
+              You can generate a workout plan according to your profile
             </p>
             <button
-              className="add-button"
+              className="generate-btn"
               onClick={handleGenerateWorkoutPlan}
               disabled={loading}
             >
@@ -131,19 +171,19 @@ export default function Workout() {
                       <WorkoutCard key={w._id} workout={w} />
                     ))}
                   </div>
-
-                  <div className="delete-wrapper">
-                    <button
-                      className="delete-button"
-                      onClick={handleDeleteWorkoutPlan}
-                      disabled={loading}
-                    >
-                      Delete Workout Plan
-                    </button>
-                  </div>
                 </div>
               );
             })}
+
+            <div className="delete-wrapper">
+              <button
+                className="delete-button"
+                onClick={handleDeleteWorkoutPlan}
+                disabled={loading}
+              >
+                Delete Workout Plan
+              </button>
+            </div>
           </>
         )}
       </div>

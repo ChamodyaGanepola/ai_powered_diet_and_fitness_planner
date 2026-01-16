@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import "./DailyProgress.css";
 import { useAuth } from "../../context/authContext.jsx";
-import { getExercisesByDate } from "../../api/workoutPlan.js";
-import { getLatestMealPlan } from "../../api/mealPlanApi.js";
+import { getExercisesByDate, createWorkoutPlan } from "../../api/workoutPlan.js";
+import { getLatestMealPlan, createMealPlan } from "../../api/mealPlanApi.js";
 import {
   getDailyProgressByDate,
   createDailyProgress,
@@ -12,10 +12,14 @@ import {
 } from "../../api/dailyProgress.js";
 import Header from "../../component/Header.jsx";
 import Footer from "../../component/Footer.jsx";
+import { getProfileByUserId } from "../../api/userProfileApi.js";
 
 export default function DailyProgress() {
   const { user } = useAuth();
-
+ const [profileExists, setProfileExists] = useState(true);
+  const [mealPlanExists, setMealPlanExists] = useState(false);
+  const [workoutPlanExists, setWorkoutPlanExists] = useState(false);
+  
   const [completedDates, setCompletedDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [date, setDate] = useState(formatDateUTC(new Date()));
@@ -36,6 +40,7 @@ export default function DailyProgress() {
   const [weight, setWeight] = useState("");
   const [bodyFatPercentage, setBodyFatPercentage] = useState("");
   const [measurements, setMeasurements] = useState({ chest: "", waist: "", hips: "" });
+const [plansChecked, setPlansChecked] = useState(false);
 
   // ---------------------------
   function formatDateUTC(d) {
@@ -51,9 +56,38 @@ export default function DailyProgress() {
 
   // ---------------------------
   useEffect(() => {
+    checkProfileAndPlans();
     initDailyProgress();
   }, []);
+const checkProfileAndPlans = async () => {
+    setLoading(true);
+    try {
+      // 1️⃣ Check if user profile exists
+      const profileRes = await getProfileByUserId(user.id);
+      if (!profileRes || !profileRes._id) {
+        setProfileExists(false);
+        setLoading(false);
+        setTimeout(() => {
+          window.location.href = "/home";
+        }, 3000);
+        return; // stop here, show only profile message
+      }
+      setProfileExists(true);
 
+      // 2️⃣ Check active meal and workout plans
+      const mealRes = await getLatestMealPlan(user.id);
+      const workoutRes = await getExercisesByDate(user.id, formatDateUTC(new Date()));
+
+      setMealPlanExists(!!mealRes?.mealPlan?.meals?.length);
+      setWorkoutPlanExists(!!workoutRes?.exercises?.length);
+
+      setPlansChecked(true); // ✅ plans checked, now conditional render
+    } catch (err) {
+      console.error("Error checking profile or plans:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   // When selected date changes → load progress for that date
   useEffect(() => {
     if (planStartDate && planEndDate) {
@@ -254,8 +288,83 @@ const loadDailyProgressForDate = async (dateObj) => {
     }
     return acc;
   }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
+  const handleGenerateMealPlan = async () => {
+    await createMealPlan(user.id);
+    await checkProfileAndPlans(); // refresh
+  };
 
+  const handleGenerateWorkoutPlan = async () => {
+    await createWorkoutPlan(user.id);
+    await checkProfileAndPlans(); // refresh
+  };
+
+  const handleGenerateBothPlans = async () => {
+    await createMealPlan(user.id);
+    await createWorkoutPlan(user.id);
+    await checkProfileAndPlans(); // refresh
+  };
   const dateValid = isDateWithinPlan(date);
+ // ------------------------- RENDER -------------------------
+  if (!profileExists) {
+    return (
+      <div className="app-container">
+        <Header />
+        <div className="progress-page center-message">
+          <h2>Hey {user.username}, first create your profile.</h2>
+          <p>Redirecting to home...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!plansChecked) {
+    return (
+      <div className="app-container">
+        <Header />
+        <div className="progress-page center-message">
+          <p>Loading plans...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!mealPlanExists && !workoutPlanExists) {
+    return (
+      <div className="app-container">
+        <Header />
+        <div className="progress-page center-message">
+          <button onClick={handleGenerateBothPlans}>Generate Meal & Workout Plan</button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!mealPlanExists) {
+    return (
+      <div className="app-container">
+        <Header />
+        <div className="progress-page center-message">
+          <button onClick={handleGenerateMealPlan}>Generate Meal Plan</button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!workoutPlanExists) {
+    return (
+      <div className="app-container">
+        <Header />
+        <div className="progress-page center-message">
+          <button onClick={handleGenerateWorkoutPlan}>Generate Workout Plan</button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
