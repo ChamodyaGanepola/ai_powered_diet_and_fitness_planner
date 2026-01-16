@@ -1,47 +1,69 @@
-import React from "react";
-import { LineChart, Line, BarChart, Bar, XAxis, Tooltip } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import "./ActivityChart.css";
 
-const barData = [
-  { d: "S", v: 5 },
-  { d: "M", v: 6 },
-  { d: "T", v: 7 },
-  { d: "W", v: 8 },
-  { d: "T", v: 9 },
-  { d: "F", v: 7 },
-  { d: "S", v: 6 },
-];
-
-const lineData = [
-  { d: "S", v: 3 },
-  { d: "M", v: 5 },
-  { d: "T", v: 4 },
-  { d: "W", v: 6 },
-  { d: "T", v: 5 },
-  { d: "F", v: 7 },
-  { d: "S", v: 6 },
-];
-
-export default function ActivityChart({ type }) {
-  if (type === "cycling" || type === "gym") {
-    return (
-      <LineChart width={220} height={90} data={lineData}>
-        <Line
-          type="monotone"
-          dataKey="v"
-          stroke="#6366f1"
-          strokeWidth={2.5}
-          dot={false}
-        />
-        <Tooltip content={null} />
-      </LineChart>
-    );
-  }
+export default function ActivityChart({ type, data }) {
+  const chartData = data.map(d => ({
+    date: d.date.slice(5, 10),
+    meal: d.mealAdherenceScore,
+    workout: d.workoutAdherenceScore,
+    weight: d.weight,
+    taken: d.totalCaloriesTaken,
+    burned: d.totalCaloriesBurned,
+  }));
 
   return (
-    <BarChart width={220} height={90} data={barData}>
-      <Bar dataKey="v" radius={[8, 8, 0, 0]} fill="#6366f1" />
-      <XAxis dataKey="d" tick={{ fontSize: 10 }} />
-    </BarChart>
+    <div className="chart-wrapper">
+      <ResponsiveContainer width="100%" height={100}>
+        <LineChart data={chartData}>
+          <XAxis dataKey="date" hide />
+          <Tooltip />
+
+          {type === "meal" && (
+            <Line dataKey="meal" stroke="#22c55e" strokeWidth={2} dot={false} />
+          )}
+
+          {type === "workout" && (
+            <Line
+              dataKey="workout"
+              stroke="#6366f1"
+              strokeWidth={2}
+              dot={false}
+            />
+          )}
+
+          {type === "weight" && (
+            <Line
+              dataKey="weight"
+              stroke="#f59e0b"
+              strokeWidth={2}
+              dot={false}
+            />
+          )}
+
+          {type === "calories" && (
+            <>
+              <Line
+                dataKey="taken"
+                stroke="#ef4444"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                dataKey="burned"
+                stroke="#22c55e"
+                strokeWidth={2}
+                dot={false}
+              />
+            </>
+          )}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

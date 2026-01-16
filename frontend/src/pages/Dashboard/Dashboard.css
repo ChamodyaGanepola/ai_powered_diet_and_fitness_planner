@@ -1,44 +1,57 @@
-body {
-    margin: 0;
-    background: #ffffff;
-    font-family: 'Inter', sans-serif;
-}
-
 .dashboard-root {
-    display: flex;
-    height: 100vh;
-    padding: 20px;
+  padding: 16px;
 }
 
 .dashboard-main {
-    flex: 1;
-    margin-left: 20px;
-    background: #f5f8ff;
-    border-radius: 26px;
-    padding: 28px;
+  background: #f5f8ff;
+  border-radius: 24px;
+  padding: 24px;
 }
 
 .welcome h1 {
-    margin: 0;
-    font-size: 30px;
-    font-weight: 700;
+  font-size: 28px;
+  margin: 0;
 }
 
 .welcome h3 {
-    margin: 0;
-    color: #777;
-    font-weight: 500;
+  margin: 0;
+  color: #6b7280;
 }
 
 .stats {
-    display: flex;
-    gap: 18px;
-    margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 20px;
 }
 
 .activities {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 28px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .stats,
+  .activities {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .dashboard-main {
+    padding: 16px;
+  }
+
+  .stats,
+  .activities {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome h1 {
+    font-size: 22px;
+  }
 }

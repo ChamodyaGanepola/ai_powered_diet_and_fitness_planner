@@ -13,9 +13,16 @@ const getAuthHeader = () => {
 };
 
 export const checkDailyProgressForUser = async (user_id) => {
-  const res = await axios.get(`${API_URL}/checkProgress`, { params: { user_id } });
+  const res = await axios.get(
+    `${API_URL}/checkProgress`,
+    {
+      params: { user_id },
+      ...getAuthHeader(),
+    }
+  );
   return res.data;
 };
+
 export const createDailyProgress = async (
   user_id,
   date,
@@ -79,11 +86,22 @@ export const resetPlanDatesIfNoProgress = async (user_id, selectedStartDate) => 
 };
 
 
-export const getCompletedProgressDates = async (userId, mealplanId, workoutplanId) => {
+export const getCompletedProgressDates = async (
+  userId,
+  mealplanId,
+  workoutplanId
+) => {
   const params = { user_id: userId };
   if (mealplanId) params.mealplan_id = mealplanId;
   if (workoutplanId) params.workoutplan_id = workoutplanId;
 
-  const res = await axios.get(`${API_URL}/completed-dates`, { params });
+  const res = await axios.get(
+    `${API_URL}/completed-dates`,
+    {
+      params,
+      ...getAuthHeader(),
+    }
+  );
+
   return res.data.completedDates || [];
 };
