@@ -1,5 +1,8 @@
 .dashboard-root {
-  padding: 16px;
+  margin: 0 auto;
+  padding: 32px;
+  background: #f4f6fa;
+  min-height: 100vh;
 }
 
 .dashboard-main {

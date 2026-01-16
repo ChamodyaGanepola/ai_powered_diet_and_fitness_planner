@@ -1,8 +1,9 @@
 .workouts-page {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 30px;
-  font-family: "Segoe UI", sans-serif;
+  padding: 32px;
+  background: #f4f6fa;
+  min-height: 100vh;
+ 
 }
 
 h1 {
@@ -38,10 +39,94 @@ h1 {
   gap: 20px;
 }
 
+
+
+/* No plan wrapper - full center */
+.no-plan-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  margin-top: 40px;
+}
+
+.no-plan-greeting {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 16px;
+}
+
+.no-plan-text {
+  font-size: 1.2rem;
+  color: #374151;
+  margin-bottom: 32px;
+  max-width: 600px;
+}
+
+/* Buttons */
+.add-button {
+ background: linear-gradient(135deg,#01280d,#295339);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: linear-gradient(135deg, #01280d, #295339);
+}
+
+/* Delete button wrapper */
+.delete-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.delete-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+}
+
+/* WORKOUT GRID */
+.workouts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
 /* MOBILE */
 @media (max-width: 768px) {
   .workouts-grid {
     grid-template-columns: 1fr;
     gap: 14px;
+  }
+
+  .no-plan-wrapper {
+    padding: 60px 16px;
+  }
+
+  .no-plan-greeting {
+    font-size: 1.6rem;
+  }
+
+  .no-plan-text {
+    font-size: 1rem;
   }
 }

@@ -219,3 +219,41 @@ export const getExercisesByDate = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch exercises", error: err.message });
   }
 };
+
+export const updateWorkoutPlanStatus = async (req, res) => {
+  try {
+    const { workoutPlanId } = req.params;
+    const { status } = req.body;
+
+    if (!["completed", "account-updated", "not-suitable"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Allowed: completed, account-updated, not-suitable",
+      });
+    }
+
+    const workoutPlan = await WorkoutPlan.findById(workoutPlanId);
+    if (!workoutPlan) {
+      return res.status(404).json({ success: false, message: "Workout  plan not found" });
+    }
+
+    workoutPlan.status = status;
+    await workoutPlan.save();
+
+    res.json({
+      success: true,
+      message: `Workout plan status updated to ${status}`,
+      workoutPlan: {
+        id: workoutPlan._id,
+        status: workoutPlan.status,
+      },
+    });
+  } catch (err) {
+    console.error("Update WorkoutPlan Status Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update workout plan status",
+      error: err.message,
+    });
+  }
+};

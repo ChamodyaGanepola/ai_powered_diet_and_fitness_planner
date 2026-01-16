@@ -45,3 +45,17 @@ export const getExercisesByDate = async (userId, date) => {
     throw err;
   }
 };
+
+export const updateWorkoutPlanStatus = async (workoutPlanId, status) => {
+  try {
+    const res = await axios.put(
+      `${API_URL}/status/${workoutPlanId}`,
+      { status },
+      getAuthHeader()
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Update Workout Plan Status Error:", err);
+    throw err;
+  }
+};
