@@ -31,10 +31,10 @@ const foodItemSchema = new mongoose.Schema(
       required: true,
       min: 0
     },
-
-    category: {
-      type: String,
-      trim: true
+    carbohydrates: {
+      type: Number,
+      required: true,
+      min: 0
     },
 
     unit: {

@@ -59,8 +59,7 @@ export default function Progress() {
   const progressPercent = (completedCount / totalMeals) * 100;
 
   return (
-    <>
-      <Header />
+
       <div className="diet-dashboard">
         <div className="dashboard-header">
           <h1>Hello 👋</h1>
@@ -97,7 +96,6 @@ export default function Progress() {
           ))}
         </div>
       </div>
-      <Footer />
-    </>
+  
   );
 }

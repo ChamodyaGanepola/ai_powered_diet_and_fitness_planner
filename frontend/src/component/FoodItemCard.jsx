@@ -8,6 +8,7 @@ export default function FoodItemCard({ item }) {
         <span>{item.calories} kcal</span>
         <span>{item.protein}g P</span>
         <span>{item.fat}g F</span>
+        <span>{item.carbohydrates}g C</span>
       </div>
     </div>
   );

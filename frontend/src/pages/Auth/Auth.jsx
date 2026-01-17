@@ -63,22 +63,28 @@ const Auth = () => {
   };
 
   useEffect(() => setError && setError(""), []);
+useEffect(() => {
+  document.body.classList.add("authPage");
+  return () => document.body.classList.remove("authPage");
+}, []);
 
   return (
     <div className="Auth">
       <div className="a-left">
         <img src={Logo} alt="Logo" className="logoImage" />
         <div className="welcomeText">
-          <span className="helloText">Hello</span>
+          <span className="helloText">Hello </span>
           <span className="pinkChampsText">HealthPilot 👋</span>
           <p className="description">
-            Welcome to HealthPilot – AI guides your health journey. <br />
-            First, create an account or log in to your existing account.
+            Your personal AI-powered health companion.
+            <br />
+            Track workouts, plan meals, and stay consistent on your wellness
+            journey.
+            <br />
+            Sign up to get started or log in to continue.
           </p>
         </div>
-        <div className="copyright">
-          © {new Date().getFullYear()} HealthPilot. All rights reserved.
-        </div>
+      
       </div>
 
       <div className="a-right">

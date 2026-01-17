@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../component/Header.jsx";
-import Footer from "../../component/Footer.jsx";
 import MealPlanCard from "../../component/MealPlanCard.jsx";
 import { useAuth } from "../../context/authContext.jsx";
 import {
@@ -11,15 +9,19 @@ import {
 } from "../../api/mealPlanApi.js";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./DietPlan.css";
+import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
+import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
 
 export default function DietPlan() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [profileExists, setProfileExists] = useState(true);
+  const [userProfileId, setUserProfileId] = useState(null);
   const [mealPlans, setMealPlans] = useState([]);
   const [activeMealPlanId, setActiveMealPlanId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     checkUserProfile();
@@ -27,35 +29,37 @@ export default function DietPlan() {
 
   // ✅ Check if user profile exists
   const checkUserProfile = async () => {
-  try {
-    const res = await getProfileByUserId(user.id);
-    console.log("Profile check response:", res);
+    try {
+      const res = await getProfileByUserId(user.id);
+      console.log("Profile check response:", res);
+      
+      // ✅ Correct check for your API structure
+      if (!res || !res._id) {
+        setUserProfileId(null);
+        setProfileExists(false);
+        setLoading(false);
 
-    // ✅ Correct check for your API structure
-    if (!res || !res._id) {
+        // Auto redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/home");
+        }, 3000);
+
+        return;
+      }
+      setUserProfileId(res._id);
+
+      // Profile exists → fetch meal plans
+      setProfileExists(true);
+      fetchMealPlans();
+    } catch (err) {
+      console.error("Error fetching profile:", err);
       setProfileExists(false);
       setLoading(false);
-
-      // Auto redirect after 3 seconds
       setTimeout(() => {
         navigate("/home");
       }, 3000);
-
-      return;
     }
-
-    // Profile exists → fetch meal plans
-    setProfileExists(true);
-    fetchMealPlans();
-  } catch (err) {
-    console.error("Error fetching profile:", err);
-    setProfileExists(false);
-    setLoading(false);
-    setTimeout(() => {
-      navigate("/home");
-    }, 3000);
-  }
-};
+  };
 
   const fetchMealPlans = async () => {
     setLoading(true);
@@ -74,6 +78,7 @@ export default function DietPlan() {
               calories: f.calories,
               protein: f.protein,
               fat: f.fat,
+              carbohydrates: f.carbohydrates,
             })),
           })),
           totalCalories: plan.totalCalories,
@@ -95,23 +100,32 @@ export default function DietPlan() {
     }
   };
 
-  // 🔴 Delete meal plan
-  const handleDeleteMealPlan = async () => {
+  // Delete meal plan
+
+  const handleDeleteMealPlan = () => {
     if (!activeMealPlanId) return;
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this meal plan?"
-    );
-    if (!confirmed) return;
-
-    try {
-      await updateMealPlanStatus(activeMealPlanId, "not-suitable");
-      await fetchMealPlans();
-    } catch (err) {
-      console.error("Failed to delete meal plan:", err);
-    }
+    setShowFeedback(true);
   };
+  const confirmMealFeedback = async (reason) => {
+  try {
+    await updateMealPlanStatus(activeMealPlanId, "not-suitable");
 
-  // 🟢 Generate meal plan
+    await submitPlanFeedback({
+      user_id: user.id,
+      userProfile_id: userProfileId,
+      planType: "meal",
+      mealPlan_id: activeMealPlanId,
+      reason,
+    });
+
+    fetchMealPlans(); // refresh plans
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+  // Generate meal plan
   const handleGenerateMealPlan = async () => {
     try {
       await createMealPlan(user.id);
@@ -122,8 +136,7 @@ export default function DietPlan() {
   };
 
   return (
-    <>
-      <Header />
+
       <div className="diet-page">
         {loading ? (
           <p className="loading-text">Loading meal plans...</p>
@@ -138,7 +151,8 @@ export default function DietPlan() {
           <div className="empty-state centered-card">
             <h1 className="greeting">Hey {user.username},</h1>
             <p className="no-plan-text">
-              No active meal plan available. You can generate one based on your profile.
+              No active meal plan available. You can generate one based on your
+              profile.
             </p>
             <button
               className="generate-btn"
@@ -165,8 +179,13 @@ export default function DietPlan() {
             </div>
           </>
         )}
+        <PlanFeedbackModal
+          open={showFeedback}
+          onCancel={() => setShowFeedback(false)}
+          onConfirm={confirmMealFeedback}
+          title="Why is this meal plan not suitable?"
+        />
       </div>
-      <Footer />
-    </>
+
   );
 }

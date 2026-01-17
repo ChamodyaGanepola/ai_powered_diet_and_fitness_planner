@@ -11,14 +11,17 @@ import {
 } from "../../api/workoutPlan.js";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./Workouts.css";
-
+import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
+import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
 export default function Workout() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [profileExists, setProfileExists] = useState(true);
+  const [userProfileId, setUserProfileId] = useState(null);
   const [plans, setPlans] = useState([]);
   const [activePlanId, setActivePlanId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     checkUserProfile();
@@ -41,7 +44,7 @@ export default function Workout() {
 
         return;
       }
-
+      setUserProfileId(res._id);
       // Profile exists → fetch workout plans
       setProfileExists(true);
       fetchWorkoutPlans();
@@ -88,23 +91,7 @@ export default function Workout() {
     }
   };
 
-  // 🔴 Delete active workout plan
-  const handleDeleteWorkoutPlan = async () => {
-    if (!activePlanId) return;
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this workout plan?"
-    );
-    if (!confirmed) return;
-
-    try {
-      await updateWorkoutPlanStatus(activePlanId, "not-suitable");
-      await fetchWorkoutPlans();
-    } catch (err) {
-      console.error("Failed to delete workout plan:", err);
-    }
-  };
-
-  // 🟢 Generate workout plan
+  // Generate workout plan
   const handleGenerateWorkoutPlan = async () => {
     try {
       await createWorkoutPlan({ user_id: user.id });
@@ -114,9 +101,30 @@ export default function Workout() {
     }
   };
 
+  const handleDeleteWorkoutPlan = () => {
+    if (!activePlanId) return;
+    setShowFeedback(true);
+  };
+  const confirmWorkoutFeedback = async (reason) => {
+    try {
+      await updateWorkoutPlanStatus(activePlanId, "not-suitable");
+
+      await submitPlanFeedback({
+        user_id: user.id,
+        userProfile_id: userProfileId,
+        planType: "workout",
+        workoutPlan_id: activePlanId,
+        reason,
+      });
+
+      fetchWorkoutPlans();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <>
-      <Header />
+
       <div className="workouts-page">
         {loading ? (
           <p className="loading-text">Loading workout plans...</p>
@@ -149,11 +157,11 @@ export default function Workout() {
               const workouts = plan.workouts || [];
               const totalDuration = workouts.reduce(
                 (sum, w) => sum + (w.duration || 0),
-                0
+                0,
               );
               const totalCalories = workouts.reduce(
                 (sum, w) => sum + (w.caloriesBurned || 0),
-                0
+                0,
               );
 
               return (
@@ -162,7 +170,7 @@ export default function Workout() {
                     <h2>Workout Plan</h2>
                     <div className="plan-summary">
                       <span>Total Duration: {totalDuration} min</span>
-                      <span>Total Calories: {totalCalories} kcal</span>
+                      <span>Total Calories Burned: {totalCalories} kcal</span>
                     </div>
                   </div>
 
@@ -186,8 +194,13 @@ export default function Workout() {
             </div>
           </>
         )}
+        <PlanFeedbackModal
+          open={showFeedback}
+          onCancel={() => setShowFeedback(false)}
+          onConfirm={confirmWorkoutFeedback}
+          title="Why is this workout plan not suitable?"
+        />
       </div>
-      <Footer />
-    </>
+
   );
 }

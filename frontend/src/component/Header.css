@@ -6,12 +6,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 24px;   
   color: white;
   box-sizing: border-box;
-  position: relative;
-  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+ 
 }
+.header.disabled,
+.header.disabled * {
+  pointer-events: none;
+  cursor: default;
+ 
+}
+
 
 /* Logo */
 .logo {

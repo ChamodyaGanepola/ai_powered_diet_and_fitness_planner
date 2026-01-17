@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 import { getProfileByUserId, deleteProfile } from "../../api/userProfileApi";
 import { createNotification } from "../../api/notificationApi.js";
-
+import PageLayout from "../../layouts/PageLayout.jsx";
 import "./Profile.css";
 import { useAuth } from "../../context/authContext.jsx";
 import Header from "../../component/Header.jsx";
@@ -37,6 +37,7 @@ const Profile = () => {
     try {
       const data = await getProfileByUserId(user.id);
       setProfile(data);
+      console.log("Fetched profile data in Profile page:", data);
     } catch {
       setProfile(null);
     } finally {
@@ -44,20 +45,20 @@ const Profile = () => {
     }
   };
   const renderAvatar = () => {
-  if (!profile?.gender) return <FaUser className="profile-avatar" />;
+    if (!profile?.gender) return <FaUser className="profile-avatar" />;
 
-  const gender = profile.gender.toLowerCase();
+    const gender = profile.gender.toLowerCase();
 
-  if (gender === "female") {
-    return <FaFemale className="profile-avatar" />;
-  }
+    if (gender === "female") {
+      return <FaFemale className="profile-avatar" />;
+    }
 
-  if (gender === "male") {
-    return <FaMale className="profile-avatar" />;
-  }
+    if (gender === "male") {
+      return <FaMale className="profile-avatar" />;
+    }
 
-  return <FaUser className="profile-avatar" />;
-};
+    return <FaUser className="profile-avatar" />;
+  };
 
   const handleDeleteProfile = async () => {
     try {
@@ -66,7 +67,10 @@ const Profile = () => {
       markProfileUpdated(); //  notify whole app
       setSuccessMsg("Successfully deleted your profile");
       //  Create delete notification
-      await createNotification(user.id, `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`);
+      await createNotification(
+        user.id,
+        `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`,
+      );
       setTimeout(() => {
         setShowConfirm(false);
         setSuccessMsg("");
@@ -80,8 +84,6 @@ const Profile = () => {
 
   return (
     <>
-      <Header />
-
       <div className="profile-page">
         {/* HEADER */}
         <div className="profile-header">
@@ -148,9 +150,11 @@ const Profile = () => {
               items={profile.healthConditions}
             />
             <Section
-              title="Preferences"
+              title="Workout Preferences"
               icon={<FaUser />}
-              items={profile.preferences}
+              items={
+                profile.workoutPreferences ? [profile.workoutPreferences] : []
+              }
             />
           </>
         ) : (
@@ -184,8 +188,7 @@ const Profile = () => {
         </div>
       )}
 
-      <Footer />
-    </>
+  </>
   );
 };
 

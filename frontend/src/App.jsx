@@ -1,70 +1,85 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import Auth from "./pages/Auth/Auth.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
-import DietPlan from "./pages/DietPlan/DietPlan.jsx";
-import Progress from "./pages/Progress/Progress.jsx";
 import Dashboard from "./pages/Dashboard/Dashboard.jsx";
+import DietPlan from "./pages/DietPlan/DietPlan.jsx";
 import Workouts from "./pages/Workouts/Workouts.jsx";
+import Progress from "./pages/Progress/Progress.jsx";
+import DailyProgress from "./pages/DailyProgress/DailyProgress.jsx";
 import ForgotPassword from "./component/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
-import "./App.css";
-import DailyProgress from "./pages/DailyProgress/DailyProgress.jsx";
 import { useAuth } from "./context/authContext.jsx";
-
+import PageLayout from "./layouts/PageLayout.jsx";
 
 function App() {
-  const { user } = useAuth(); // ✅ reactive
+  const { user } = useAuth();
 
   return (
     <Routes>
-      {/* AUTH PAGE */}
+      {/* AUTH */}
       <Route
-        path="/"
-        element={user ? <Navigate to="/home" replace /> : <Auth />}
-      />
-      <Route
-        path="/forgot-password"
-        element={user ? <Navigate to="/home" replace /> : <ForgotPassword />}
-      />
-      <Route
-        path="/reset-password/:token"
-        element={user ? <Navigate to="/home" replace /> : <ResetPassword />}
-      />
+  path="/"
+  element={user ? <Navigate to="/home" replace /> : (
+    <PageLayout hideNavLinks>
+      <Auth />
+    </PageLayout>
+  )}
+/>
 
-      {/* HOME */}
+      <Route path="/forgot-password" element={user ? <Navigate to="/home" replace /> : <ForgotPassword />} />
+      <Route path="/reset-password/:token" element={user ? <Navigate to="/home" replace /> : <ResetPassword />} />
+
+      {/* PROTECTED PAGES */}
       <Route
         path="/home"
-        element={user ? <Home /> : <Navigate to="/" replace />}
+        element={
+          user ? (
+            <PageLayout>
+              <Home />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
-      <Route
+
+       <Route
         path="/profile"
-        element={user ? <Profile /> : <Navigate to="/" replace />}
+        element={
+          user ? (
+            <PageLayout>
+              <Profile />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
+
+      {/* ADD OTHERS */}
       <Route
         path="/dashboard"
-        element={user ? <Dashboard /> : <Navigate to="/" replace />}
+        element={user ? <PageLayout><Dashboard /></PageLayout> : <Navigate to="/" replace />}
       />
       <Route
         path="/dietplan"
-        element={user ? <DietPlan /> : <Navigate to="/" replace />}
+        element={user ? <PageLayout><DietPlan /></PageLayout> : <Navigate to="/" replace />}
       />
       <Route
         path="/workouts"
-        element={user ? <Workouts /> : <Navigate to="/" replace />}
+        element={user ? <PageLayout><Workouts /></PageLayout> : <Navigate to="/" replace />}
       />
-       <Route
+      <Route
         path="/dailyprogress"
-        element={user ? <DailyProgress /> : <Navigate to="/" replace />}
+        element={user ? <PageLayout><DailyProgress /></PageLayout> : <Navigate to="/" replace />}
       />
       <Route
         path="/progress"
-        element={user ? <Progress /> : <Navigate to="/" replace />}
+        element={user ? <PageLayout><Progress /></PageLayout> : <Navigate to="/" replace />}
       />
     </Routes>
   );
 }
-
 
 export default App;

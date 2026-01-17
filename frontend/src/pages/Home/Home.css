@@ -1,11 +1,10 @@
 /* ===== HOME PAGE ===== */
 .home {
-  background: #f7faf9;
-  min-height: calc(100vh - 64px - 48px); /* subtract header + footer height */
-  padding-bottom: 0; /* no need extra padding if footer is outside main */
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
 }
+
 /* ===== HERO ===== */
 .hero {
   text-align: center;
@@ -52,7 +51,7 @@
 }
 
 .feature-card {
-  background: white;
+  background: #daf4de;
   padding: 28px 22px;
   border-radius: 14px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);

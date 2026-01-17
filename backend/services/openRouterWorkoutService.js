@@ -37,9 +37,26 @@ export const generateWorkoutPlan = async (prompt) => {
       }
     );
 
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    console.error("OpenRouter Workout Error:", error.response?.data || error.message);
+   let content = response.data.choices[0].message.content || "{}";
+
+    // Clean AI response
+    content = content.trim()
+      .replace(/^```json\s*/, "")
+      .replace(/^```/, "")
+      .replace(/```$/, "")
+      .replace(/\bNaN\b/g, "0");
+
+    // Parse safely
+    try {
+      return JSON.parse(content);
+    } catch {
+      // Fallback: remove trailing non-JSON characters
+      const lastBrace = content.lastIndexOf("}");
+      content = content.slice(0, lastBrace + 1);
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.error("OpenRouter Workout API error:", err.response?.data || err.message);
     throw new Error("Workout AI generation failed");
   }
 };

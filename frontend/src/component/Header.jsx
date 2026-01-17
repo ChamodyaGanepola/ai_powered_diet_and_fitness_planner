@@ -10,7 +10,7 @@ import {
   markNotificationsRead,
 } from "../api/notificationApi.js";
 
-const Header = () => {
+const Header = ({ disableLinks }) => {
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -88,25 +88,35 @@ const Header = () => {
   // Close dropdown if click outside (desktop only)
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (!isMobile && notifRef.current && !notifRef.current.contains(e.target)) {
+      if (
+        !isMobile &&
+        notifRef.current &&
+        !notifRef.current.contains(e.target)
+      ) {
         setNotifOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobile]);
+  const handleNav = (path) => {
+    if (disableLinks) return;
+    navigate(path);
+  };
 
   return (
     <>
-      <header className="header">
-        <div className="logo" onClick={() => navigate("/")}>HealthPilot</div>
+      <header className={`header ${disableLinks ? "disabled" : ""}`}>
+        <div className="logo" onClick={() => handleNav("/")}>
+          HealthPilot
+        </div>
 
         <nav className="nav-links">
-          <span onClick={() => navigate("/home")}>Home</span>
-          <span onClick={() => navigate("/dashboard")}>Dashboard</span>
-          <span onClick={() => navigate("/dietplan")}>Diet Plan</span>
-          <span onClick={() => navigate("/workouts")}>Workouts</span>
-          <span onClick={() => navigate("/dailyprogress")}>Progress</span>
+          <span onClick={() => handleNav("/home")}>Home</span>
+          <span onClick={() => handleNav("/dashboard")}>Dashboard</span>
+          <span onClick={() => handleNav("/dietplan")}>Diet Plan</span>
+          <span onClick={() => handleNav("/workouts")}>Workouts</span>
+          <span onClick={() => handleNav("/dailyprogress")}>Progress</span>
 
           <div className="icon-group">
             {/* Notifications */}
@@ -114,11 +124,13 @@ const Header = () => {
               ref={notifRef}
               className="icon-item"
               data-label="Notifications"
-              onClick={toggleNotifications}
+              onClick={() => (disableLinks ? null : toggleNotifications())}
             >
               <FiBell />
               {unreadCount > 0 && (
-                <span className={`notification-badge ${animateBadge ? "pop" : ""}`}>
+                <span
+                  className={`notification-badge ${animateBadge ? "pop" : ""}`}
+                >
                   {unreadCount}
                 </span>
               )}
@@ -128,16 +140,29 @@ const Header = () => {
                 <div className="notification-dropdown">
                   <div className="notif-header">
                     <p className="notification-title">Notifications</p>
-                    <span className="notif-close" onClick={() => setNotifOpen(false)}>✕</span>
+                    <span
+                      className="notif-close"
+                      onClick={() => setNotifOpen(false)}
+                    >
+                      ✕
+                    </span>
                   </div>
                   {notifications.length === 0 ? (
-                    <div className="notification-item empty">No notifications</div>
+                    <div className="notification-item empty">
+                      No notifications
+                    </div>
                   ) : (
                     <div className="notification-list">
                       {notifications.map((n) => {
-                        const time = new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+                        const time = new Date(n.createdAt).toLocaleTimeString(
+                          [],
+                          { hour: "2-digit", minute: "2-digit", hour12: true },
+                        );
                         return (
-                          <div key={n._id} className={`notification-item ${n.isRead ? "read" : "unread"}`}>
+                          <div
+                            key={n._id}
+                            className={`notification-item ${n.isRead ? "read" : "unread"}`}
+                          >
                             <span className="notif-message">{n.message}</span>
                             <span className="notif-time">{time}</span>
                           </div>
@@ -150,26 +175,94 @@ const Header = () => {
             </div>
 
             {/* Profile */}
-            <div className="icon-item" data-label="Profile" onClick={() => navigate("/profile")}><FiUser /></div>
+            <div
+              className="icon-item"
+              data-label="Profile"
+              onClick={() => (disableLinks ? null : navigate("/profile"))}
+            >
+              <FiUser />
+            </div>
             {/* Logout */}
-            <div className="icon-item" data-label="Logout" onClick={handleLogout}><FiLogOut /></div>
+            <div
+              className="icon-item"
+              data-label="Logout"
+              onClick={() => (disableLinks ? null : handleLogout())}
+            >
+              <FiLogOut />
+            </div>
           </div>
         </nav>
 
-        <div className="menu-icon" onClick={() => setOpen(true)}>☰</div>
+        <div
+          className="menu-icon"
+          onClick={() => (disableLinks ? null : setOpen(true))}
+        >
+          ☰
+        </div>
       </header>
 
       {/* Mobile Sidebar */}
       <div className={`side-navbar ${open ? "open" : ""}`}>
-        <div className="close-btn" onClick={() => setOpen(false)}>✕</div>
-        <span onClick={() => { navigate("/home"); setOpen(false); }}>Home</span>
-        <span onClick={() => { navigate("/dashboard"); setOpen(false); }}>Dashboard</span>
-        <span onClick={() => { navigate("/dietplan"); setOpen(false); }}>Diet Plan</span>
-        <span onClick={() => { navigate("/workouts"); setOpen(false); }}>Workouts</span>
-        <span onClick={() => { navigate("/dailyprogress"); setOpen(false); }}>Progress</span>
+        <div className="close-btn" onClick={() => setOpen(false)}>
+          ✕
+        </div>
+        <span
+          onClick={() => {
+            navigate("/home");
+            setOpen(false);
+          }}
+        >
+          Home
+        </span>
+        <span
+          onClick={() => {
+            navigate("/dashboard");
+            setOpen(false);
+          }}
+        >
+          Dashboard
+        </span>
+        <span
+          onClick={() => {
+            navigate("/dietplan");
+            setOpen(false);
+          }}
+        >
+          Diet Plan
+        </span>
+        <span
+          onClick={() => {
+            navigate("/workouts");
+            setOpen(false);
+          }}
+        >
+          Workouts
+        </span>
+        <span
+          onClick={() => {
+            navigate("/dailyprogress");
+            setOpen(false);
+          }}
+        >
+          Progress
+        </span>
         {/* Trigger Mobile Notifications */}
-        <span onClick={() => { setNotifOpen(true); setOpen(false); }}>Notifications</span>
-        <span onClick={() => { navigate("/profile"); setOpen(false); }}>Profile</span>
+        <span
+          onClick={() => {
+            setNotifOpen(true);
+            setOpen(false);
+          }}
+        >
+          Notifications
+        </span>
+        <span
+          onClick={() => {
+            navigate("/profile");
+            setOpen(false);
+          }}
+        >
+          Profile
+        </span>
         <span onClick={handleLogout}>Logout</span>
       </div>
 
@@ -178,16 +271,25 @@ const Header = () => {
         <div className="mobile-notif-panel">
           <div className="notif-header">
             <p className="notification-title">Notifications</p>
-            <span className="notif-close" onClick={() => setNotifOpen(false)}>✕</span>
+            <span className="notif-close" onClick={() => setNotifOpen(false)}>
+              ✕
+            </span>
           </div>
           {notifications.length === 0 ? (
             <div className="notification-item empty">No notifications</div>
           ) : (
             <div className="notification-list">
               {notifications.map((n) => {
-                const time = new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+                const time = new Date(n.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                });
                 return (
-                  <div key={n._id} className={`notification-item ${n.isRead ? "read" : "unread"}`}>
+                  <div
+                    key={n._id}
+                    className={`notification-item ${n.isRead ? "read" : "unread"}`}
+                  >
                     <span className="notif-message">{n.message}</span>
                     <span className="notif-time">{time}</span>
                   </div>

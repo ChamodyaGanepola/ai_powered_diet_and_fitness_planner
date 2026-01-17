@@ -54,15 +54,17 @@ export const createMealPlan = async (req, res) => {
       gender: userProfile.gender,
       weight: Number(userProfile.weight),
       height: Number(userProfile.height),
-      activityLevel: userProfile.activityLevel || "sedentary",
-      fitnessGoal: userProfile.fitnessGoal || "maintain",
+      activityLevel: userProfile.activityLevel,
+      fitnessGoal: userProfile.fitnessGoal,
       dietaryRestrictions: userProfile.dietaryRestrictions || [],
       preferences: userProfile.preferences || [],
     };
 
     console.log("Calculating macros for user profile:", profileData);
     const macros = calculateMacros(profileData);
-
+const dietaryText = profileData.dietaryRestrictions.length > 0
+      ? profileData.dietaryRestrictions.join(", ")
+      : "None";
     // AI Prompt
  const prompt = `
 Create a MEAL PLAN TEMPLATE (not a single-day log).
@@ -71,30 +73,25 @@ This meal plan provides MULTIPLE OPTIONS for each meal.
 User will choose ONLY ONE food item per meal per day.
 
 STRICT RULES:
-1. Include EXACTLY these meal types:
-   - Breakfast
-   - Lunch
-   - Dinner
-   - Snack
+1. Include EXACTLY these meal types and each meal type MUST have:
+   - Breakfast (3 options)
+   - Lunch (3 options)
+   - Dinner (3 options)
+   - Snack (2 options)
 
-2. Each meal type MUST have:
-   - Breakfast: 3 options
-   - Lunch: 3 options
-   - Dinner: 3 options
-   - Snack: 2 options
-
-3. Each food item represents ONE COMPLETE MEAL OPTION
+2. Each food item represents ONE COMPLETE MEAL OPTION
    (not components to be eaten together)
 
-4. All food options within the SAME meal type must be
+3. All food options within the SAME meal type must be
    nutritionally similar (±10% calories/macros)
 
-5. All food items MUST include these fields:
-   - name
-   - calories (number, kcal)
-   - protein (number, g)
-   - fat (number, g)
-   - unit (string, e.g., "serving", "cup")
+4. All food items MUST include these fields:
+- name
+- calories (number, kcal)
+- protein (number, g)
+- fat (number, g)
+- carbohydrates (number, g)
+- unit (string, e.g., "cup", "serving")
 
 6. Also, suggest the TOTAL NUMBER OF DAYS this meal plan should continue
    based on user's profile and fitness goals.
@@ -110,10 +107,9 @@ Age: ${profileData.age}
 Gender: ${profileData.gender}
 Weight: ${profileData.weight}kg
 Height: ${profileData.height}cm
-Activity Level: ${profileData.activityLevel}
 Fitness Goal: ${profileData.fitnessGoal}
-Dietary Restrictions: ${profileData.dietaryRestrictions.join(", ")}
-Preferences: ${profileData.preferences.join(", ")}
+Dietary Restrictions: ${dietaryText}
+
 
 Return ONLY valid JSON.
 
@@ -128,7 +124,8 @@ FORMAT:
           "calories": number,
           "protein": number,
           "fat": number,
-          "unit": "string"
+          "unit": "string",
+          "carbohydrates": number
         }
       ]
     }
@@ -136,10 +133,7 @@ FORMAT:
   "durationDays": number
 }
 `;
-let durationDays = 7; // default
-if (mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)) {
-  durationDays = Number(mealPlanData.durationDays);
-}
+
 
 
     // Call AI
@@ -165,6 +159,10 @@ if (mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)) {
       }
     }
 
+   // Determine durationDays from AI, default 7
+    const durationDays = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
+      ? Number(mealPlanData.durationDays)
+      : 7;
     // Ensure totalCalories is a number
     if (!mealPlanData.totalCalories || isNaN(mealPlanData.totalCalories)) {
       mealPlanData.totalCalories = macros.calories;
@@ -201,7 +199,7 @@ const newMealPlan = await MealPlan.create({
           calories: food.calories || 0,
           protein: food.protein || 0,
           fat: food.fat || 0,
-          category: food.category || "",
+          carbohydrates: food.carbohydrates || 0, 
           unit: food.unit || "serving",
         });
       }

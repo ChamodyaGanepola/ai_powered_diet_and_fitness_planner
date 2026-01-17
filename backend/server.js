@@ -13,6 +13,7 @@ import workoutPlanRoutes from "./routes/workoutPlanRoutes.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import dailyProgressRoutes from "./routes/dailyProgressRoutes.js";
+import planFeedbackRoutes from "./routes/feedbackRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -49,6 +50,7 @@ app.use("/api/meal-plan", mealPlanRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/workout-plan", workoutPlanRoutes);
 app.use("/api/daily-progress", dailyProgressRoutes);
+app.use("/api/plan-feedback", planFeedbackRoutes);
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)

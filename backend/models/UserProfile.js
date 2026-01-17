@@ -10,10 +10,10 @@ const userProfileSchema = new mongoose.Schema({
   activityLevel: { type: String, required: true },
   dietaryRestrictions: { type: [String], default: [] },
   healthConditions: { type: [String], default: [] },
-  preferences: { type: [String], default: [] },
+  workoutPreferences: { type: String, required: true, enum: ["Yoga", "Gym", "Home Workouts", "Walking", "Running", "Cycling", "Swimming"] },
   culturalDietaryPatterns: { type: [String], default: [] },
 
-  bmi: { type: Number },
+  bmi: { type:Number},
   bmiCategory: { type: String }, 
   
   status: {

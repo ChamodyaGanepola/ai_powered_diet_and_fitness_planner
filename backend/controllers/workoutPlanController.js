@@ -6,7 +6,6 @@ import { generateWorkoutPlan } from "../services/openRouterWorkoutService.js";
 // Clean AI response safely
 const cleanAIResponse = (str) => {
   if (!str) return "{}";
-
   // Remove ```json or ``` wrappers
   str = str.trim()
     .replace(/^```json\s*/, "")
@@ -60,57 +59,54 @@ export const createWorkoutPlan = async (req, res) => {
       age,
       weight,
       height,
-      activityLevel = "Sedentary",
-      fitnessGoal = "Maintain Fitness",
+      activityLevel ,
+      fitnessGoal,
       healthConditions = [],
-      preferences = [],
+      workoutPreferences,
     } = userProfile;
 
     const healthText = healthConditions.length ? `Health Conditions: ${healthConditions.join(", ")}` : "";
-    const prefText = preferences.length ? `Preferences: ${preferences.join(", ")}` : "";
-
+    
     // AI prompt
     const prompt = `
-Create a 5-day weekly workout plan in JSON ONLY, each day max 4 exercises.
-Reps must be strings like "8-12". Do not truncate.
-User:
-- Age: ${age}
-- Weight: ${weight}kg
-- Height: ${height}cm
-- Activity Level: ${activityLevel}
-- Fitness Goal: ${fitnessGoal}
-${healthText}
-${prefText}
+Create a weekly workout plan in JSON ONLY.
+Include exercises ONLY from user's preferred workout type: ${workoutPreferences}.
+Each exercise must have: name, targetMuscle, sets, reps, restTime, durationMinutes, caloriesBurned, day.
+Include rest days as "Rest".
+
+User Info:
+Age: ${age}
+Weight: ${weight} kg
+Height: ${height} cm
+Activity Level: ${activityLevel}
+Fitness Goal: ${fitnessGoal}
+Workout Preferences: ${workoutPreferences}
+Health Conditions: ${healthText}
 
 Rules:
-- Use Push / Pull / Legs split
-- Include Rest days
 - Safe for teens
 - Avoid exercises worsening user's health conditions
-- No extreme workouts
-- reps MUST be string
-- No explanations or trailing commas
+- Do not truncate reps
+- No explanations
 
-Format:
+Output format:
 {
-  "days": [
+  "difficulty": "${mapActivityLevelToDifficulty(activityLevel)}",
+  "exercises": [
     {
-      "day": "Monday",
-      "split": "Push | Pull | Legs | Cardio | Rest",
-      "difficulty": "easy | medium | hard",
-      "exercises": [
-        {
-          "name": "",
-          "targetMuscle": "",
-          "sets": number,
-          "reps": "8-12",
-          "restTime": number
-        }
-      ]
+      "name": "string",
+      "targetMuscle": "string",
+      "sets": number,
+      "reps": "8-12",
+      "restTime": number,
+      "durationMinutes": number,
+      "caloriesBurned": number,
+      "day": "Monday"
     }
   ]
 }
 `;
+
 
     // Call AI
     const aiRaw = await generateWorkoutPlan(prompt);
@@ -131,7 +127,16 @@ Format:
         return res.status(500).json({ message: "AI workout JSON invalid", aiRaw });
       }
     }
+const durationDays = workoutData.durationDays && !isNaN(workoutData.durationDays)
+  ? Number(workoutData.durationDays)
+  : 7;
 
+// Start date = today
+const startDateUTC = new Date();
+
+// End date = startDate + durationDays - 1
+const endDateUTC = new Date();
+endDateUTC.setDate(startDateUTC.getDate() + durationDays - 1);
     // Create WorkoutPlan document
     const workoutPlan = await WorkoutPlan.create({
       user_id,
@@ -139,35 +144,37 @@ Format:
       fitnessGoal,
       difficulty: mapActivityLevelToDifficulty(activityLevel),
       status: "active",
+      startDate: startDateUTC,
+      endDate: endDateUTC,
+
     });
+
+    // Save exercises per day
 
     let totalCalories = 0;
     let totalDuration = 0;
 
-    // Save exercises per day
-    for (const day of workoutData.days || []) {
-      const isRest = day.split === "Rest";
-      const duration = isRest ? 0 : 45; // default duration per day
-      const calories = isRest ? 0 : Math.round(weight * duration * 5);
+    for (const ex of workoutData.exercises || []) {
+      await Exercise.create({
+        workoutplan_id: workoutPlan._id,
+        name: ex.name || "Unknown Exercise",
+        targetMuscle: ex.targetMuscle || "General",
+        sets: Math.min(Math.max(ex.sets || 3, 1), 5),
+        reps: ex.reps || "8-12",
+        restTime: Math.min(Math.max(ex.restTime || 60, 0), 120),
+        durationMinutes: ex.durationMinutes || 30, // fallback
+        caloriesBurned: ex.caloriesBurned || Math.round(userProfile.weight * (ex.durationMinutes || 30) * 5), // rough calc if AI missing
+        day: ex.day || "Monday",
+      });
 
-      totalCalories += calories;
-      totalDuration += duration;
-
-      for (const ex of day.exercises || []) {
-        await Exercise.create({
-          workoutplan_id: workoutPlan._id,
-          name: ex.name || "Unknown Exercise",
-          targetMuscle: ex.targetMuscle || "General",
-          sets: Math.min(Math.max(ex.sets || 3, 1), 5),
-          reps: ex.reps || "8-12",
-          restTime: Math.min(Math.max(ex.restTime || 60, 0), 120),
-        });
-      }
+      totalCalories += ex.caloriesBurned ;
+      totalDuration += ex.durationMinutes ;
     }
 
     workoutPlan.totalCaloriesBurned = totalCalories;
     workoutPlan.duration = totalDuration;
     await workoutPlan.save();
+
 
     res.json({ success: true, workoutPlan });
   } catch (err) {

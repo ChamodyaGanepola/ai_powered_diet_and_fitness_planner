@@ -24,7 +24,7 @@ export const generateMealPlan = async (prompt) => {
             content: prompt
           }
         ],
-        temperature: 0.4,
+        temperature: 0.5,
         max_tokens: 800
       },
       {
@@ -38,12 +38,25 @@ export const generateMealPlan = async (prompt) => {
       }
     );
 
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    console.error(
-      "OpenRouter Error:",
-      error.response?.data || error.message
-    );
-    throw new Error("OpenRouter API call failed");
+     let content = response.data.choices[0].message.content || "{}";
+
+    // Clean AI response
+    content = content.trim()
+      .replace(/^```json\s*/, "")
+      .replace(/^```/, "")
+      .replace(/```$/, "")
+      .replace(/\bNaN\b/g, "0");
+
+    // Parse safely
+    try {
+      return JSON.parse(content);
+    } catch {
+      const lastBrace = content.lastIndexOf("}");
+      content = content.slice(0, lastBrace + 1);
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.error("OpenRouter Meal API error:", err.response?.data || err.message);
+    throw new Error("Meal AI generation failed");
   }
 };

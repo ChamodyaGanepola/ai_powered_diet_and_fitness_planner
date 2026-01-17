@@ -23,7 +23,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
     activityLevel: "",
     dietaryRestrictions: "",
     healthConditions: "",
-    preferences: "",
+    workoutPreferences: "",
     culturalDietaryPatterns: "",
   });
 
@@ -54,7 +54,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               activityLevel: data.activityLevel || "",
               dietaryRestrictions: data.dietaryRestrictions?.join(", ") || "",
               healthConditions: data.healthConditions?.join(", ") || "",
-              preferences: data.preferences?.join(", ") || "",
+              workoutPreferences: data.workoutPreferences || "",
               culturalDietaryPatterns:
                 data.culturalDietaryPatterns?.join(", ") || "",
             });
@@ -97,9 +97,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
       healthConditions: formData.healthConditions
         ? formData.healthConditions.split(",").map((i) => i.trim())
         : [],
-      preferences: formData.preferences
-        ? formData.preferences.split(",").map((i) => i.trim())
-        : [],
+      workoutPreferences: formData.workoutPreferences,
       culturalDietaryPatterns: formData.culturalDietaryPatterns
         ? formData.culturalDietaryPatterns.split(",").map((i) => i.trim())
         : [],
@@ -283,15 +281,24 @@ const ProfileCard = ({ onClose, edit = false }) => {
                 />
               </div>
 
+          
               <div className="form-group">
-                <label>Food Preferences</label>
-                <input
-                  type="text"
-                  name="preferences"
-                  placeholder="Spicy, Low-carb, High-protein"
-                  value={formData.preferences}
+                <label>Workout Preferences *</label>
+                <select
+                  name="workoutPreferences"
+                  required
+                  value={formData.workoutPreferences}
                   onChange={handleChange}
-                />
+                >
+                  <option value="" disabled>Select Workout Preference</option>
+                  <option value="Yoga">Yoga</option>
+                  <option value="Gym">Gym</option>
+                  <option value="Home Workouts">Home Workouts</option>
+                  <option value="Walking">Walking</option>
+                  <option value="Running">Running</option>
+                  <option value="Cycling">Cycling</option>
+                  <option value="Swimming">Swimming</option>
+                </select>
               </div>
 
               <div className="form-group">

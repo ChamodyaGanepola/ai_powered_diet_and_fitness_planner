@@ -38,9 +38,7 @@ const Home = () => {
   }, [user?.id, profileUpdated, token]); // refetch whenever user changes or profileUpdated triggers
 
   return (
-    <>
-      <Header />
-
+  
       <main className="home">
         <section className="hero">
           <h1>
@@ -92,8 +90,7 @@ const Home = () => {
         )}
       </main>
 
-      <Footer />
-    </>
+ 
   );
 };
 
