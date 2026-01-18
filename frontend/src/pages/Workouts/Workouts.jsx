@@ -183,30 +183,37 @@ export default function Workout() {
         </div>
       )}
 
-      {!loading &&
-        profileExists &&
-        plans.map((plan) =>
-          groupByDay(plan.workouts || []).map(({ day, workouts }) => (
-            <section key={day} className="day-section">
-              <h3 className="day-title">{day}</h3>
+{!loading && profileExists && plans.length > 0 && (
+  <div className="day-grid">
+    {plans.map((plan) =>
+      groupByDay(plan.workouts || []).map(({ day, workouts }) => (
+        <section key={day} className="day-section">
+          <h3 className="day-title">{day}</h3>
+          <div className="workouts-grid">
+            {workouts.map((w) => (
+              <WorkoutCard key={w._id} workout={w} />
+            ))}
+          </div>
+        </section>
+      ))
+    )}
+  </div>
+)}
 
-              <div className="workouts-grid">
-                {workouts.map((w) => (
-                  <WorkoutCard key={w._id} workout={w} />
-                ))}
-              </div>
-            </section>
-          )),
-        )}
 
-      {plans.length > 0 && (
-        <button
-          className="delete-button centered"
-          onClick={handleDeleteWorkoutPlan}
-        >
-          Delete Workout Plan
-        </button>
-      )}
+
+
+   {plans.length > 0 && (
+  <div className="delete-plan-wrapper">
+    <button
+      className="delete-button"
+      onClick={handleDeleteWorkoutPlan}
+    >
+      Delete Workout Plan
+    </button>
+  </div>
+)}
+
 
       {/* Feedback Section */}
       {plans.length > 0 && (
