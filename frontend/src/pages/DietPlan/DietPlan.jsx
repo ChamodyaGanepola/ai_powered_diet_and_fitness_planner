@@ -11,6 +11,7 @@ import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./DietPlan.css";
 import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
 import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
+import FeedbackList from "../../component/FeedbackList.jsx";
 
 export default function DietPlan() {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ export default function DietPlan() {
   const [activeMealPlanId, setActiveMealPlanId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showFeedbackList, setShowFeedbackList] = useState(false);
 
   useEffect(() => {
     checkUserProfile();
@@ -32,7 +34,7 @@ export default function DietPlan() {
     try {
       const res = await getProfileByUserId(user.id);
       console.log("Profile check response:", res);
-      
+
       // ✅ Correct check for your API structure
       if (!res || !res._id) {
         setUserProfileId(null);
@@ -107,23 +109,22 @@ export default function DietPlan() {
     setShowFeedback(true);
   };
   const confirmMealFeedback = async (reason) => {
-  try {
-    await updateMealPlanStatus(activeMealPlanId, "not-suitable");
+    try {
+      await updateMealPlanStatus(activeMealPlanId, "not-suitable");
 
-    await submitPlanFeedback({
-      user_id: user.id,
-      userProfile_id: userProfileId,
-      planType: "meal",
-      mealPlan_id: activeMealPlanId,
-      reason,
-    });
+      await submitPlanFeedback({
+        user_id: user.id,
+        userProfile_id: userProfileId,
+        planType: "meal",
+        mealPlan_id: activeMealPlanId,
+        reason,
+      });
 
-    fetchMealPlans(); // refresh plans
-  } catch (err) {
-    console.error(err);
-  }
-};
-
+      fetchMealPlans(); // refresh plans
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // Generate meal plan
   const handleGenerateMealPlan = async () => {
@@ -136,56 +137,84 @@ export default function DietPlan() {
   };
 
   return (
+    <div className="diet-page">
+      {loading ? (
+        <p className="loading-text">Loading meal plans...</p>
+      ) : !profileExists ? (
+        <div className="empty-state centered-card">
+          <h1 className="greeting">Hey {user.username},</h1>
+          <p className="no-plan-text">
+            First create your profile. Redirecting to home...
+          </p>
+        </div>
+      ) : mealPlans.length === 0 ? (
+        <div className="empty-state centered-card">
+          <h1 className="greeting">Hey {user.username},</h1>
+          <p className="no-plan-text">
+            No active meal plan available. You can generate one based on your
+            profile.
+          </p>
+          <button
+            className="generate-btn"
+            onClick={handleGenerateMealPlan}
+            disabled={loading}
+          >
+            Generate Meal Plan
+          </button>
+        </div>
+      ) : (
+        <>
+          {mealPlans.map((plan, index) => (
+            <MealPlanCard key={index} plan={plan} index={index} />
+          ))}
 
-      <div className="diet-page">
-        {loading ? (
-          <p className="loading-text">Loading meal plans...</p>
-        ) : !profileExists ? (
-          <div className="empty-state centered-card">
-            <h1 className="greeting">Hey {user.username},</h1>
-            <p className="no-plan-text">
-              First create your profile. Redirecting to home...
-            </p>
-          </div>
-        ) : mealPlans.length === 0 ? (
-          <div className="empty-state centered-card">
-            <h1 className="greeting">Hey {user.username},</h1>
-            <p className="no-plan-text">
-              No active meal plan available. You can generate one based on your
-              profile.
-            </p>
+          <div className="delete-wrapper">
             <button
-              className="generate-btn"
-              onClick={handleGenerateMealPlan}
+              className="delete-button"
+              onClick={handleDeleteMealPlan}
               disabled={loading}
             >
-              Generate Meal Plan
+              Delete Meal Plan
             </button>
           </div>
-        ) : (
-          <>
-            {mealPlans.map((plan, index) => (
-              <MealPlanCard key={index} plan={plan} index={index} />
-            ))}
-
-            <div className="delete-wrapper">
-              <button
-                className="delete-button"
-                onClick={handleDeleteMealPlan}
-                disabled={loading}
+          {/* Meal Feedback Section */}
+          <div className="feedback-section">
+            <div
+              className="feedback-header-toggle"
+              onClick={() => setShowFeedbackList((prev) => !prev)}
+            >
+              <span
+                className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}
               >
-                Delete Meal Plan
-              </button>
-            </div>
-          </>
-        )}
-        <PlanFeedbackModal
-          open={showFeedback}
-          onCancel={() => setShowFeedback(false)}
-          onConfirm={confirmMealFeedback}
-          title="Why is this meal plan not suitable?"
-        />
-      </div>
+                ▾
+              </span>
 
+              <h2 className="feedback-title">
+                Your Previous Meal Plan Feedback (Not suitable)
+              </h2>
+            </div>
+
+            {/* Collapsible content */}
+            <div
+              className={`feedback-content ${
+                showFeedbackList ? "show" : "hide"
+              }`}
+            >
+              <FeedbackList
+                userId={user.id}
+                userProfileId={userProfileId}
+                type="meal"
+              />
+            </div>
+          </div>
+        </>
+      )}
+      <PlanFeedbackModal
+        open={showFeedback}
+        onCancel={() => setShowFeedback(false)}
+        onConfirm={confirmMealFeedback}
+        title="Why is this meal plan not suitable?"
+      />
+    </div>
   );
 }

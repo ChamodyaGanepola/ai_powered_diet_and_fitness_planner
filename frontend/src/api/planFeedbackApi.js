@@ -36,3 +36,29 @@ export const submitPlanFeedback = async (payload) => {
     throw new Error("Failed to submit plan feedback");
   }
 };
+// All feedback (meal + workout)
+export const getAllFeedback = async (user_id, userProfile_id) => {
+  const res = await axios.get(`${API_URL}/all`, {
+    params: { user_id, userProfile_id },
+    ...getAuthHeader(),
+  });
+  return res.data;
+};
+
+// Only meal feedback
+export const getMealFeedback = async (user_id, userProfile_id) => {
+  const res = await axios.get(`${API_URL}/meal`, {
+    params: { user_id, userProfile_id },
+    ...getAuthHeader(),
+  });
+  return res.data;
+};
+
+// Only workout feedback
+export const getWorkoutFeedback = async (user_id, userProfile_id) => {
+  const res = await axios.get(`${API_URL}/workout`, {
+    params: { user_id, userProfile_id },
+    ...getAuthHeader(),
+  });
+  return res.data;
+};

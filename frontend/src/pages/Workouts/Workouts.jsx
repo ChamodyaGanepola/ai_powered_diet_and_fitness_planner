@@ -13,6 +13,7 @@ import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./Workouts.css";
 import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
 import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
+import FeedbackList from "../../component/FeedbackList.jsx";
 export default function Workout() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Workout() {
   const [activePlanId, setActivePlanId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
-
+  const [showFeedbackList, setShowFeedbackList] = useState(false);
   useEffect(() => {
     checkUserProfile();
   }, []);
@@ -192,8 +193,39 @@ export default function Workout() {
                 Delete Workout Plan
               </button>
             </div>
-          </>
-        )}
+             {/* Workout Feedback Section */}
+          <div className="feedback-section">
+            <div
+              className="feedback-header-toggle"
+              onClick={() => setShowFeedbackList((prev) => !prev)}
+            >
+              <span
+                className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}
+              >
+                ▾
+              </span>
+
+              <h2 className="feedback-title">
+                Your Previous Workout Plan Feedback (Not suitable)
+              </h2>
+            </div>
+
+            {/* Collapsible content */}
+            <div
+              className={`feedback-content ${
+                showFeedbackList ? "show" : "hide"
+              }`}
+            >
+              <FeedbackList
+                userId={user.id}
+                userProfileId={userProfileId}
+                type="workout"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
         <PlanFeedbackModal
           open={showFeedback}
           onCancel={() => setShowFeedback(false)}

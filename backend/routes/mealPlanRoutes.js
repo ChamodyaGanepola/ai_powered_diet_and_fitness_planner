@@ -1,4 +1,3 @@
-// routes/mealPlanRoutes.js
 const express = require("express");
 const { createMealPlan, getLatestMealPlan, updateMealPlanStartDate, getCompletedMealPlans,
      getNotSuitableMealPlans,updateMealPlanStatus, deleteMealPlansByUserProfile } = require("../controllers/mealPlanController.js");

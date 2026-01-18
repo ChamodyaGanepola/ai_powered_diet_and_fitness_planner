@@ -4,6 +4,7 @@ const { calculateBMI, getBMICategory } = require("../utils/bmi");
 // Create profile
 exports.createProfile = async (req, res) => {
   try {
+    console.log("Request body:", req.user.id, req.user.role);
     const {
       user_id,
       age,
@@ -108,6 +109,7 @@ exports.updateProfile = async (req, res) => {
 // Get profile by user_id (only active)
 exports.getProfileByUserId = async (req, res) => {
   try {
+    console.log("Request body:", req.user.id, req.user.role);
     const { user_id } = req.params;
 
     const profile = await UserProfile.findOne({ user_id, status: "active" })

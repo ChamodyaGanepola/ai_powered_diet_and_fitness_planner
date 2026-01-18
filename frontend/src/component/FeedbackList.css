@@ -1,0 +1,136 @@
+/* Wrapper protects grid from parent flex */
+.feedback-grid-wrapper {
+  width: 100%;
+  display: block;
+}
+
+/* ===== GRID LAYOUT ===== */
+.feedback-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* LARGE: 3 per row */
+  gap: 32px;
+  margin-top: 32px;
+  margin-bottom: 48px;
+}
+
+/* ===== CARD ===== */
+.feedback-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feedback-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== HEADER ===== */
+.feedback-header {
+  margin-bottom: 14px;
+}
+
+.badge {
+  padding: 5px 12px;
+  font-size: 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge.meal {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge.workout {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+/* ===== BODY ===== */
+.feedback-body {
+  margin-bottom: 16px;
+}
+
+.feedback-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.feedback-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.feedback-value {
+  color: #1f2937;
+}
+
+.feedback-date-value {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* ===== FOOTER ===== */
+.feedback-plan {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.plan-label {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.plan-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+/* ===== STATES ===== */
+.feedback-loading,
+.feedback-error,
+.feedback-empty {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 24px;
+}
+
+/* =========================
+   RESPONSIVE BREAKPOINTS
+   ========================= */
+
+/* Medium screens → 2 cards */
+@media (max-width: 1200px) {
+  .feedback-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+}
+
+/* Mobile → 1 card */
+@media (max-width: 968px) {
+  .feedback-container {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .feedback-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .feedback-plan {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
