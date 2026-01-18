@@ -1,23 +1,12 @@
 /* ===== AUTH PAGE ===== */
 .Auth {
   width: 100%;
-  min-height: calc(100vh - 97px);/* header + footer height */
+  min-height: 100vh;/* header + footer height */
   display: flex;
   background: #daeadc;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.Auth {
-  width: 100%;
-  min-height: calc(100vh - 97px);
-  display: flex;
-  background: #daeadc;
-  overflow-x: hidden;
+
 }
 
-body.authPage {
-  overflow: hidden !important;   /* disable body scroll */
-}
 
 /* LEFT + RIGHT PANEL */
 .a-left,
@@ -36,13 +25,13 @@ body.authPage {
   background: linear-gradient(135deg, #01280d, #03491e);
   color: white;
   text-align: center;
-  padding: 2rem 1.2rem;
+  padding: 1rem 1.2rem;
   overflow-y: auto;
 }
 
 .a-left img {
   width: 100px;
-  margin-bottom: 1rem;
+  margin-bottom: 10px;
 }
 
 /* LEFT TEXT */
@@ -96,14 +85,24 @@ body.authPage {
 .a-right {
   background: #daeadc;
   padding: 2rem 1.2rem;
-  overflow-y: auto;
 }
 
 .pinkChampsTopic {
   margin-bottom: 1rem;
-  font-size: 32px;
+  font-size: 34px;
   color: #01280d;
+  text-align: center;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  background: linear-gradient(90deg, #a3ffb8,
+  #01280d, #6be29a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: fill;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
 }
+
 
 /* ===== AUTH FORM ===== */
 .authForm {

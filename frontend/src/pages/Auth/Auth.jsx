@@ -63,10 +63,10 @@ const Auth = () => {
   };
 
   useEffect(() => setError && setError(""), []);
-useEffect(() => {
-  document.body.classList.add("authPage");
-  return () => document.body.classList.remove("authPage");
-}, []);
+  useEffect(() => {
+    document.body.classList.add("authPage");
+    return () => document.body.classList.remove("authPage");
+  }, []);
 
   return (
     <div className="Auth">
@@ -80,15 +80,15 @@ useEffect(() => {
             <br />
             Track workouts, plan meals, and stay consistent on your wellness
             journey.
-            <br />
-            Sign up to get started or log in to continue.
           </p>
         </div>
-      
       </div>
 
       <div className="a-right">
-        <h1 className="pinkChampsTopic">HealthPilot</h1>
+        <h1 className="pinkChampsTopic">
+          SignUp to Get Started <br />
+          or LogIn to Continue
+        </h1>
         <form className="infoForm authForm" onSubmit={handleSubmit}>
           <h2>{isSignUp ? "Register" : "Login"}</h2>
 

@@ -10,11 +10,13 @@ import ForgotPassword from "./component/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
 import { useAuth } from "./context/authContext.jsx";
 import PageLayout from "./layouts/PageLayout.jsx";
-
+import ScrollToTop from "./component/ScrollToTop.jsx";
 function App() {
   const { user } = useAuth();
 
   return (
+    <>
+   <ScrollToTop />
     <Routes>
       {/* AUTH */}
       <Route
@@ -133,6 +135,7 @@ function App() {
       />
       
     </Routes>
+    </>
   );
 }
 

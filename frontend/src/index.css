@@ -40,7 +40,7 @@ body {
 /* Disable body scroll on desktop only */
 @media (min-width: 769px) {
   body.authPage {
-    overflow: hidden !important;
+    overflow: auto !important;
   }
 }
 
