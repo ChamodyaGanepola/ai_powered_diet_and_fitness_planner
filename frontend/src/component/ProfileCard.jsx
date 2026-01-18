@@ -170,7 +170,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               {/* Age & Gender */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>Age *</label>
+                  <label>Age <span className="required">*</span></label>
                   <input
                     type="number"
                     name="age"
@@ -182,7 +182,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Gender *</label>
+                  <label>Gender <span className="required">*</span></label>
                   <select
                     name="gender"
                     required
@@ -200,7 +200,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               {/* Weight & Height */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>Weight (kg) *</label>
+                  <label>Weight (kg) <span className="required">*</span></label>
                   <input
                     type="number"
                     name="weight"
@@ -211,7 +211,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Height (cm) *</label>
+                  <label>Height (cm) <span className="required">*</span></label>
                   <input
                     type="number"
                     name="height"
@@ -225,7 +225,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
 
               {/* Fitness Goal & Activity Level */}
               <div className="form-group">
-                <label>Fitness Goal *</label>
+                <label>Fitness Goal <span className="required">*</span></label>
                 <select
                   name="fitnessGoal"
                   required
@@ -241,7 +241,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               </div>
 
               <div className="form-group">
-                <label>Activity Level *</label>
+                <label>Activity Level <span className="required">*</span></label>
                 <select
                   name="activityLevel"
                   required
@@ -281,7 +281,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
 
           
               <div className="form-group">
-                <label>Workout Preferences *</label>
+                <label>Workout Preferences <span className="required">* </span></label>
                 <select
                   name="workoutPreferences"
                   required
