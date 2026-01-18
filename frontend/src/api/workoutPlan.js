@@ -26,17 +26,17 @@ export const createWorkoutPlan = async (userProfile) => {
 };
 
 // ---------------- GET LATEST workout plan ----------------
-export const getLatestWorkoutPlan = async (userId) => {
+export const getLatestWorkoutPlan = async () => {
   const res = await axios.get(`${API_URL}/latest`, {
-    params: { user_id: userId },
+    ...getAuthHeader(),
   });
   return res.data;
 };
 // ---------------- GET exercises by date ----------------
-export const getExercisesByDate = async (userId, date) => {
+export const getExercisesByDate = async (date) => {
   try {
     const res = await axios.get(`${API_URL}/exercises-by-date`, {
-      params: { userId, date },
+      params: { date },
       ...getAuthHeader(),
     });
     return res.data; // { exercises: [...], dayOfWeek: "Monday" }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext.jsx";
 import { FiBell, FiUser, FiLogOut } from "react-icons/fi";
 import { io } from "socket.io-client";
@@ -11,6 +11,7 @@ import {
 } from "../api/notificationApi.js";
 
 const Header = ({ disableLinks }) => {
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -23,14 +24,12 @@ const Header = ({ disableLinks }) => {
   const notifRef = useRef(null);
   const socketRef = useRef(null);
 
-  // Handle window resize to update isMobile
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // --- SOCKET.IO ---
   useEffect(() => {
     if (!user?.id) return;
 
@@ -51,7 +50,6 @@ const Header = ({ disableLinks }) => {
     return () => socket.disconnect();
   }, [user?.id]);
 
-  // Fetch initial unread count
   useEffect(() => {
     const fetchUnread = async () => {
       try {
@@ -85,7 +83,6 @@ const Header = ({ disableLinks }) => {
     setOpen(false);
   };
 
-  // Close dropdown if click outside (desktop only)
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -99,6 +96,7 @@ const Header = ({ disableLinks }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobile]);
+
   const handleNav = (path) => {
     if (disableLinks) return;
     navigate(path);
@@ -112,14 +110,42 @@ const Header = ({ disableLinks }) => {
         </div>
 
         <nav className="nav-links">
-          <span onClick={() => handleNav("/home")}>Home</span>
-          <span onClick={() => handleNav("/dashboard")}>Dashboard</span>
-          <span onClick={() => handleNav("/dietplan")}>Diet Plan</span>
-          <span onClick={() => handleNav("/workouts")}>Workouts</span>
-          <span onClick={() => handleNav("/dailyprogress")}>Progress</span>
+          <span
+            className={location.pathname === "/home" ? "active" : ""}
+            onClick={() => handleNav("/home")}
+          >
+            Home
+          </span>
+
+          <span
+            className={location.pathname === "/dashboard" ? "active" : ""}
+            onClick={() => handleNav("/dashboard")}
+          >
+            Dashboard
+          </span>
+
+          <span
+            className={location.pathname === "/dietplan" ? "active" : ""}
+            onClick={() => handleNav("/dietplan")}
+          >
+            Diet Plan
+          </span>
+
+          <span
+            className={location.pathname === "/workouts" ? "active" : ""}
+            onClick={() => handleNav("/workouts")}
+          >
+            Workouts
+          </span>
+
+          <span
+            className={location.pathname === "/dailyprogress" ? "active" : ""}
+            onClick={() => handleNav("/dailyprogress")}
+          >
+            Progress
+          </span>
 
           <div className="icon-group">
-            {/* Notifications */}
             <div
               ref={notifRef}
               className="icon-item"
@@ -135,7 +161,6 @@ const Header = ({ disableLinks }) => {
                 </span>
               )}
 
-              {/* Desktop Dropdown */}
               {!isMobile && notifOpen && (
                 <div className="notification-dropdown">
                   <div className="notif-header">
@@ -147,6 +172,7 @@ const Header = ({ disableLinks }) => {
                       ✕
                     </span>
                   </div>
+
                   {notifications.length === 0 ? (
                     <div className="notification-item empty">
                       No notifications
@@ -156,12 +182,14 @@ const Header = ({ disableLinks }) => {
                       {notifications.map((n) => {
                         const time = new Date(n.createdAt).toLocaleTimeString(
                           [],
-                          { hour: "2-digit", minute: "2-digit", hour12: true },
+                          { hour: "2-digit", minute: "2-digit", hour12: true }
                         );
                         return (
                           <div
                             key={n._id}
-                            className={`notification-item ${n.isRead ? "read" : "unread"}`}
+                            className={`notification-item ${
+                              n.isRead ? "read" : "unread"
+                            }`}
                           >
                             <span className="notif-message">{n.message}</span>
                             <span className="notif-time">{time}</span>
@@ -174,15 +202,15 @@ const Header = ({ disableLinks }) => {
               )}
             </div>
 
-            {/* Profile */}
-            <div
-              className="icon-item"
-              data-label="Profile"
-              onClick={() => (disableLinks ? null : navigate("/profile"))}
-            >
-              <FiUser />
-            </div>
-            {/* Logout */}
+           <div
+  className={`icon-item ${location.pathname === "/profile" ? "active" : ""}`}
+  data-label="Profile"
+  onClick={() => (disableLinks ? null : navigate("/profile"))}
+>
+  <FiUser />
+</div>
+
+
             <div
               className="icon-item"
               data-label="Logout"
@@ -206,7 +234,9 @@ const Header = ({ disableLinks }) => {
         <div className="close-btn" onClick={() => setOpen(false)}>
           ✕
         </div>
+
         <span
+          className={location.pathname === "/home" ? "active" : ""}
           onClick={() => {
             navigate("/home");
             setOpen(false);
@@ -214,7 +244,9 @@ const Header = ({ disableLinks }) => {
         >
           Home
         </span>
+
         <span
+          className={location.pathname === "/dashboard" ? "active" : ""}
           onClick={() => {
             navigate("/dashboard");
             setOpen(false);
@@ -222,7 +254,9 @@ const Header = ({ disableLinks }) => {
         >
           Dashboard
         </span>
+
         <span
+          className={location.pathname === "/dietplan" ? "active" : ""}
           onClick={() => {
             navigate("/dietplan");
             setOpen(false);
@@ -230,7 +264,9 @@ const Header = ({ disableLinks }) => {
         >
           Diet Plan
         </span>
+
         <span
+          className={location.pathname === "/workouts" ? "active" : ""}
           onClick={() => {
             navigate("/workouts");
             setOpen(false);
@@ -238,7 +274,9 @@ const Header = ({ disableLinks }) => {
         >
           Workouts
         </span>
+
         <span
+          className={location.pathname === "/dailyprogress" ? "active" : ""}
           onClick={() => {
             navigate("/dailyprogress");
             setOpen(false);
@@ -246,7 +284,7 @@ const Header = ({ disableLinks }) => {
         >
           Progress
         </span>
-        {/* Trigger Mobile Notifications */}
+
         <span
           onClick={() => {
             setNotifOpen(true);
@@ -255,6 +293,7 @@ const Header = ({ disableLinks }) => {
         >
           Notifications
         </span>
+
         <span
           onClick={() => {
             navigate("/profile");
@@ -263,6 +302,7 @@ const Header = ({ disableLinks }) => {
         >
           Profile
         </span>
+
         <span onClick={handleLogout}>Logout</span>
       </div>
 
@@ -275,6 +315,7 @@ const Header = ({ disableLinks }) => {
               ✕
             </span>
           </div>
+
           {notifications.length === 0 ? (
             <div className="notification-item empty">No notifications</div>
           ) : (
@@ -288,7 +329,9 @@ const Header = ({ disableLinks }) => {
                 return (
                   <div
                     key={n._id}
-                    className={`notification-item ${n.isRead ? "read" : "unread"}`}
+                    className={`notification-item ${
+                      n.isRead ? "read" : "unread"
+                    }`}
                   >
                     <span className="notif-message">{n.message}</span>
                     <span className="notif-time">{time}</span>

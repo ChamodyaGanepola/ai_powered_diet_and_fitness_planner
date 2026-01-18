@@ -2,30 +2,41 @@
   flex: 1;
   padding: 22px;
   border-radius: 26px;
-  color: #fff;
+  color: #0b1220;
   display: flex;
   gap: 14px;
   align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f3f4f6;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.16);
 }
 
 .stat-card h2 {
   margin: 0;
   font-size: 26px;
+  color: #0b1220;
 }
 
 .stat-card p {
   margin: 0;
   opacity: 0.9;
+  color: #2f3a4a;
 }
 
+/* Darker but still soft gradients */
 .stat-card.blue {
-  background: #4f46e5;
+  background: linear-gradient(135deg, #c7d8ff, #a9b7ff);
 }
 
 .stat-card.orange {
-  background: #fb923c;
+  background: linear-gradient(135deg, #ffd1a6, #ffb57a);
 }
 
 .stat-card.green {
-  background: #22c55e;
+  background: linear-gradient(135deg, #b8f2d1, #86e6b7);
 }

@@ -7,7 +7,7 @@
 /* ===== GRID LAYOUT ===== */
 .feedback-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* LARGE: 3 per row */
+  grid-template-columns: repeat(2, 1fr); /* LARGE: 3 per row */
   gap: 32px;
   margin-top: 32px;
   margin-bottom: 48px;

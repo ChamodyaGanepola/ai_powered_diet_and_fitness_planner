@@ -5,8 +5,8 @@ const { calculateBMI, getBMICategory } = require("../utils/bmi");
 exports.createProfile = async (req, res) => {
   try {
     console.log("Request body:", req.user.id, req.user.role);
+    const user_id = req.user.id; // from authMiddleware
     const {
-      user_id,
       age,
       gender,
       weight,
@@ -60,7 +60,7 @@ exports.createProfile = async (req, res) => {
 // Update profile (creates a new active profile)
 exports.updateProfile = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user.id; // from authMiddleware
     const updateData = req.body;
 
     // Find the existing active profile
@@ -109,9 +109,8 @@ exports.updateProfile = async (req, res) => {
 // Get profile by user_id (only active)
 exports.getProfileByUserId = async (req, res) => {
   try {
-    console.log("Request body:", req.user.id, req.user.role);
-    const { user_id } = req.params;
-
+    const user_id = req.user.id; // from authMiddleware
+    console.log("Fetching profile for user ID:", user_id);
     const profile = await UserProfile.findOne({ user_id, status: "active" })
       .populate("user_id", "username email");
 
@@ -131,7 +130,7 @@ exports.getProfileByUserId = async (req, res) => {
 // Delete profile by user_id
 exports.deleteProfile = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user.id; // from authMiddleware
 
     const profile = await UserProfile.findOneAndDelete({ user_id, status: "active" });
     if (!profile) {

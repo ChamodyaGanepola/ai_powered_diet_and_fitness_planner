@@ -18,11 +18,10 @@ const getAuthHeader = () => {
    CREATE MEAL PLAN
    POST /create
 ---------------------------- */
-export const createMealPlan = async (user_id) => {
+export const createMealPlan = async () => {
   try {
     const res = await axios.post(
       `${API_URL}/create`,
-      { user_id },
       getAuthHeader()
     );
     return res.data;
@@ -36,10 +35,9 @@ export const createMealPlan = async (user_id) => {
    GET LATEST ACTIVE MEAL PLAN
    GET /latest?user_id=
 ---------------------------- */
-export const getLatestMealPlan = async (user_id) => {
+export const getLatestMealPlan = async () => {
   try {
     const res = await axios.get(`${API_URL}/latest`, {
-      params: { user_id },
       ...getAuthHeader(),
     });
     return res.data;
@@ -51,12 +49,10 @@ export const getLatestMealPlan = async (user_id) => {
 
 /* ---------------------------
    GET COMPLETED MEAL PLANS
-   GET /completed?user_id=
 ---------------------------- */
-export const getCompletedMealPlans = async (user_id) => {
+export const getCompletedMealPlans = async () => {
   try {
     const res = await axios.get(`${API_URL}/completed`, {
-      params: { user_id },
       ...getAuthHeader(),
     });
     return res.data;
@@ -68,12 +64,10 @@ export const getCompletedMealPlans = async (user_id) => {
 
 /* ---------------------------
    GET NOT-SUITABLE MEAL PLANS
-   GET /not-suitable?user_id=
 ---------------------------- */
-export const getNotSuitableMealPlans = async (user_id) => {
+export const getNotSuitableMealPlans = async () => {
   try {
     const res = await axios.get(`${API_URL}/not-suitable`, {
-      params: { user_id },
       ...getAuthHeader(),
     });
     return res.data;
@@ -103,7 +97,6 @@ export const updateMealPlanStatus = async (mealPlanId, status) => {
 
 /* ---------------------------
    UPDATE MEAL PLAN START DATE
-   PATCH /:mealPlanId/start-date
 ---------------------------- */
 export const updateMealPlanStartDate = async (mealPlanId, startDate) => {
   try {
@@ -124,12 +117,11 @@ export const updateMealPlanStartDate = async (mealPlanId, startDate) => {
    DELETE /?user_id=&userProfile_id=
 ---------------------------- */
 export const deleteMealPlansByUserProfile = async (
-  user_id,
   userProfile_id
 ) => {
   try {
     const res = await axios.delete(`${API_URL}`, {
-      params: { user_id, userProfile_id },
+      params: { userProfile_id },
       ...getAuthHeader(),
     });
     return res.data;

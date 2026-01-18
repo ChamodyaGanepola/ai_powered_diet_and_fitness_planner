@@ -4,8 +4,8 @@ import WorkoutPlan from "../models/WorkoutPlan.js";
 
 export const submitPlanFeedback = async (req, res) => {
   try {
+    const user_id = req.user.id; // from authMiddleware
     const {
-      user_id,
       userProfile_id,
       planType,
       mealPlan_id,
@@ -60,7 +60,8 @@ export const submitPlanFeedback = async (req, res) => {
 
 export const getAllFeedbackByUserAndProfile = async (req, res) => {
   try {
-    const { user_id, userProfile_id } = req.query;
+    const { userProfile_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
 
     if (!user_id || !userProfile_id) {
       return res.status(400).json({
@@ -94,8 +95,8 @@ export const getAllFeedbackByUserAndProfile = async (req, res) => {
 
 export const getMealFeedbackByUserAndProfile = async (req, res) => {
   try {
-    const { user_id, userProfile_id } = req.query;
-
+    const {  userProfile_id } = req.query;
+    const user_id = req.user.id; 
     if (!user_id || !userProfile_id) {
       return res.status(400).json({
         success: false,
@@ -128,7 +129,8 @@ export const getMealFeedbackByUserAndProfile = async (req, res) => {
 
 export const getWorkoutFeedbackByUserAndProfile = async (req, res) => {
   try {
-    const { user_id, userProfile_id } = req.query;
+    const { userProfile_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
 
     if (!user_id || !userProfile_id) {
       return res.status(400).json({

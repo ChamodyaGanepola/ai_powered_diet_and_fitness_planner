@@ -5,7 +5,6 @@ import Profile from "./pages/Profile/Profile.jsx";
 import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import DietPlan from "./pages/DietPlan/DietPlan.jsx";
 import Workouts from "./pages/Workouts/Workouts.jsx";
-import Progress from "./pages/Progress/Progress.jsx";
 import DailyProgress from "./pages/DailyProgress/DailyProgress.jsx";
 import ForgotPassword from "./component/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword/ResetPassword.jsx";
@@ -19,16 +18,42 @@ function App() {
     <Routes>
       {/* AUTH */}
       <Route
-  path="/"
-  element={user ? <Navigate to="/home" replace /> : (
-    <PageLayout hideNavLinks>
-      <Auth />
-    </PageLayout>
-  )}
-/>
+        path="/"
+        element={
+          user ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <PageLayout hideNavLinks>
+              <Auth />
+            </PageLayout>
+          )
+        }
+      />
 
-      <Route path="/forgot-password" element={user ? <Navigate to="/home" replace /> : <ForgotPassword />} />
-      <Route path="/reset-password/:token" element={user ? <Navigate to="/home" replace /> : <ResetPassword />} />
+      <Route
+        path="/forgot-password"
+        element={
+          user ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <PageLayout hideNavLinks>
+              <ForgotPassword />
+            </PageLayout>
+          )
+        }
+      />
+      <Route
+        path="/reset-password/:token"
+        element={
+          user ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <PageLayout hideNavLinks>
+              <ResetPassword />
+            </PageLayout>
+          )
+        }
+      />
 
       {/* PROTECTED PAGES */}
       <Route
@@ -44,7 +69,7 @@ function App() {
         }
       />
 
-       <Route
+      <Route
         path="/profile"
         element={
           user ? (
@@ -60,24 +85,53 @@ function App() {
       {/* ADD OTHERS */}
       <Route
         path="/dashboard"
-        element={user ? <PageLayout><Dashboard /></PageLayout> : <Navigate to="/" replace />}
+        element={
+          user ? (
+            <PageLayout>
+              <Dashboard />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
       <Route
         path="/dietplan"
-        element={user ? <PageLayout><DietPlan /></PageLayout> : <Navigate to="/" replace />}
+        element={
+          user ? (
+            <PageLayout>
+              <DietPlan />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
       <Route
         path="/workouts"
-        element={user ? <PageLayout><Workouts /></PageLayout> : <Navigate to="/" replace />}
+        element={
+          user ? (
+            <PageLayout>
+              <Workouts />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
       <Route
         path="/dailyprogress"
-        element={user ? <PageLayout><DailyProgress /></PageLayout> : <Navigate to="/" replace />}
+        element={
+          user ? (
+            <PageLayout>
+              <DailyProgress />
+            </PageLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
-      <Route
-        path="/progress"
-        element={user ? <PageLayout><Progress /></PageLayout> : <Navigate to="/" replace />}
-      />
+      
     </Routes>
   );
 }

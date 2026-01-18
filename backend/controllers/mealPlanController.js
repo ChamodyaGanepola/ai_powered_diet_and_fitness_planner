@@ -24,9 +24,9 @@ const cleanAIResponse = (str) => {
 
   // Remove ```json or ``` at start/end
   str = str.trim()
-           .replace(/^```json\s*/, "")
-           .replace(/^```/, "")
-           .replace(/```$/, "");
+    .replace(/^```json\s*/, "")
+    .replace(/^```/, "")
+    .replace(/```$/, "");
 
   // Replace NaN with 0
   str = str.replace(/\bNaN\b/g, "0");
@@ -36,7 +36,7 @@ const cleanAIResponse = (str) => {
 
 export const createMealPlan = async (req, res) => {
   try {
-    const { user_id } = req.body;
+    const user_id = req.user.id; // from authMiddleware
 
     if (!user_id) {
       return res.status(400).json({ success: false, message: "user_id is required" });
@@ -62,11 +62,11 @@ export const createMealPlan = async (req, res) => {
 
     console.log("Calculating macros for user profile:", profileData);
     const macros = calculateMacros(profileData);
-const dietaryText = profileData.dietaryRestrictions.length > 0
+    const dietaryText = profileData.dietaryRestrictions.length > 0
       ? profileData.dietaryRestrictions.join(", ")
       : "None";
     // AI Prompt
- const prompt = `
+    const prompt = `
 Create a MEAL PLAN TEMPLATE (not a single-day log).
 
 This meal plan provides MULTIPLE OPTIONS for each meal.
@@ -159,7 +159,7 @@ FORMAT:
       }
     }
 
-   // Determine durationDays from AI, default 7
+    // Determine durationDays from AI, default 7
     const durationDays = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
       ? Number(mealPlanData.durationDays)
       : 7;
@@ -168,21 +168,21 @@ FORMAT:
       mealPlanData.totalCalories = macros.calories;
     }
 
-const startDateUTC = toUTCDateOnly(new Date());
-const endDateUTC = new Date(startDateUTC);
-endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1); // inclusive
+    const startDateUTC = toUTCDateOnly(new Date());
+    const endDateUTC = new Date(startDateUTC);
+    endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1); // inclusive
 
-const newMealPlan = await MealPlan.create({
-  user_id,
-  userProfile_id: userProfile._id,
-  startDate: startDateUTC,
-  endDate: endDateUTC,
-  totalCalories: mealPlanData.totalCalories,
-  totalProtein: macros.protein,
-  totalCarbs: macros.carbs,
-  totalFat: macros.fat,
-  status: "active",
-});
+    const newMealPlan = await MealPlan.create({
+      user_id,
+      userProfile_id: userProfile._id,
+      startDate: startDateUTC,
+      endDate: endDateUTC,
+      totalCalories: mealPlanData.totalCalories,
+      totalProtein: macros.protein,
+      totalCarbs: macros.carbs,
+      totalFat: macros.fat,
+      status: "active",
+    });
 
 
     // Save Meals and FoodItems
@@ -199,7 +199,7 @@ const newMealPlan = await MealPlan.create({
           calories: food.calories || 0,
           protein: food.protein || 0,
           fat: food.fat || 0,
-          carbohydrates: food.carbohydrates || 0, 
+          carbohydrates: food.carbohydrates || 0,
           unit: food.unit || "serving",
         });
       }
@@ -265,8 +265,8 @@ export const updateMealPlanStatus = async (req, res) => {
 
 export const deleteMealPlansByUserProfile = async (req, res) => {
   try {
-    const { user_id, userProfile_id } = req.query;
-
+    const {userProfile_id } = req.query;
+    const  user_id = req.user.id; // from authMiddleware
     if (!user_id || !userProfile_id) {
       return res.status(400).json({
         success: false,
@@ -299,7 +299,7 @@ export const deleteMealPlansByUserProfile = async (req, res) => {
 ---------------------------- */
 export const getLatestMealPlan = async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const  user_id  = req.user.id; // from authMiddleware
     if (!user_id)
       return res.status(400).json({ message: "user_id is required" });
 
@@ -327,12 +327,12 @@ export const getLatestMealPlan = async (req, res) => {
   }
 };
 
-/* ---------------------------
+/* 
    GET ALL NOT-SUITABLE MEAL PLANS
----------------------------- */
+ */
 export const getNotSuitableMealPlans = async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
     if (!user_id)
       return res.status(400).json({ message: "user_id is required" });
 
@@ -364,7 +364,7 @@ export const getNotSuitableMealPlans = async (req, res) => {
 ---------------------------- */
 export const getCompletedMealPlans = async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
     if (!user_id)
       return res.status(400).json({ message: "user_id is required" });
 

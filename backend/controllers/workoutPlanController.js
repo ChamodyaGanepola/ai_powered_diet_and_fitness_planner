@@ -44,7 +44,7 @@ const mapActivityLevelToDifficulty = (activityLevel) => {
 
 export const createWorkoutPlan = async (req, res) => {
   try {
-    const { user_id } = req.body;
+    const user_id = req.user.id; // from authMiddleware
     if (!user_id) {
       return res.status(400).json({ message: "user_id is required" });
     }
@@ -59,14 +59,14 @@ export const createWorkoutPlan = async (req, res) => {
       age,
       weight,
       height,
-      activityLevel ,
+      activityLevel,
       fitnessGoal,
       healthConditions = [],
       workoutPreferences,
     } = userProfile;
 
     const healthText = healthConditions.length ? `Health Conditions: ${healthConditions.join(", ")}` : "";
-    
+
     // AI prompt
     const prompt = `
 Create a weekly workout plan in JSON ONLY.
@@ -127,16 +127,16 @@ Output format:
         return res.status(500).json({ message: "AI workout JSON invalid", aiRaw });
       }
     }
-const durationDays = workoutData.durationDays && !isNaN(workoutData.durationDays)
-  ? Number(workoutData.durationDays)
-  : 7;
+    const durationDays = workoutData.durationDays && !isNaN(workoutData.durationDays)
+      ? Number(workoutData.durationDays)
+      : 7;
 
-// Start date = today
-const startDateUTC = new Date();
+    // Start date = today
+    const startDateUTC = new Date();
 
-// End date = startDate + durationDays - 1
-const endDateUTC = new Date();
-endDateUTC.setDate(startDateUTC.getDate() + durationDays - 1);
+    // End date = startDate + durationDays - 1
+    const endDateUTC = new Date();
+    endDateUTC.setDate(startDateUTC.getDate() + durationDays - 1);
     // Create WorkoutPlan document
     const workoutPlan = await WorkoutPlan.create({
       user_id,
@@ -167,8 +167,8 @@ endDateUTC.setDate(startDateUTC.getDate() + durationDays - 1);
         day: ex.day || "Monday",
       });
 
-      totalCalories += ex.caloriesBurned ;
-      totalDuration += ex.durationMinutes ;
+      totalCalories += ex.caloriesBurned;
+      totalDuration += ex.durationMinutes;
     }
 
     workoutPlan.totalCaloriesBurned = totalCalories;
@@ -186,7 +186,7 @@ endDateUTC.setDate(startDateUTC.getDate() + durationDays - 1);
 // Fetch latest workout plan
 export const getLatestWorkoutPlan = async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
     if (!user_id) return res.status(400).json({ message: "user_id is required" });
 
     const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
@@ -206,7 +206,8 @@ export const getLatestWorkoutPlan = async (req, res) => {
 // Get exercises for a user on a specific date
 export const getExercisesByDate = async (req, res) => {
   try {
-    const { userId, date } = req.query;
+    const userId = req.user.id; // from authMiddleware
+    const { date } = req.query;
     if (!userId || !date) return res.status(400).json({ message: "User ID and date are required" });
 
     // Find active workout plan for user

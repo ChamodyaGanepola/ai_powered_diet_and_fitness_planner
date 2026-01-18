@@ -6,7 +6,7 @@ import {
   getWorkoutFeedback,
 } from "../api/planFeedbackApi.js";
 
-const FeedbackList = ({ userId, userProfileId, type = "all" }) => {
+const FeedbackList = ({  userId, userProfileId, type = "all" }) => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,11 +19,11 @@ const FeedbackList = ({ userId, userProfileId, type = "all" }) => {
 
         let response;
         if (type === "meal") {
-          response = await getMealFeedback(userId, userProfileId);
+          response = await getMealFeedback(userProfileId);
         } else if (type === "workout") {
-          response = await getWorkoutFeedback(userId, userProfileId);
+          response = await getWorkoutFeedback(userProfileId);
         } else {
-          response = await getAllFeedback(userId, userProfileId);
+          response = await getAllFeedback(userProfileId);
         }
 
         setFeedbacks(response.data || []);

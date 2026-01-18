@@ -12,6 +12,7 @@ import "./DietPlan.css";
 import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
 import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
 import FeedbackList from "../../component/FeedbackList.jsx";
+import Loading from "../../component/Loading";
 
 export default function DietPlan() {
   const { user } = useAuth();
@@ -32,7 +33,7 @@ export default function DietPlan() {
   // ✅ Check if user profile exists
   const checkUserProfile = async () => {
     try {
-      const res = await getProfileByUserId(user.id);
+      const res = await getProfileByUserId();
       console.log("Profile check response:", res);
 
       // ✅ Correct check for your API structure
@@ -66,7 +67,7 @@ export default function DietPlan() {
   const fetchMealPlans = async () => {
     setLoading(true);
     try {
-      const res = await getLatestMealPlan(user.id);
+      const res = await getLatestMealPlan();
 
       if (res.success && res.mealPlan) {
         const plan = res.mealPlan;
@@ -113,7 +114,6 @@ export default function DietPlan() {
       await updateMealPlanStatus(activeMealPlanId, "not-suitable");
 
       await submitPlanFeedback({
-        user_id: user.id,
         userProfile_id: userProfileId,
         planType: "meal",
         mealPlan_id: activeMealPlanId,
@@ -129,7 +129,7 @@ export default function DietPlan() {
   // Generate meal plan
   const handleGenerateMealPlan = async () => {
     try {
-      await createMealPlan(user.id);
+      await createMealPlan();
       await fetchMealPlans();
     } catch (err) {
       console.error("Failed to generate meal plan:", err);
@@ -139,26 +139,22 @@ export default function DietPlan() {
   return (
     <div className="diet-page">
       {loading ? (
-        <p className="loading-text">Loading meal plans...</p>
+        <Loading text="Loading meal plans..." />
       ) : !profileExists ? (
-        <div className="empty-state centered-card">
+        <div className="centered-card">
           <h1 className="greeting">Hey {user.username},</h1>
           <p className="no-plan-text">
             First create your profile. Redirecting to home...
           </p>
         </div>
       ) : mealPlans.length === 0 ? (
-        <div className="empty-state centered-card">
+        <div className="centered-card">
           <h1 className="greeting">Hey {user.username},</h1>
           <p className="no-plan-text">
             No active meal plan available. You can generate one based on your
             profile.
           </p>
-          <button
-            className="generate-btn"
-            onClick={handleGenerateMealPlan}
-            disabled={loading}
-          >
+          <button className="generate-btn" onClick={handleGenerateMealPlan}>
             Generate Meal Plan
           </button>
         </div>

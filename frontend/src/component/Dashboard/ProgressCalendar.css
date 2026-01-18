@@ -1,7 +1,7 @@
 /* Calendar wrapper & adaptive rows */
 .progress-calendar-wrapper {
   display: grid;
-  gap: 16px;
+  gap: 18px;
   margin-top: 28px;
 }
 
@@ -12,60 +12,132 @@
 
 /* Month box */
 .calendar-month {
-  background: #f3f4f6;
-  border-radius: 12px;
-  padding: 12px;
-  min-width: 200px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  min-width: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
 }
 
 .calendar-month-name {
   text-align: center;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin-bottom: 10px;
   font-size: 14px;
+  color: #0f172a;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .calendar-header {
   font-size: 10px;
   text-align: center;
-  color: #6b7280;
-  font-weight: 500;
+  color: #64748b;
+  font-weight: 600;
   margin-bottom: 2px;
 }
 
 .calendar-cell {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   background: #e5e7eb;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  color: #1f2937;
+  cursor: pointer;
+  cursor: pointer;
+}
+
+/* Tooltip */
+.calendar-cell:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 10, 0.85);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  animation: pop 0.15s forwards;
+}
+
+/* Tooltip arrow */
+.calendar-cell:hover::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(10, 10, 10, 0.85);
+  z-index: 10;
+  opacity: 0;
+  animation: pop 0.15s forwards;
+}
+
+/* Pop animation */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* Empty cells */
-.calendar-cell.empty { background: transparent; }
+.calendar-cell.empty {
+  background: transparent;
+}
 
 /* Start / End circle */
-.calendar-cell.start { border: 2px solid #3b82f6; border-radius: 50%; }
-.calendar-cell.end { border: 2px solid #ef4444; border-radius: 50%; }
+.calendar-cell.start { 
+  border: 2px solid #4f46e5; 
+  border-radius: 50%;
+  background: #eef2ff;
+}
+
+.calendar-cell.end { 
+  border: 2px solid #ef4444; 
+  border-radius: 50%;
+  background: #ffe4e6;
+}
 
 /* Completed progress */
-.calendar-cell.completed { background: #d1fae5; color: #065f46; }
+.calendar-cell.completed { 
+  background: #d1fae5; 
+  color: #065f46; 
+}
 
 /* Tick mark */
-.tick { position: absolute; top: -2px; right: -2px; font-size: 10px; color: #16a34a; }
+.tick { 
+  position: absolute; 
+  top: -3px; 
+  right: -3px; 
+  font-size: 10px; 
+  color: #16a34a; 
+}
 
 /* Past days before today (from start) */
 .calendar-cell.past:not(.completed):not(.start):not(.end) {
@@ -83,6 +155,6 @@
 @media (max-width: 600px) {
   .progress-calendar-wrapper { grid-template-columns: 1fr !important; }
   .calendar-month { min-width: 100%; }
-  .calendar-cell { width: 22px; height: 22px; font-size: 10px; }
+  .calendar-cell { width: 24px; height: 24px; font-size: 10px; }
   .tick { font-size: 8px; }
 }

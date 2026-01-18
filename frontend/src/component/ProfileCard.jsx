@@ -43,7 +43,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
       if (edit && user?.id) {
         setLoading(true);
         try {
-          const data = await getProfileByUserId(user.id);
+          const data = await getProfileByUserId();
           if (data) {
             setFormData({
               age: data.age || "",
@@ -107,7 +107,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
       let actionType = "";
       let profile;
       if (edit) {
-        const res = await updateProfile(user.id, payload);
+        const res = await updateProfile(payload);
         console.log("payload for update:", payload);
         profile = res.profile;
         actionType = "updated";
@@ -122,7 +122,6 @@ const ProfileCard = ({ onClose, edit = false }) => {
 
       markProfileUpdated();
       await createNotification(
-        user.id,
         `Hi ${user.username}, your profile has been successfully ${actionType}! 🙂`
       );
 
@@ -131,10 +130,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
 
       // Generate meal & workout plans
       try {
-        await createMealPlan({ user_id: user.id });
-        await createWorkoutPlan({ user_id: user.id });
+        await createMealPlan();
+        await createWorkoutPlan();
         await createNotification(
-          user.id,
           "🍽️ Meal plan and 🏋️ Workout plan are ready!"
         );
         setStep("done"); // success

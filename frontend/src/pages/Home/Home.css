@@ -8,7 +8,7 @@
 /* ===== HERO ===== */
 .hero {
   text-align: center;
-  padding: 80px 20px 60px;
+  padding: 20px 20px 60px;
 }
 
 .hero h1 {
@@ -24,6 +24,20 @@
   margin-bottom: 28px;
 }
 
+/* ===== COLORS FOR CARDS ===== */
+.feature-card.diet-card {
+  background: #D9F7E3;
+}
+
+.feature-card.workout-card {
+  background: #FFE7D6;
+}
+
+.feature-card.progress-card {
+  background: #D9E8FF;
+}
+
+/* ===== BUTTON ===== */
 .primary-btn {
   background: linear-gradient(135deg, #01280d, #295339);
   color: white;
@@ -44,19 +58,19 @@
 .features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1100px;
+  gap: 34px;
+  max-width: 2000px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .feature-card {
-  background: #daf4de;
   padding: 28px 22px;
   border-radius: 14px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
   text-align: center;
   transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
 .feature-card:hover {
@@ -75,6 +89,15 @@
   line-height: 1.6;
 }
 
+/* ===== IMAGE STYLE ===== */
+.feature-img {
+  width: 100%;
+  aspect-ratio: 1 / 0.7;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 18px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .features {
@@ -87,5 +110,9 @@
 
   .hero p {
     font-size: 16px;
+  }
+
+  .feature-img {
+    aspect-ratio: 1 / 1;
   }
 }

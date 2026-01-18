@@ -98,7 +98,8 @@ const getPlannedWorkoutsFull = async (workoutPlanId) => {
 /* --------------------------- SAVE DAILY PROGRESS --------------------------- */
 export const saveDailyProgress = async (req, res) => {
   try {
-    const { user_id, date, weight, bodyFatPercentage, measurements, meals, workouts } = req.body;
+    const { date, weight, bodyFatPercentage, measurements, meals, workouts } = req.body;
+    const user_id = req.user.id;
     if (!user_id || !date || weight == null || bodyFatPercentage == null || !measurements || !meals || !workouts) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -164,7 +165,8 @@ export const saveDailyProgress = async (req, res) => {
 ---------------------------- */
 export const getDailyProgress = async (req, res) => {
   try {
-    const { user_id, date } = req.query;
+    const { date } = req.query;
+    const user_id = req.user.id;
     if (!user_id || !date)
       return res.status(400).json({ message: "user_id and date required" });
 
@@ -187,47 +189,16 @@ export const getDailyProgress = async (req, res) => {
   }
 };
 
-/* -------------------------------------
-   CHECK IF ANY PROGRESS EXISTS FOR DATE
--------------------------------------- */
-export const checkDailyProgressExists = async (req, res) => {
-  try {
-    const { user_id, date } = req.query;
-    if (!user_id || !date)
-      return res.status(400).json({ message: "user_id and date required" });
-
-    const dayUTC = toUTCDate(date);
-    const nextDayUTC = new Date(dayUTC);
-    nextDayUTC.setUTCDate(nextDayUTC.getUTCDate() + 1);
-
-    const exists = await DailyProgress.exists({
-      user_id,
-      date: { $gte: dayUTC, $lt: nextDayUTC },
-    });
-
-    res.json({ success: true, exists: !!exists });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to check progress",
-      error: err.message,
-    });
-  }
-};
-
-
-
 
 /**
  * Reset start/end dates for latest active plans if no progress exists
- * @param user_id - user to update
  * @param selectedStartDate - new start date selected by user
  */
 
-
 export const resetPlanDatesIfNoProgress = async (req, res) => {
   try {
-    const { user_id, selectedStartDate } = req.body;
+    const { selectedStartDate } = req.body;
+    const user_id = req.user.id;
 
     if (!user_id || !selectedStartDate) {
       return res.status(400).json({
@@ -275,9 +246,7 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
       return end;
     };
 
-    // -------------------------------
     // Reset MealPlan dates safely
-    // -------------------------------
     if (mealPlan) {
       let durationDays = defaultDurationDays;
 
@@ -298,9 +267,9 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
       };
     }
 
-    // -------------------------------
+
     // Reset WorkoutPlan dates safely
-    // -------------------------------
+
     if (workoutPlan) {
       let durationDays = defaultDurationDays;
 
@@ -336,16 +305,15 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
   }
 };
 
-/* ---------------------------
-   GET COMPLETED DATES FOR USER
----------------------------- */
+
 /**
  * GET all completed progress dates for a user filtered by meal/workout plan
  * Returns array of date strings (YYYY-MM-DD)
  */
 export const getCompletedProgressDates = async (req, res) => {
   try {
-    const { user_id, mealplan_id, workoutplan_id } = req.query;
+    const { mealplan_id, workoutplan_id } = req.query;
+    const user_id = req.user.id;
     if (!user_id) {
       return res.status(400).json({ success: false, message: "user_id required" });
     }
@@ -372,12 +340,10 @@ export const getCompletedProgressDates = async (req, res) => {
 
 
 // Check if any daily progress exists for a user considering their active meal/workout plan
-// dailyProgressController.js
-
 
 export const checkDailyProgressForUser = async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const user_id = req.user.id;
     if (!user_id) return res.status(400).json({ success: false, message: "user_id required" });
 
     // Get active meal/workout plans

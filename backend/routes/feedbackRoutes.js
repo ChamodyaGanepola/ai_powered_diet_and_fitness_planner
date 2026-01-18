@@ -5,14 +5,13 @@ import {
   getMealFeedbackByUserAndProfile,
   getWorkoutFeedbackByUserAndProfile,
 } from "../controllers/planFeedbackController.js";
-
+import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
-router.post("/save", submitPlanFeedback);
-
-// GET feedback (ONLY user_id & userProfile_id)
-router.get("/all", getAllFeedbackByUserAndProfile);
-router.get("/meal", getMealFeedbackByUserAndProfile);
-router.get("/workout", getWorkoutFeedbackByUserAndProfile);
+router.post("/save", authMiddleware, submitPlanFeedback);
+// GET feedback ( userProfile_id)
+router.get("/all", authMiddleware, getAllFeedbackByUserAndProfile);
+router.get("/meal", authMiddleware, getMealFeedbackByUserAndProfile);
+router.get("/workout", authMiddleware, getWorkoutFeedbackByUserAndProfile);
 
 export default router;

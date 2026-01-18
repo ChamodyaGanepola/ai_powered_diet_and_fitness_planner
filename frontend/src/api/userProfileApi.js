@@ -15,8 +15,8 @@ const getAuthHeader = () => {
 
 
 // Get user profile by user id
-export const getProfileByUserId = async (id) => {
-  const res = await axios.get(`${API_URL}/${id}`, getAuthHeader());
+export const getProfileByUserId = async () => {
+  const res = await axios.get(`${API_URL}`, getAuthHeader());
   return res.data;
 };
 
@@ -27,13 +27,13 @@ export const createProfile = async (profileData) => {
 };
 
 // Update profile by user id
-export const updateProfile = async (id, updateData) => {
-  const res = await axios.patch(`${API_URL}/${id}`, updateData, getAuthHeader());
+export const updateProfile = async (updateData) => {
+  const res = await axios.patch(`${API_URL}`, updateData, getAuthHeader());
   return res.data;
 };
 
 // Delete profile by user id
-export const deleteProfile = async (id) => {
-  const res = await axios.delete(`${API_URL}/${id}`, getAuthHeader());
+export const deleteProfile = async () => {
+  const res = await axios.delete(`${API_URL}`, getAuthHeader());
   return res.data;
 };

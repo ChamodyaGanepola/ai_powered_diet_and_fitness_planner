@@ -17,8 +17,6 @@ import { createNotification } from "../../api/notificationApi.js";
 import PageLayout from "../../layouts/PageLayout.jsx";
 import "./Profile.css";
 import { useAuth } from "../../context/authContext.jsx";
-import Header from "../../component/Header.jsx";
-import Footer from "../../component/Footer.jsx";
 
 const Profile = () => {
   const { user, markProfileUpdated } = useAuth();
@@ -35,7 +33,7 @@ const Profile = () => {
     if (!user?.id) return;
     setLoading(true);
     try {
-      const data = await getProfileByUserId(user.id);
+      const data = await getProfileByUserId();
       setProfile(data);
       console.log("Fetched profile data in Profile page:", data);
     } catch {
@@ -62,13 +60,12 @@ const Profile = () => {
 
   const handleDeleteProfile = async () => {
     try {
-      await deleteProfile(user.id);
+      await deleteProfile();
       setProfile(null);
       markProfileUpdated(); //  notify whole app
       setSuccessMsg("Successfully deleted your profile");
       //  Create delete notification
       await createNotification(
-        user.id,
         `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`,
       );
       setTimeout(() => {
@@ -79,6 +76,20 @@ const Profile = () => {
       console.error("Profile delete failed", err);
     }
   };
+const getBMIClass = (category) => {
+  switch (category) {
+    case "Underweight":
+      return "underweight";
+    case "Normal weight":
+      return "normal";
+    case "Overweight":
+      return "overweight";
+    case "Obesity":
+      return "obese";
+    default:
+      return "normal";
+  }
+};
 
   if (loading) return <p className="loading">Loading profile...</p>;
 
@@ -128,6 +139,15 @@ const Profile = () => {
                 value={`${profile.height} cm`}
               />
               <ProfileItem
+                icon={<FaHeart />}
+                label="BMI"
+                value={`${profile.bmi} (${profile.bmiCategory})`}
+              />
+              
+ 
+
+
+              <ProfileItem
                 icon={<FaBullseye />}
                 label="Fitness Goal"
                 value={profile.fitnessGoal}
@@ -138,6 +158,52 @@ const Profile = () => {
                 value={profile.activityLevel}
               />
             </div>
+            {profile ? (
+  <>
+    {/* BMI CARD */}
+    <div className="bmi-card">
+      <div className="bmi-card-left">
+        <div className="bmi-value">{profile.bmi}</div>
+        <div className="bmi-category">{profile.bmiCategory}</div>
+      </div>
+
+      <div className="bmi-card-right">
+        <div className="bmi-scale">
+          <span>Underweight</span>
+          <span>Normal</span>
+          <span>Overweight</span>
+          <span>Obese</span>
+        </div>
+
+        <div className="bmi-bar">
+          <div
+            className={`bmi-progress ${
+              profile.bmiCategory === "Underweight"
+                ? "underweight"
+                : profile.bmiCategory === "Normal weight"
+                ? "normal"
+                : profile.bmiCategory === "Overweight"
+                ? "overweight"
+                : "obese"
+            }`}
+          />
+        </div>
+
+        <p className="bmi-note">
+          BMI shows your body weight relative to your height.
+        </p>
+      </div>
+    </div>
+
+    {/* PROFILE GRID */}
+    <div className="profile-grid">
+      ...
+    </div>
+  </>
+) : (
+  <p className="empty">No data available</p>
+)}
+
 
             <Section
               title="Dietary Restrictions"
@@ -187,8 +253,7 @@ const Profile = () => {
           </div>
         </div>
       )}
-
-  </>
+    </>
   );
 };
 

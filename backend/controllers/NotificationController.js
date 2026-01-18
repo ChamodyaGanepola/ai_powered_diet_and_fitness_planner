@@ -4,8 +4,8 @@ import { io } from "../server.js"; // import the socket.io server
 /* Create notification */
 export const createNotificationHandler = async (req, res) => {
     try {
-        const { user_id, message } = req.body;
-
+        const { message } = req.body;
+        const user_id = req.user.id; // from authMiddleware
         if (!user_id || !message) {
             return res.status(400).json({ message: "user_id and message are required" });
         }

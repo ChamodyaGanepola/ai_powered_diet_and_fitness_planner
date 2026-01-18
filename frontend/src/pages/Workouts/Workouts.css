@@ -1,169 +1,39 @@
 .workouts-page {
-  margin: 0 auto;
   padding: 32px;
-  background: #f4f6fa;
   min-height: 100vh;
- 
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #1e3a8a;
-}
-
-.plan-card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 28px;
-  margin-bottom: 32px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-}
-
-.plan-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 28px;
-}
-
-.plan-summary span {
-  margin-left: 12px;
-  font-weight: 600;
-  color: #555;
-}
-
-.workouts-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-
-
-/* No plan wrapper - full center */
-.no-plan-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 20px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  text-align: center;
+/* Day grouping */
+.day-section {
   margin-top: 40px;
 }
 
-.no-plan-greeting {
-  font-size: 2rem;
-  color: #1e3a8a;
-  margin-bottom: 16px;
-}
-
-.no-plan-text {
-  font-size: 1.2rem;
-  color: #374151;
-  margin-bottom: 32px;
-  max-width: 600px;
-}
-
-/* Buttons */
-.add-button {
- background: linear-gradient(135deg,#01280d,#295339);
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.add-button:hover {
-  background-color: linear-gradient(135deg, #01280d, #295339);
-}
-
-/* Delete button wrapper */
-.delete-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 26px;
-}
-
-.delete-button {
-  background-color: #dc2626;
-  color: white;
-  border: none;
-  padding: 12px 26px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.delete-button:hover {
-  background-color: #b91c1c;
-}
-
-/* WORKOUT GRID */
-.workouts-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-/* ===== FEEDBACK SECTION ===== */
-.feedback-section {
-  margin-top: 48px;
-}
-
-/* Header row */
-.feedback-header-toggle {
-  display: inline-flex;             
-  align-items: center;
-  gap: 10px;                         
-  cursor: pointer;
-  user-select: none;
-  padding: 12px 4px;
-}
-
-/* Title */
-.feedback-title {
+.day-title {
   font-size: 22px;
   font-weight: 700;
   color: #1e3a8a;
+  margin-bottom: 18px;
 }
 
-/* Arrow */
-.feedback-arrow {
-  font-size: 26px;
-  line-height: 1;
-  transition: transform 0.3s ease;
-  color: #1e3a8a;
+/* Exercise cards grid */
+.workouts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
-/* Rotate when open */
-.feedback-arrow.open {
-  transform: rotate(180deg);
+/* Center delete button */
+.delete-button.centered {
+  display: block;
+  margin: 48px auto 0;
 }
 
-/* ===== COLLAPSIBLE CONTENT ===== */
-.feedback-content {
-  overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
+/* Keep feedback clean */
+.feedback-section {
+  margin-top: 60px;
 }
 
-/* Hidden */
-.feedback-content.hide {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
 
-/* Visible */
-.feedback-content.show {
-  max-height: 3000px; /* large enough */
-  opacity: 1;
-  margin-top: 24px;
-}
 /* MOBILE */
 @media (max-width: 868px) {
   .workouts-grid {

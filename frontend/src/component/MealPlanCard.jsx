@@ -1,12 +1,17 @@
 import MealSection from "./MealSection";
 import "react-datepicker/dist/react-datepicker.css";
 import "./MealPlanCard.css";
-
+import PageHeader from "./PageHeader.jsx";
 export default function MealPlanCard({ plan, index }) {
   return (
     <div className="mealplan-card">
       <div className="mealplan-header">
-        <h2>Diet Plan </h2>
+                <PageHeader
+          icon="🥗"
+          title="Your Diet Plan"
+          subtitle="Personalized nutrition designed to support your goals"
+        />
+        
         <div className="macros">
           <span>{plan.totalCalories || 1655} kcal</span>
           <span>{plan.totalProtein || 77}g protein</span>

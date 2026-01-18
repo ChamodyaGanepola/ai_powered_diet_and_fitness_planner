@@ -12,12 +12,12 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.post("/", authMiddleware,createProfile);
 
 // PATCH → update profile by user_id
-router.patch("/:user_id", authMiddleware,updateProfile);
+router.patch("/", authMiddleware,updateProfile);
 
 // GET → profile by user_id
-router.get("/:user_id", authMiddleware, getProfileByUserId);
+router.get("/", authMiddleware, getProfileByUserId);
 
 // DELETE → delete profile by user_id
-router.delete("/:user_id", authMiddleware, deleteProfile);
+router.delete("/", authMiddleware, deleteProfile);
 
 module.exports = router;

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/daily-progress";
 
-// Helper to get auth header
+
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return {
@@ -12,11 +12,10 @@ const getAuthHeader = () => {
   };
 };
 
-export const checkDailyProgressForUser = async (user_id) => {
+export const checkDailyProgressForUser = async () => {
   const res = await axios.get(
     `${API_URL}/checkProgress`,
     {
-      params: { user_id },
       ...getAuthHeader(),
     }
   );
@@ -24,7 +23,6 @@ export const checkDailyProgressForUser = async (user_id) => {
 };
 
 export const createDailyProgress = async (
-  user_id,
   date,
   weight,
   bodyFatPercentage,
@@ -36,7 +34,6 @@ export const createDailyProgress = async (
     const response = await axios.post(
       `${API_URL}/daily`,
       { 
-        user_id,
         date,
         weight,
         bodyFatPercentage,
@@ -54,13 +51,11 @@ export const createDailyProgress = async (
 };
 
 
-
-
 // Get daily progress for a specific date
-export const getDailyProgressByDate = async (user_id, date) => {
+export const getDailyProgressByDate = async ( date) => {
   try {
     const res = await axios.get(`${API_URL}/daily`, {
-      params: { user_id, date },
+      params: { date },
       ...getAuthHeader(),
     });
     return res.data;
@@ -70,12 +65,12 @@ export const getDailyProgressByDate = async (user_id, date) => {
   }
 };
 // RESET PLAN DATES IF NO PROGRESS EXISTS
-// ---------------------------
-export const resetPlanDatesIfNoProgress = async (user_id, selectedStartDate) => {
+
+export const resetPlanDatesIfNoProgress = async ( selectedStartDate) => {
   try {
     const res = await axios.post(
       `${API_URL}/reset-plan-dates`,
-      { user_id, selectedStartDate },
+      { selectedStartDate },
       getAuthHeader()
     );
     return res.data;
@@ -87,11 +82,10 @@ export const resetPlanDatesIfNoProgress = async (user_id, selectedStartDate) => 
 
 
 export const getCompletedProgressDates = async (
-  userId,
   mealplanId,
   workoutplanId
 ) => {
-  const params = { user_id: userId };
+  const params = { };
   if (mealplanId) params.mealplan_id = mealplanId;
   if (workoutplanId) params.workoutplan_id = workoutplanId;
 

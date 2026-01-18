@@ -1,43 +1,35 @@
 .diet-page {
   padding: 32px;
-  background: #f4f6fa;
   min-height: 100vh;
+  background: #e5efe9;
 }
 
-/* Global actions */
-.plan-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-}
-
-/* Centered empty card for no meal plan */
+/* ===== PLAIN CENTERED STATE (NO CARD) ===== */
 .centered-card {
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
-  margin-top: 40px;
+   background: #e5efe9;
 }
 
+/* Text */
 .greeting {
   font-size: 2rem;
   color: #1e3a8a;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .no-plan-text {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #374151;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   max-width: 600px;
 }
 
+/* Button */
 .generate-btn {
   background: linear-gradient(135deg, #01280d, #295339);
   color: white;
@@ -49,10 +41,10 @@
 }
 
 .generate-btn:hover {
-  background-color: linear-gradient(135deg, #01280d, #295339);
+  opacity: 0.95;
 }
 
-/* Delete button wrapper */
+/* Delete */
 .delete-wrapper {
   display: flex;
   justify-content: center;
@@ -73,57 +65,46 @@
   background-color: #b91c1c;
 }
 
-/* ===== FEEDBACK SECTION ===== */
+/* ===== FEEDBACK ===== */
 .feedback-section {
   margin-top: 48px;
 }
 
-/* Header row */
 .feedback-header-toggle {
-  display: inline-flex;             
+  display: inline-flex;
   align-items: center;
-  gap: 10px;                         
+  gap: 10px;
   cursor: pointer;
   user-select: none;
-  padding: 12px 4px;
 }
 
-/* Title */
 .feedback-title {
   font-size: 22px;
   font-weight: 700;
   color: #1e3a8a;
 }
 
-/* Arrow */
 .feedback-arrow {
   font-size: 26px;
-  line-height: 1;
   transition: transform 0.3s ease;
-  color: #1e3a8a;
 }
 
-/* Rotate when open */
 .feedback-arrow.open {
   transform: rotate(180deg);
 }
 
-/* ===== COLLAPSIBLE CONTENT ===== */
 .feedback-content {
   overflow: hidden;
   transition: max-height 0.4s ease, opacity 0.3s ease;
 }
 
-/* Hidden */
 .feedback-content.hide {
   max-height: 0;
   opacity: 0;
-  pointer-events: none;
 }
 
-/* Visible */
 .feedback-content.show {
-  max-height: 3000px; /* large enough */
+  max-height: 3000px;
   opacity: 1;
   margin-top: 24px;
 }
@@ -132,13 +113,6 @@
 @media (max-width: 868px) {
   .diet-page {
     padding: 16px;
-  }
-
-  .plan-actions {
-    justify-content: center;
-  }
-  .centered-card {
-    padding: 60px 16px;
   }
 
   .greeting {

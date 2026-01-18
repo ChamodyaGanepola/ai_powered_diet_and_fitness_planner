@@ -71,6 +71,15 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
                 const isPast = date >= start && date < today;
                 const isToday = dateStr === todayStr;
 
+                // Tooltip text
+                const tooltipText = startCircle
+                  ? `Start Date: ${dateStr}`
+                  : endCircle
+                  ? `End Date: ${dateStr}`
+                  : completed
+                  ? `Completed: ${dateStr}`
+                  : `Not Completed: ${dateStr}`;
+
                 return (
                   <div
                     key={dateStr}
@@ -81,6 +90,7 @@ export default function ProgressCalendar({ startDate, endDate, completedDates = 
                       ${isPast ? "past" : ""}
                       ${isToday ? "today" : ""}
                     `}
+                    data-tooltip={tooltipText}   // <-- Tooltip added here
                   >
                     {i + 1}
                     {completed && <span className="tick">✔</span>}

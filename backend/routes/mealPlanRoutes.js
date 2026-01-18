@@ -1,14 +1,14 @@
-const express = require("express");
-const { createMealPlan, getLatestMealPlan, updateMealPlanStartDate, getCompletedMealPlans,
-     getNotSuitableMealPlans,updateMealPlanStatus, deleteMealPlansByUserProfile } = require("../controllers/mealPlanController.js");
-
+import express from "express";
+import { createMealPlan, getLatestMealPlan, updateMealPlanStartDate, getCompletedMealPlans,
+     getNotSuitableMealPlans,updateMealPlanStatus, deleteMealPlansByUserProfile } from "../controllers/mealPlanController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
-router.post("/create", createMealPlan);
-router.get("/latest", getLatestMealPlan);
-router.get("/not-suitable", getNotSuitableMealPlans);
-router.get("/completed", getCompletedMealPlans);
-router.patch("/:mealPlanId/start-date", updateMealPlanStartDate);
-router.put("/status/:mealPlanId", updateMealPlanStatus);
-router.delete("/", deleteMealPlansByUserProfile)
-module.exports = router;
+router.post("/create", authMiddleware, createMealPlan);
+router.get("/latest", authMiddleware, getLatestMealPlan);
+router.get("/not-suitable", authMiddleware, getNotSuitableMealPlans);
+router.get("/completed", authMiddleware, getCompletedMealPlans);
+router.patch("/:mealPlanId/start-date", authMiddleware, updateMealPlanStartDate);
+router.put("/status/:mealPlanId", authMiddleware, updateMealPlanStatus);
+router.delete("/", authMiddleware, deleteMealPlansByUserProfile)
+export default router;

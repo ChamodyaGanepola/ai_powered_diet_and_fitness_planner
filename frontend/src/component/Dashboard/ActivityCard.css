@@ -1,21 +1,30 @@
 .activity-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 22px;
   padding: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.14);
 }
 
 .activity-card h4 {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
+  color: #0f172a;
 }
 
 .activity-card p {
   margin: 6px 0 10px;
   font-size: 13px;
-  color: #777;
+  color: #475569;
 }
 
 .activity-card .avg {
   font-size: 11px;
-  color: #999;
+  color: #64748b;
 }
