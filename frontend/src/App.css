@@ -30,4 +30,5 @@
   padding-top: 64px;     /* HEADER HEIGHT */
   padding-bottom: 64px;  /* FOOTER HEIGHT */
   overflow-y: auto;
+   overflow-x: hidden;
 }
