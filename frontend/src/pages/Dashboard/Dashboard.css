@@ -1,56 +1,128 @@
+/* ================= ROOT ================= */
 .dashboard-root {
   width: 100%;
   min-height: 100vh;
-  box-sizing: border-box;
   display: flex;
- 
 }
 
 .dashboard-main {
   width: 100%;
   background: #e5efe9;
   padding: 26px;
-  
+  box-sizing: border-box;
 }
 
+/* ================= HEADER ================= */
+.dashboard-header {
+  margin-bottom: 20px;
+}
 
-
-/* ===== GRID ===== */
-.stats {
+/* ================= TOP GRID ================= */
+.dashboard-top-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 220px 1fr 360px;
+  grid-template-rows: repeat(2, auto);
   gap: 16px;
-  margin-top: 20px;
+
+  grid-template-areas:
+    "progress stats calendar"
+    "progress stats calendar";
 }
+
+.progress-col {
+  grid-area: progress;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stats-col {
+  grid-area: stats;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.calendar-col {
+  grid-area: calendar;
+}
+
+/* Calendar compact */
+.calendar-col .calendar-wrapper {
+  max-width: 340px;
+  padding: 8px;
+}
+
+.calendar-col .calendar-cell {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+.calendar-col .calendar-header-day {
+  font-size: 9px;
+}
+
+.calendar-col .month-title {
+  font-size: 12px;
+}
+
 
 .activities {
+  margin-top: 28px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
-  margin-top: 28px;
 }
-
-/* Tablet */
+/* ===== Container & Layout ===== */
+.app-container {
+  margin: 0 auto;
+  padding: 32px;
+  background: #e5efe9;
+  min-height: 100vh;
+  
+}
+/* Simple message without card */
+.simple-message {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+/* ================= TABLET ================= */
 @media (max-width: 1024px) {
-  .stats,
+  .dashboard-top-grid {
+    grid-template-columns: 200px 1fr 300px;
+  }
+
   .activities {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Mobile */
-@media (max-width: 600px) {
+/* ================= MOBILE ================= */
+@media (max-width: 900px) {
   .dashboard-main {
     padding: 16px;
   }
 
-  .stats,
-  .activities {
+  .dashboard-top-grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "progress"
+      "stats"
+      "activities"
+      "calendar";
+    gap: 12px;
   }
 
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .stats-col {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .activities {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 }

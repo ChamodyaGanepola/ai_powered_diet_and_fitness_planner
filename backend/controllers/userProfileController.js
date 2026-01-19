@@ -16,7 +16,8 @@ exports.createProfile = async (req, res) => {
       dietaryRestrictions,
       healthConditions,
       workoutPreferences,
-      culturalDietaryPatterns
+      culturalDietaryPatterns,
+      days
     } = req.body;
 
     if (!user_id || !age || !gender || !weight || !height) {
@@ -27,7 +28,8 @@ exports.createProfile = async (req, res) => {
     if (existingProfile) {
       return res.status(400).json({ message: "Active profile already exists for this user", profile: existingProfile });
     }
-
+ // Convert days to number (if provided)
+    const daysNumber = days !== undefined ? Number(days) : null;
     const bmi = calculateBMI(weight, height);
     const bmiCategory = getBMICategory(bmi);
 
@@ -46,6 +48,7 @@ exports.createProfile = async (req, res) => {
       bmi,
       bmiCategory,
       status: "active",
+      days:daysNumber,
     });
 
     await profile.save();
@@ -76,6 +79,10 @@ exports.updateProfile = async (req, res) => {
     // Recalculate BMI if weight or height is updated
     const weight = updateData.weight || activeProfile.weight;
     const height = updateData.height || activeProfile.height;
+    // Convert days to number 
+    const daysNumber = updateData.days !== undefined
+      ? Number(updateData.days)
+      : activeProfile.days;
     const bmi = calculateBMI(weight, height);
     const bmiCategory = getBMICategory(bmi);
 
@@ -92,6 +99,7 @@ exports.updateProfile = async (req, res) => {
       healthConditions: updateData.healthConditions || activeProfile.healthConditions,
       workoutPreferences: updateData.workoutPreferences || activeProfile.workoutPreferences,
       culturalDietaryPatterns: updateData.culturalDietaryPatterns || activeProfile.culturalDietaryPatterns,
+      days: daysNumber,
       bmi,
       bmiCategory,
       status: "active"

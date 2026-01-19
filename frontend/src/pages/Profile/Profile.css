@@ -6,11 +6,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #e5efe9;  /* same as index */
+  background: #e5efe9;
   color: #1b2b22;
   box-sizing: border-box;
 }
-
+/* ===== Container & Layout ===== */
+.app-container {
+  margin: 0 auto;
+  padding: 32px;
+  background: #e5efe9;
+  min-height: 100vh;
+  
+}
+/* Simple message without card */
+.simple-message {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
 /* ===== HEADER ===== */
 .profile-header {
   text-align: center;
@@ -21,7 +35,7 @@
   border: 1px solid rgba(43, 122, 75, 0.18);
   border-radius: 18px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px; /* bigger width */
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -51,9 +65,10 @@
 }
 
 /* ===== BMI CARD ===== */
+/* ===== BMI CARD ===== */
 .bmi-card {
   width: 100%;
-  max-width: 900px;
+  max-width: 510px;
   display: flex;
   gap: 18px;
   padding: 20px;
@@ -62,6 +77,15 @@
   border: 1px solid rgba(43, 122, 75, 0.18);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
   margin-bottom: 24px;
+  grid-column: span 1;   /* <-- FIXED */
+}
+
+
+/* MAKE BMI CARD LOOK LIKE OTHER CARDS IN GRID */
+.bmi-grid-card {
+  max-width: none;
+  width: 517px;
+  grid-column: span 1;
 }
 
 .bmi-card-left {
@@ -137,10 +161,10 @@
 /* ===== GRID ===== */
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   margin-bottom: 24px;
 }
 
@@ -170,11 +194,13 @@
   margin-top: 2px;
 }
 
+
 /* ===== SECTIONS ===== */
 .profile-section {
   width: 100%;
-  max-width: 900px;
-  margin-bottom: 25px;
+  max-width: 1200px;
+
+   margin-bottom: 0;
 }
 
 .profile-section h3 {
@@ -242,7 +268,6 @@
   color: #1b2b22;
 }
 
-/* ACTION BUTTONS */
 .confirm-actions {
   display: flex;
   gap: 12px;
@@ -287,9 +312,22 @@
   transform: translateY(-1px);
   transition: 0.2s ease;
 }
+.profile-sections-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 24px;
+}
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
+
+  .profile-sections-row {
+    grid-template-columns: 1fr; /* stack on mobile */
+  }
+
   .profile-page {
     padding: 20px 14px;
   }

@@ -13,6 +13,8 @@ import { getLatestMealPlan } from "../../api/mealPlanApi";
 import { getLatestWorkoutPlan } from "../../api/workoutPlan";
 import Loading from "../../component/Loading";
 import PageHeader from "../../component/PageHeader.jsx";
+import ProgressPercentage from "../../component/ProgressPercentage.jsx";
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [last7Days, setLast7Days] = useState([]);
@@ -22,6 +24,7 @@ export default function Dashboard() {
   const [activeWorkoutPlan, setActiveWorkoutPlan] = useState(null);
   const [completedDates, setCompletedDates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [profileExists, setProfileExists] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -32,10 +35,10 @@ export default function Dashboard() {
       try {
         const profile = await getProfileByUserId();
         if (!profile?._id) {
-          window.location.href = "/home";
-          return;
+          setProfileExists(false);
+          setTimeout(() => (window.location.href = "/home"), 3000);
         }
-
+        setProfileExists(true);
         setInitialWeight(profile.weight);
 
         const mealPlanRes = await getLatestMealPlan();
@@ -47,18 +50,13 @@ export default function Dashboard() {
         setActiveWorkoutPlan(workoutPlan);
 
         if (!mealPlan && !workoutPlan) {
-          window.location.href = "/home";
-          return;
-        }
-
-        if (!mealPlan && workoutPlan) {
-          window.location.href = "/dietplan";
-          return;
+          setTimeout(() => (window.location.href = "/home"), 3000);
+        } else if (!mealPlan && workoutPlan) {
+          setTimeout(() => (window.location.href = "/dietPlan"), 3000);
         }
 
         if (!workoutPlan && mealPlan) {
-          window.location.href = "/workouts";
-          return;
+          setTimeout(() => (window.location.href = "/workouts"), 3000);
         }
 
         if (mealPlan?._id) {
@@ -87,48 +85,108 @@ export default function Dashboard() {
     loadDashboard();
   }, [user]);
 
-  if (loading) {
-    return <Loading text="Loading dashboard..." />;
+  if (loading) return <Loading text="Loading dashboard..." />;
+
+  if (!profileExists) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          Hey {user.username}, first create your profile. Redirecting to home...
+        </p>
+      </div>
+    );
+  }
+
+  if (!activeMealPlan && !activeWorkoutPlan) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          No active plans found. Redirecting to home...
+        </p>
+      </div>
+    );
+  }
+
+  if (activeWorkoutPlan && !activeMealPlan) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          No active meal plan found. Redirecting to meal plan...
+        </p>
+      </div>
+    );
+  }
+
+  if (activeMealPlan && !activeWorkoutPlan) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          No active workout plan found. Redirecting to workout plan...
+        </p>
+      </div>
+    );
   }
 
   return (
     <div className="dashboard-root">
       <main className="dashboard-main">
-  
-        <PageHeader
-          icon="👋"
-          title={`Hey ${user?.username}!`}
-          subtitle="Your progress is looking great. Keep going!"
-        />
-        
-
-        <div className="stats">
-          <StatCard
-            icon="🎯"
-            title="Initial Weight"
-            value={initialWeight ? `${initialWeight} kg` : "--"}
-            color="blue"
-          />
-          <StatCard
-            icon="⚖️"
-            title="Current Weight"
-            value={latest ? `${latest.weight} kg` : "--"}
-            color="green"
-          />
-          <StatCard
-            icon="🔥"
-            title="Calories Taken"
-            value={latest?.totalCaloriesTaken ?? "--"}
-            color="orange"
-          />
-          <StatCard
-            icon="💪"
-            title="Calories Burned"
-            value={latest?.totalCaloriesBurned ?? "--"}
-            color="green"
+        {/* ===== ROW 1: HEADER ===== */}
+        <div className="dashboard-header">
+          <PageHeader
+            icon="👋"
+            title={`Hey ${user?.username}!`}
+            subtitle="Let's start living healthy from today"
           />
         </div>
 
+        {/* ===== ROW 2: GRID ===== */}
+        <div className="dashboard-top-grid">
+          {/* COLUMN 1 */}
+          <div className="progress-col">
+            <ProgressPercentage />
+          </div>
+
+          {/* COLUMN 2 */}
+          <div className="stats-col">
+            <StatCard
+              icon="⚖️"
+              title="Initial Weight"
+              value={`${initialWeight ?? "--"} kg`}
+              className="pink"
+            />
+            <StatCard
+              icon="💪"
+              title="Current Weight"
+              value={`${latest?.weight ?? "--"} kg`}
+              className="blue"
+            />
+            <StatCard
+              icon="🍽️"
+              title="Calories Taken"
+              value={latest?.totalCaloriesTaken ?? "--"}
+              className="green"
+            />
+            <StatCard
+              icon="🔥"
+              title="Calories Burned"
+              value={latest?.totalCaloriesBurned ?? "--"}
+              className="orange"
+            />
+          </div>
+
+          {/* COLUMN 3 */}
+          {activeMealPlan && (
+            <div className="calendar-col">
+              <ProgressCalendar
+                startDate={activeMealPlan.startDate}
+                endDate={activeMealPlan.endDate}
+                completedDates={completedDates}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* ===== ROW 3: GRAPHS ===== */}
         <section className="activities">
           <ActivityCard
             title="Meal Adherence"
@@ -155,14 +213,6 @@ export default function Dashboard() {
             data={last7Days}
           />
         </section>
-
-        {activeMealPlan && (
-          <ProgressCalendar
-            startDate={activeMealPlan.startDate}
-            endDate={activeMealPlan.endDate}
-            completedDates={completedDates}
-          />
-        )}
       </main>
     </div>
   );

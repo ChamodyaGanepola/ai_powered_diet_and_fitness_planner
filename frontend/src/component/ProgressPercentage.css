@@ -1,0 +1,26 @@
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.info-card {
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 14px;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+.label {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}

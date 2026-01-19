@@ -150,14 +150,9 @@ export default function Workout() {
       {/* Header ONLY when plan exists */}
       {plans.length > 0 && (
         <PageHeader
+          icon="🏋️"
           title="Your Workout Plan"
           subtitle="Keep going, you’re doing great!"
-          icon={
-            <img
-              src="https://img.icons8.com/ios-filled/100/running.png"
-              alt="running icon"
-            />
-          }
         />
       )}
 
@@ -183,37 +178,30 @@ export default function Workout() {
         </div>
       )}
 
-{!loading && profileExists && plans.length > 0 && (
-  <div className="day-grid">
-    {plans.map((plan) =>
-      groupByDay(plan.workouts || []).map(({ day, workouts }) => (
-        <section key={day} className="day-section">
-          <h3 className="day-title">{day}</h3>
-          <div className="workouts-grid">
-            {workouts.map((w) => (
-              <WorkoutCard key={w._id} workout={w} />
-            ))}
-          </div>
-        </section>
-      ))
-    )}
-  </div>
-)}
+      {!loading && profileExists && plans.length > 0 && (
+        <div className="day-grid">
+          {plans.map((plan) =>
+            groupByDay(plan.workouts || []).map(({ day, workouts }) => (
+              <section key={day} className="day-section">
+                <h3 className="day-title">{day}</h3>
+                <div className="workouts-grid">
+                  {workouts.map((w) => (
+                    <WorkoutCard key={w._id} workout={w} />
+                  ))}
+                </div>
+              </section>
+            )),
+          )}
+        </div>
+      )}
 
-
-
-
-   {plans.length > 0 && (
-  <div className="delete-plan-wrapper">
-    <button
-      className="delete-button"
-      onClick={handleDeleteWorkoutPlan}
-    >
-      Delete Workout Plan
-    </button>
-  </div>
-)}
-
+      {plans.length > 0 && (
+        <div className="delete-plan-wrapper">
+          <button className="delete-button" onClick={handleDeleteWorkoutPlan}>
+            Delete Workout Plan
+          </button>
+        </div>
+      )}
 
       {/* Feedback Section */}
       {plans.length > 0 && (

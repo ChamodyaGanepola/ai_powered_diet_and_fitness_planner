@@ -1,106 +1,89 @@
-import React from "react";
+import React, { useState } from "react";
 import "./ProgressCalendar.css";
 
 export default function ProgressCalendar({ startDate, endDate, completedDates = [] }) {
+  // ✅ hooks MUST be at top
+  const [index, setIndex] = useState(0);
+
   if (!startDate || !endDate) return null;
 
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0); // UTC today
-
-  const toUTCDateStr = (d) => {
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const startStr = toUTCDateStr(start);
-  const endStr = toUTCDateStr(end);
-  const todayStr = toUTCDateStr(today);
-
-  // Generate months between start and end
+  // Generate month list
   const months = [];
-  const current = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), 1));
+  const current = new Date(start.getFullYear(), start.getMonth(), 1);
   while (current <= end) {
     months.push(new Date(current));
-    current.setUTCMonth(current.getUTCMonth() + 1);
+    current.setMonth(current.getMonth() + 1);
   }
 
-  // Adaptive layout based on number of months
-  const monthCount = months.length;
-  let rowClass = "";
-  if (monthCount === 1) rowClass = "one-month";
-  else if (monthCount === 2) rowClass = "two-months";
-  else if (monthCount === 3) rowClass = "three-months";
-  else rowClass = "multi-months";
+  const month = months[index];
+
+  const monthName = month.toLocaleString("default", { month: "long" });
+  const year = month.getFullYear();
+
+  const toDateStr = (d) => {
+    return d.toISOString().split("T")[0];
+  };
+
+  const today = new Date();
+  const todayStr = toDateStr(today);
+
+  const firstDay = new Date(year, month.getMonth(), 1).getDay();
+  const daysInMonth = new Date(year, month.getMonth() + 1, 0).getDate();
+
+  const prevMonth = () => setIndex((i) => Math.max(0, i - 1));
+  const nextMonth = () => setIndex((i) => Math.min(months.length - 1, i + 1));
 
   return (
-    <div className={`progress-calendar-wrapper ${rowClass}`}>
-      {months.map((month) => {
-        const year = month.getUTCFullYear();
-        const monthIndex = month.getUTCMonth();
-        const monthName = month.toLocaleString("default", { month: "short" });
+    <div className="calendar-wrapper">
+      <div className="calendar-header">
+        <button onClick={prevMonth} disabled={index === 0} className="nav-btn">←</button>
+        <div className="month-title">{monthName} {year}</div>
+        <button onClick={nextMonth} disabled={index === months.length - 1} className="nav-btn">→</button>
+      </div>
 
-        const firstDay = new Date(Date.UTC(year, monthIndex, 1)).getUTCDay();
-        const daysInMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+      <div className="calendar-grid">
+        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
+          <div key={d} className="calendar-header-day">{d}</div>
+        ))}
 
-        return (
-          <div key={`${year}-${monthIndex}`} className="calendar-month">
-            <div className="calendar-month-name">{monthName} {year}</div>
-            <div className="calendar-grid">
-              {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
-                <div key={d} className="calendar-header">{d}</div>
-              ))}
+        {Array(firstDay).fill(null).map((_, i) => (
+          <div key={i} className="calendar-cell empty" />
+        ))}
 
-              {Array(firstDay).fill(null).map((_, i) => (
-                <div key={`empty-${i}`} className="calendar-cell empty" />
-              ))}
+        {Array(daysInMonth).fill(null).map((_, i) => {
+  const date = new Date(year, month.getMonth(), i + 1);
+  const dateStr = toDateStr(date);
 
-              {Array(daysInMonth).fill(null).map((_, i) => {
-                const date = new Date(Date.UTC(year, monthIndex, i + 1));
-                const dateStr = toUTCDateStr(date);
+  const completed = completedDates.includes(dateStr);
+  const isToday = dateStr === todayStr;
+  const isStart = dateStr === toDateStr(new Date(startDate));
+  const isEnd = dateStr === toDateStr(new Date(endDate));
 
-                const startCircle = dateStr === startStr;
-                const endCircle = dateStr === endStr;
-                const completed = completedDates.includes(dateStr);
+  return (
+    <div
+      key={dateStr}
+      className={`calendar-cell
+        ${completed ? "completed" : ""}
+        ${isToday ? "today" : ""}
+        ${isStart ? "start" : ""}
+        ${isEnd ? "end" : ""}
+      `}
+      data-tooltip={
+        isStart ? "Start Date" :
+        isEnd ? "End Date" :
+        completed ? "Completed" : "Not Completed"
+      }
+    >
+      {i + 1}
+      {completed && <span className="tick">✔</span>}
+    </div>
+  );
+})}
 
-                // Past days (from start) and today
-                const isPast = date >= start && date < today;
-                const isToday = dateStr === todayStr;
-
-                // Tooltip text
-                const tooltipText = startCircle
-                  ? `Start Date: ${dateStr}`
-                  : endCircle
-                  ? `End Date: ${dateStr}`
-                  : completed
-                  ? `Completed: ${dateStr}`
-                  : `Not Completed: ${dateStr}`;
-
-                return (
-                  <div
-                    key={dateStr}
-                    className={`calendar-cell
-                      ${startCircle ? "start" : ""}
-                      ${endCircle ? "end" : ""}
-                      ${completed ? "completed" : ""}
-                      ${isPast ? "past" : ""}
-                      ${isToday ? "today" : ""}
-                    `}
-                    data-tooltip={tooltipText}   // <-- Tooltip added here
-                  >
-                    {i + 1}
-                    {completed && <span className="tick">✔</span>}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+      </div>
     </div>
   );
 }

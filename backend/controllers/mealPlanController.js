@@ -57,7 +57,8 @@ export const createMealPlan = async (req, res) => {
       activityLevel: userProfile.activityLevel,
       fitnessGoal: userProfile.fitnessGoal,
       dietaryRestrictions: userProfile.dietaryRestrictions || [],
-      preferences: userProfile.preferences || [],
+      workoutPreferences: userProfile.workoutPreferences || [],
+      days: userProfile.days,
     };
 
     console.log("Calculating macros for user profile:", profileData);
@@ -65,6 +66,16 @@ export const createMealPlan = async (req, res) => {
     const dietaryText = profileData.dietaryRestrictions.length > 0
       ? profileData.dietaryRestrictions.join(", ")
       : "None";
+    // ====== DAYS LOGIC ======
+    const requestedDays = Number(profileData.days || 0);
+
+    let daysPrompt;
+    if (requestedDays === 0) {
+      daysPrompt = `Duration: AI should decide best duration based on user profile.`;
+    } else {
+      daysPrompt = `Duration: Create a meal plan for ${requestedDays} days.
+If ${requestedDays} is less than 7, AI should decide a suitable duration (>=7).`;
+    }
     // AI Prompt
     const prompt = `
 Create a MEAL PLAN TEMPLATE (not a single-day log).
@@ -93,8 +104,7 @@ STRICT RULES:
 - carbohydrates (number, g)
 - unit (string, e.g., "cup", "serving")
 
-6. Also, suggest the TOTAL NUMBER OF DAYS this meal plan should continue
-   based on user's profile and fitness goals.
+6. ${daysPrompt}  
 
 DAILY TARGETS (user chooses options to match these):
 Calories: ${macros.calories}
@@ -159,18 +169,36 @@ FORMAT:
       }
     }
 
-    // Determine durationDays from AI, default 7
-    const durationDays = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
+    const aiDuration = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
       ? Number(mealPlanData.durationDays)
-      : 7;
+      : 7; // fallback
+
+    let durationDays;
+    //If user selected 0 → AI decides
+    //If user selected less than 7 → AI decides
+    //If user selected 7 or more → use user value
+    if (requestedDays === 0) {
+      durationDays = aiDuration;
+    } else {
+      durationDays = requestedDays < 7 ? aiDuration : requestedDays;
+    }
+
+    await UserProfile.findOneAndUpdate(
+      { user_id },
+      { days: durationDays },
+      { new: true }
+    );
     // Ensure totalCalories is a number
     if (!mealPlanData.totalCalories || isNaN(mealPlanData.totalCalories)) {
       mealPlanData.totalCalories = macros.calories;
     }
 
-    const startDateUTC = toUTCDateOnly(new Date());
+    const startDateUTC = new Date();
+    startDateUTC.setUTCHours(0, 0, 0, 0);   // set time to 00:00:00 UTC
+
     const endDateUTC = new Date(startDateUTC);
-    endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1); // inclusive
+    endDateUTC.setDate(endDateUTC.getDate() + durationDays - 1);
+
 
     const newMealPlan = await MealPlan.create({
       user_id,
@@ -265,8 +293,8 @@ export const updateMealPlanStatus = async (req, res) => {
 
 export const deleteMealPlansByUserProfile = async (req, res) => {
   try {
-    const {userProfile_id } = req.query;
-    const  user_id = req.user.id; // from authMiddleware
+    const { userProfile_id } = req.query;
+    const user_id = req.user.id; // from authMiddleware
     if (!user_id || !userProfile_id) {
       return res.status(400).json({
         success: false,
@@ -299,7 +327,7 @@ export const deleteMealPlansByUserProfile = async (req, res) => {
 ---------------------------- */
 export const getLatestMealPlan = async (req, res) => {
   try {
-    const  user_id  = req.user.id; // from authMiddleware
+    const user_id = req.user.id; // from authMiddleware
     if (!user_id)
       return res.status(400).json({ message: "user_id is required" });
 

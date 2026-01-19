@@ -32,6 +32,13 @@ export const getLatestWorkoutPlan = async () => {
   });
   return res.data;
 };
+export const getWorkoutPlanDetails = async () => {
+  const res = await axios.get(`${API_URL}/latest-workoutPlan`, {
+    ...getAuthHeader(),
+  });
+  return res.data;
+};
+
 // ---------------- GET exercises by date ----------------
 export const getExercisesByDate = async (date) => {
   try {

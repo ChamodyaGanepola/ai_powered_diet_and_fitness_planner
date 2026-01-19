@@ -57,6 +57,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               workoutPreferences: data.workoutPreferences || "",
               culturalDietaryPatterns:
                 data.culturalDietaryPatterns?.join(", ") || "",
+              days: "",
             });
             setBMI(data.bmi || null);
             setBMICategory(data.bmiCategory || null);
@@ -71,10 +72,15 @@ const ProfileCard = ({ onClose, edit = false }) => {
     fetchProfile();
   }, [edit, user?.id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+ 
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: name === "days" ? Number(value) : value,
+  }));
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,6 +107,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
       culturalDietaryPatterns: formData.culturalDietaryPatterns
         ? formData.culturalDietaryPatterns.split(",").map((i) => i.trim())
         : [],
+      days: formData.days,
     };
 
     try {
@@ -122,7 +129,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
 
       markProfileUpdated();
       await createNotification(
-        `Hi ${user.username}, your profile has been successfully ${actionType}! 🙂`
+        `Hi ${user.username}, your profile has been successfully ${actionType}! 🙂`,
       );
 
       // Show BMI + spinner card
@@ -132,16 +139,13 @@ const ProfileCard = ({ onClose, edit = false }) => {
       try {
         await createMealPlan();
         await createWorkoutPlan();
-        await createNotification(
-          "🍽️ Meal plan and 🏋️ Workout plan are ready!"
-        );
+        await createNotification("🍽️ Meal plan and 🏋️ Workout plan are ready!");
         setStep("done"); // success
       } catch (err) {
         console.error(err);
         setPlanError("⚠️ Meal & Workout Plan generation failed.");
         setStep("failed"); // failed state
       }
-
     } catch (err) {
       setError(err.response?.data?.message || "Profile save failed");
     } finally {
@@ -160,9 +164,13 @@ const ProfileCard = ({ onClose, edit = false }) => {
         {step === "form" && (
           <>
             <h2>
-              👤 {edit ? "Edit Your Health Profile" : "Set Up Your Health Profile"}
+              👤{" "}
+              {edit ? "Edit Your Health Profile" : "Set Up Your Health Profile"}
             </h2>
-            <p>Complete your profile to get personalized AI-powered diet & fitness plans</p>
+            <p>
+              Complete your profile to get personalized AI-powered diet &
+              fitness plans
+            </p>
 
             {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -170,7 +178,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
               {/* Age & Gender */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>Age <span className="required">*</span></label>
+                  <label>
+                    Age <span className="required">*</span>
+                  </label>
                   <input
                     type="number"
                     name="age"
@@ -182,14 +192,18 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Gender <span className="required">*</span></label>
+                  <label>
+                    Gender <span className="required">*</span>
+                  </label>
                   <select
                     name="gender"
                     required
                     value={formData.gender}
                     onChange={handleChange}
                   >
-                    <option value="" disabled>Select Gender</option>
+                    <option value="" disabled>
+                      Select Gender
+                    </option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
@@ -200,7 +214,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
               {/* Weight & Height */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>Weight (kg) <span className="required">*</span></label>
+                  <label>
+                    Weight (kg) <span className="required">*</span>
+                  </label>
                   <input
                     type="number"
                     name="weight"
@@ -211,7 +227,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Height (cm) <span className="required">*</span></label>
+                  <label>
+                    Height (cm) <span className="required">*</span>
+                  </label>
                   <input
                     type="number"
                     name="height"
@@ -223,99 +241,136 @@ const ProfileCard = ({ onClose, edit = false }) => {
                 </div>
               </div>
 
-              {/* Fitness Goal & Activity Level */}
-              <div className="form-group">
-                <label>Fitness Goal <span className="required">*</span></label>
-                <select
-                  name="fitnessGoal"
-                  required
-                  value={formData.fitnessGoal}
-                  onChange={handleChange}
-                >
-                  <option value="" disabled>Select Goal</option>
-                  <option value="Weight Loss">Weight Loss</option>
-                  <option value="Muscle Gain">Muscle Gain</option>
-                  <option value="Maintain Fitness">Maintain Fitness</option>
-                  <option value="Improve Endurance">Improve Endurance</option>
-                </select>
+              {/* FITNESS GOAL + ACTIVITY LEVEL (same row) */}
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Fitness Goal <span className="required">*</span>
+                  </label>
+                  <select
+                    name="fitnessGoal"
+                    required
+                    value={formData.fitnessGoal}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      Select Goal
+                    </option>
+                    <option value="Weight Loss">Weight Loss</option>
+                    <option value="Muscle Gain">Muscle Gain</option>
+                    <option value="Maintain Fitness">Maintain Fitness</option>
+                    <option value="Improve Endurance">Improve Endurance</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Activity Level <span className="required">*</span>
+                  </label>
+                  <select
+                    name="activityLevel"
+                    required
+                    value={formData.activityLevel}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      Select Level
+                    </option>
+                    <option value="Sedentary">Sedentary</option>
+                    <option value="Lightly Active">Lightly Active</option>
+                    <option value="Moderately Active">Moderately Active</option>
+                    <option value="Very Active">Very Active</option>
+                  </select>
+                </div>
               </div>
 
+              {/* WORKOUT PREFERENCE + HEALTH CONDITIONS (same row) */}
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Workout Preferences <span className="required">*</span>
+                  </label>
+                  <select
+                    name="workoutPreferences"
+                    required
+                    value={formData.workoutPreferences}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      Select Workout Preference
+                    </option>
+                    <option value="Yoga">Yoga</option>
+                    <option value="Gym">Gym</option>
+                    <option value="Home Workouts">Home Workouts</option>
+                    <option value="Walking">Walking</option>
+                    <option value="Running">Running</option>
+                    <option value="Cycling">Cycling</option>
+                    <option value="Swimming">Swimming</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Health Conditions</label>
+                  <input
+                    type="text"
+                    name="healthConditions"
+                    placeholder="Diabetes, BP"
+                    value={formData.healthConditions}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              {/* DAYS  */}
               <div className="form-group">
-                <label>Activity Level <span className="required">*</span></label>
+                <label>
+                  Days <span className="required">*</span>
+                </label>
                 <select
-                  name="activityLevel"
+                  name="days"
                   required
-                  value={formData.activityLevel}
+                  value={formData.days}
                   onChange={handleChange}
                 >
-                  <option value="" disabled>Select Level</option>
-                  <option value="Sedentary">Sedentary</option>
-                  <option value="Lightly Active">Lightly Active</option>
-                  <option value="Moderately Active">Moderately Active</option>
-                  <option value="Very Active">Very Active</option>
+                  <option value="" disabled>
+                    Select Days
+                  </option>
+                  <option value="0">AI Generated</option>
+                  <option value="7">7 Days</option>
+                  <option value="30">30 Days</option>
+                  <option value="60">60 Days</option>
                 </select>
               </div>
 
               {/* Optional Fields */}
-              <div className="form-group">
-                <label>Dietary Restrictions</label>
-                <input
-                  type="text"
-                  name="dietaryRestrictions"
-                  placeholder="Vegan, Gluten-free"
-                  value={formData.dietaryRestrictions}
-                  onChange={handleChange}
-                />
-              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Dietary Restrictions</label>
+                  <input
+                    type="text"
+                    name="dietaryRestrictions"
+                    placeholder="Vegan, Gluten-free"
+                    value={formData.dietaryRestrictions}
+                    onChange={handleChange}
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Health Conditions</label>
-                <input
-                  type="text"
-                  name="healthConditions"
-                  placeholder="Diabetes, BP"
-                  value={formData.healthConditions}
-                  onChange={handleChange}
-                />
+                <div className="form-group">
+                  <label>Cultural Dietary Patterns</label>
+                  <input
+                    type="text"
+                    name="culturalDietaryPatterns"
+                    placeholder="Sri Lankan, Indian, Mediterranean"
+                    value={formData.culturalDietaryPatterns}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
-
-          
-              <div className="form-group">
-                <label>Workout Preferences <span className="required">* </span></label>
-                <select
-                  name="workoutPreferences"
-                  required
-                  value={formData.workoutPreferences}
-                  onChange={handleChange}
-                >
-                  <option value="" disabled>Select Workout Preference</option>
-                  <option value="Yoga">Yoga</option>
-                  <option value="Gym">Gym</option>
-                  <option value="Home Workouts">Home Workouts</option>
-                  <option value="Walking">Walking</option>
-                  <option value="Running">Running</option>
-                  <option value="Cycling">Cycling</option>
-                  <option value="Swimming">Swimming</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Cultural Dietary Patterns</label>
-                <input
-                  type="text"
-                  name="culturalDietaryPatterns"
-                  placeholder="Sri Lankan, Indian, Mediterranean"
-                  value={formData.culturalDietaryPatterns}
-                  onChange={handleChange}
-                />
-              </div>
-
               <button className="primary-btn" type="submit" disabled={loading}>
                 {loading
                   ? "Saving..."
                   : edit
-                  ? "💾 Update Profile & Continue"
-                  : "💾 Save Profile & Continue"}
+                    ? "💾 Update Profile & Continue"
+                    : "💾 Save Profile & Continue"}
               </button>
             </form>
           </>
@@ -324,18 +379,25 @@ const ProfileCard = ({ onClose, edit = false }) => {
         {/* GENERATING STEP */}
         {(step === "generating" || step === "done" || step === "failed") && (
           <div className="bmi-spinner-card">
-            <h3>✅ Your BMI: <strong>{bmi}</strong></h3>
-            <h4>Category: <strong>{bmiCategory}</strong></h4>
+            <h3>
+              ✅ Your BMI: <strong>{bmi}</strong>
+            </h3>
+            <h4>
+              Category: <strong>{bmiCategory}</strong>
+            </h4>
 
             {step === "generating" && <div className="spinner"></div>}
-            {step === "generating" && <p>Generating your personalized Meal & Workout Plans...</p>}
+            {step === "generating" && (
+              <p>Generating your personalized Meal & Workout Plans...</p>
+            )}
 
-            {step === "done" && <p>🎉 Your personalized Meal & Workout Plans are ready!</p>}
+            {step === "done" && (
+              <p>🎉 Your personalized Meal & Workout Plans are ready!</p>
+            )}
 
             {step === "failed" && <p style={{ color: "red" }}>{planError}</p>}
           </div>
         )}
-
       </div>
     </div>
   );
