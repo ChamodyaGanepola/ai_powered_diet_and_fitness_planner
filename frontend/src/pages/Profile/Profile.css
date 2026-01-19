@@ -10,14 +10,15 @@
   color: #1b2b22;
   box-sizing: border-box;
 }
+
 /* ===== Container & Layout ===== */
 .app-container {
   margin: 0 auto;
   padding: 32px;
   background: #e5efe9;
   min-height: 100vh;
-  
 }
+
 /* Simple message without card */
 .simple-message {
   text-align: center;
@@ -25,17 +26,28 @@
   font-size: 1.2rem;
   color: #1f2937;
 }
-/* ===== HEADER ===== */
+
+/* ===== GRID LAYOUT ===== */
+.profile-layout {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 16px;
+}
+
+/* Header spans column 1 and 2 rows */
 .profile-header {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+
   text-align: center;
-  margin-bottom: 24px;
   position: relative;
   padding: 20px 18px;
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid rgba(43, 122, 75, 0.18);
   border-radius: 18px;
-  width: 100%;
-  max-width: 1200px; /* bigger width */
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -64,110 +76,23 @@
   font-size: 14px;
 }
 
-/* ===== BMI CARD ===== */
-/* ===== BMI CARD ===== */
-.bmi-card {
-  width: 100%;
-  max-width: 510px;
-  display: flex;
-  gap: 18px;
-  padding: 20px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(43, 122, 75, 0.18);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
-  margin-bottom: 24px;
-  grid-column: span 1;   /* <-- FIXED */
+.delete-profile-btn {
+  margin-top: 15px;
+  background: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+.delete-profile-btn:hover {
+  transform: translateY(-1px);
+  transition: 0.2s ease;
 }
 
-
-/* MAKE BMI CARD LOOK LIKE OTHER CARDS IN GRID */
-.bmi-grid-card {
-  max-width: none;
-  width: 517px;
-  grid-column: span 1;
-}
-
-.bmi-card-left {
-  flex: 0 0 160px;
-  text-align: center;
-  border-right: 1px solid rgba(43, 122, 75, 0.20);
-  padding-right: 18px;
-}
-
-.bmi-value {
-  font-size: 44px;
-  font-weight: 800;
-  color: #1b2b22;
-}
-
-.bmi-category {
-  margin-top: 6px;
-  color: #5b6a5f;
-  font-weight: 600;
-}
-
-.bmi-card-right {
-  flex: 1;
-}
-
-.bmi-scale {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #5b6a5f;
-  margin-bottom: 10px;
-}
-
-.bmi-bar {
-  height: 10px;
-  background: rgba(43, 122, 75, 0.18);
-  border-radius: 999px;
-  position: relative;
-  overflow: hidden;
-}
-
-.bmi-progress {
-  height: 100%;
-  border-radius: 999px;
-}
-
-.bmi-progress.underweight {
-  width: 18%;
-  background: #6dd5f5;
-}
-
-.bmi-progress.normal {
-  width: 45%;
-  background: #2b7a4b;
-}
-
-.bmi-progress.overweight {
-  width: 70%;
-  background: #ffd36a;
-}
-
-.bmi-progress.obese {
-  width: 90%;
-  background: #ff6b6b;
-}
-
-.bmi-note {
-  margin-top: 10px;
-  color: #5b6a5f;
-  font-size: 13px;
-}
-
-/* ===== GRID ===== */
-.profile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: 24px;
-}
-
+/* ===== PROFILE CARDS ===== */
 .profile-item {
   display: flex;
   gap: 14px;
@@ -194,13 +119,80 @@
   margin-top: 2px;
 }
 
+/* ===== BMI CARD ===== */
+.bmi-card {
+  grid-column: 3 / 6;
+  grid-row: 2;
+  display: flex;
+  gap: 18px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(43, 122, 75, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+.bmi-card-left {
+  flex: 0 0 160px;
+  text-align: center;
+  border-right: 1px solid rgba(43, 122, 75, 0.20);
+  padding-right: 18px;
+}
+
+.bmi-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1b2b22;
+}
+
+.bmi-category {
+  margin-top: 6px;
+  color: #5b6a5f;
+  font-weight: 600;
+}
+
+.bmi-card-right {
+  flex: 1;
+}
+
+.bmi-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #5b6a5f;
+  margin-bottom: 10px;
+}
+
+.bmi-bar {
+  height: 10px;
+  background: rgba(43, 122, 75, 0.18);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bmi-progress {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.bmi-progress.underweight { background: #6dd5f5; }
+.bmi-progress.normal { background: #2b7a4b; }
+.bmi-progress.overweight { background: #ffd36a; }
+.bmi-progress.obese { background: #ff6b6b; }
+
+.bmi-note {
+  margin-top: 10px;
+  color: #5b6a5f;
+  font-size: 13px;
+}
 
 /* ===== SECTIONS ===== */
-.profile-section {
+.profile-sections-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
   width: 100%;
-  max-width: 1200px;
-
-   margin-bottom: 0;
+  margin-top: 24px;
 }
 
 .profile-section h3 {
@@ -262,12 +254,6 @@
   border: 1px solid rgba(43, 122, 75, 0.18);
 }
 
-.confirm-box p {
-  margin-bottom: 20px;
-  font-size: 15px;
-  color: #1b2b22;
-}
-
 .confirm-actions {
   display: flex;
   gap: 12px;
@@ -297,54 +283,21 @@
   font-weight: 600;
 }
 
-.delete-profile-btn {
-  margin-top: 15px;
-  background: #d9534f;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-.delete-profile-btn:hover {
-  transform: translateY(-1px);
-  transition: 0.2s ease;
-}
-.profile-sections-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: 24px;
-}
-
 /* ===== MOBILE ===== */
-@media (max-width: 768px) {
-
-  .profile-sections-row {
-    grid-template-columns: 1fr; /* stack on mobile */
-  }
-
-  .profile-page {
-    padding: 20px 14px;
-  }
-
-  .profile-avatar {
-    font-size: 48px;
-  }
-
-  .profile-header h2 {
-    font-size: 22px;
-  }
-
-  .profile-grid {
+@media (max-width: 868px) {
+  .profile-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .profile-header {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   .bmi-card {
+    grid-column: auto;
+    grid-row: auto;
     flex-direction: column;
   }
 
@@ -353,5 +306,9 @@
     border-bottom: 1px solid rgba(43, 122, 75, 0.18);
     padding-bottom: 18px;
     margin-bottom: 14px;
+  }
+
+  .profile-page {
+    padding: 20px 14px;
   }
 }
