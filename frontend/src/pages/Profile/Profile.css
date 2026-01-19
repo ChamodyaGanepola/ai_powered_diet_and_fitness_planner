@@ -87,6 +87,7 @@
   font-size: 14px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
+
 .delete-profile-btn:hover {
   transform: translateY(-1px);
   transition: 0.2s ease;
@@ -175,10 +176,21 @@
   border-radius: 999px;
 }
 
-.bmi-progress.underweight { background: #6dd5f5; }
-.bmi-progress.normal { background: #2b7a4b; }
-.bmi-progress.overweight { background: #ffd36a; }
-.bmi-progress.obese { background: #ff6b6b; }
+.bmi-progress.underweight {
+  background: #6dd5f5;
+}
+
+.bmi-progress.normal {
+  background: #2b7a4b;
+}
+
+.bmi-progress.overweight {
+  background: #ffd36a;
+}
+
+.bmi-progress.obese {
+  background: #ff6b6b;
+}
 
 .bmi-note {
   margin-top: 10px;
@@ -193,6 +205,10 @@
   gap: 16px;
   width: 100%;
   margin-top: 24px;
+  max-width: 1200px;
+  display: grid;
+  grid-template-rows: repeat(1, auto);
+
 }
 
 .profile-section h3 {
@@ -310,5 +326,9 @@
 
   .profile-page {
     padding: 20px 14px;
+  }
+
+  .profile-sections-row {
+    grid-template-columns: repeat(1, 1fr);
   }
 }

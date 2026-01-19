@@ -126,7 +126,6 @@ const Profile = () => {
 
   {/* CARDS (NO profile-grid wrapper) */}
   <ProfileItem icon={<FaBirthdayCake />} label="Age" value={`${profile.age} yrs`} />
-  <ProfileItem icon={<FaVenusMars />} label="Gender" value={profile.gender} />
   <ProfileItem icon={<FaWeight />} label="Weight" value={`${profile.weight} kg`} />
   <ProfileItem icon={<FaRulerVertical />} label="Height" value={`${profile.height} cm`} />
   <ProfileItem icon={<FaBullseye />} label="Fitness Goal" value={profile.fitnessGoal} />
