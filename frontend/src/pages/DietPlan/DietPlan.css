@@ -2,6 +2,29 @@
   padding: 32px;
   min-height: 100vh;
   background: #e5efe9;
+  width: 100%;
+}
+
+/* ===== Container & Layout ===== */
+.app-container {
+  margin: 0 auto;
+  padding: 32px;
+  background: #e5efe9;
+  min-height: 100vh;
+}
+
+.meal-plan-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  padding-bottom: 40px; /* IMPORTANT: avoid last card cut */
+}
+
+.simple-message {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #1f2937;
 }
 
 /* ===== PLAIN CENTERED STATE (NO CARD) ===== */
@@ -12,7 +35,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-   background: #e5efe9;
+  background: #e5efe9;
 }
 
 /* Text */
@@ -110,7 +133,7 @@
 }
 
 /* Mobile */
-@media (max-width: 868px) {
+@media (max-width: 968px) {
   .diet-page {
     padding: 16px;
   }

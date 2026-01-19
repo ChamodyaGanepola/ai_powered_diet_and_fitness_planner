@@ -11,14 +11,15 @@ const getAuthHeader = () => {
   };
 };
 // CREATE workout plan
-export const createWorkoutPlan = async (userProfile) => {
+
+export const createWorkoutPlan = async () => {
   try {
-    const response = await axios.post(
+    const res = await axios.post(
       `${API_URL}/create`,
-      userProfile,
-      getAuthHeader()
+      {},                 
+      getAuthHeader()     
     );
-    return response.data;
+    return res.data;
   } catch (err) {
     console.error("Workout plan API error:", err);
     throw err;

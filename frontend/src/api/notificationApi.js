@@ -30,10 +30,10 @@ export const markNotificationsRead = async () => {
 };
 
 /* ===== Create a new notification ===== */
-export const createNotification = async (user_id, message) => {
+export const createNotification = async (message) => {
   const res = await axios.post(
     API_URL,
-    { user_id, message },
+    { message},
     getAuthHeader()
   );
   return res.data;

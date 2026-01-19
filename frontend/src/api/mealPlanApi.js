@@ -22,7 +22,8 @@ export const createMealPlan = async () => {
   try {
     const res = await axios.post(
       `${API_URL}/create`,
-      getAuthHeader()
+      {},                 
+      getAuthHeader()     
     );
     return res.data;
   } catch (err) {
@@ -30,6 +31,7 @@ export const createMealPlan = async () => {
     throw err;
   }
 };
+
 
 /* ---------------------------
    GET LATEST ACTIVE MEAL PLAN

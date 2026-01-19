@@ -28,8 +28,12 @@ exports.createProfile = async (req, res) => {
     if (existingProfile) {
       return res.status(400).json({ message: "Active profile already exists for this user", profile: existingProfile });
     }
- // Convert days to number (if provided)
-    const daysNumber = days !== undefined ? Number(days) : null;
+    // Convert days to number (if provided)
+    const daysNumber =
+      days === undefined || days === null || isNaN(Number(days))
+        ? 0
+        : Number(days);
+
     const bmi = calculateBMI(weight, height);
     const bmiCategory = getBMICategory(bmi);
 
@@ -48,7 +52,7 @@ exports.createProfile = async (req, res) => {
       bmi,
       bmiCategory,
       status: "active",
-      days:daysNumber,
+      days: daysNumber,
     });
 
     await profile.save();

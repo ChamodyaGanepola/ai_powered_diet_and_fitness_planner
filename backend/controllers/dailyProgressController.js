@@ -100,18 +100,18 @@ export const saveDailyProgress = async (req, res) => {
   try {
     const { date, weight, bodyFatPercentage, measurements, meals, workouts } = req.body;
     const user_id = req.user.id;
+
     if (!user_id || !date || weight == null || bodyFatPercentage == null || !measurements || !meals || !workouts) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const dayUTC = toUTCDate(date);
+    const dayStr = new Date(date).toISOString().split("T")[0]; 
 
     const mealPlan = await MealPlan.findOne({ user_id, status: "active" });
     if (!mealPlan) return res.status(400).json({ message: "No active meal plan found" });
 
     const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" });
 
-    // Calculate totals
     const totalCaloriesTaken = meals.reduce((sum, meal) => {
       const mealTotal = (meal.items || []).reduce((s, item) => s + (Number(item.calories) || 0), 0);
       return sum + mealTotal;
@@ -119,8 +119,6 @@ export const saveDailyProgress = async (req, res) => {
 
     const totalCaloriesBurned = workouts.reduce((sum, w) => sum + (Number(w.caloriesBurned) || 0), 0);
 
-
-    // Planned data
     const plannedMeals = await getPlannedMealsFull(mealPlan._id);
     const plannedWorkouts = workoutPlan ? await getPlannedWorkoutsFull(workoutPlan._id) : [];
 
@@ -131,10 +129,10 @@ export const saveDailyProgress = async (req, res) => {
     const workoutAdherenceScore = deviatedWorkoutPlan ? 0 : 100;
 
     const progress = await DailyProgress.findOneAndUpdate(
-      { user_id, date: dayUTC },
+      { user_id, date: dayStr },
       {
         user_id,
-        date: dayUTC,
+        date: dayStr,
         weight,
         bodyFatPercentage,
         measurements,
@@ -160,13 +158,17 @@ export const saveDailyProgress = async (req, res) => {
   }
 };
 
+
 /* ---------------------------
    GET DAILY PROGRESS BY DATE
 ---------------------------- */
+
+
 export const getDailyProgress = async (req, res) => {
   try {
     const { date } = req.query;
     const user_id = req.user.id;
+
     if (!user_id || !date)
       return res.status(400).json({ message: "user_id and date required" });
 
@@ -174,10 +176,25 @@ export const getDailyProgress = async (req, res) => {
     const nextDayUTC = new Date(dayUTC);
     nextDayUTC.setUTCDate(nextDayUTC.getUTCDate() + 1);
 
-    const progress = await DailyProgress.findOne({
+    const activeMealPlan = await MealPlan.findOne({
+      user_id,
+      status: "active",
+    });
+
+    const activeWorkoutPlan = await WorkoutPlan.findOne({
+      user_id,
+      status: "active",
+    });
+
+    const query = {
       user_id,
       date: { $gte: dayUTC, $lt: nextDayUTC },
-    });
+    };
+
+    if (activeMealPlan) query.mealplan_id = activeMealPlan._id;
+    if (activeWorkoutPlan) query.workoutplan_id = activeWorkoutPlan._id;
+
+    const progress = await DailyProgress.findOne(query);
 
     res.json({ success: true, progress: progress || null });
   } catch (err) {
@@ -310,33 +327,56 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
  * GET all completed progress dates for a user filtered by meal/workout plan
  * Returns array of date strings (YYYY-MM-DD)
  */
+
+
 export const getCompletedProgressDates = async (req, res) => {
   try {
-    const { mealplan_id, workoutplan_id } = req.query;
     const user_id = req.user.id;
     if (!user_id) {
-      return res.status(400).json({ success: false, message: "user_id required" });
+      return res.status(400).json({
+        success: false,
+        message: "user_id required",
+      });
     }
 
-    // Build query
-    const query = { user_id, completed: true };
-    if (mealplan_id) query.mealplan_id = mealplan_id;
-    if (workoutplan_id) query.workoutplan_id = workoutplan_id;
-
-    const progresses = await DailyProgress.find(query, "date").sort({ date: 1 });
-
-    // Convert dates to YYYY-MM-DD string for frontend
-    const completedDates = progresses.map(p => {
-      const d = new Date(p.date);
-      return d.toISOString().split("T")[0];
+    // 1) Get active plans
+    const activeMealPlan = await MealPlan.findOne({
+      user_id,
+      status: "active",
     });
+
+    const activeWorkoutPlan = await WorkoutPlan.findOne({
+      user_id,
+      status: "active",
+    });
+
+    // 2) Build query using only active plan IDs
+    const query = { user_id, completed: true };
+
+    if (activeMealPlan) query.mealplan_id = activeMealPlan._id;
+    if (activeWorkoutPlan) query.workoutplan_id = activeWorkoutPlan._id;
+
+    // 3) Fetch dates
+    const progresses = await DailyProgress.find(query, "date").sort({
+      date: 1,
+    });
+
+    // 4) Convert dates to YYYY-MM-DD
+    const completedDates = progresses.map((p) =>
+      new Date(p.date).toISOString().split("T")[0]
+    );
 
     res.json({ success: true, completedDates });
   } catch (err) {
     console.error("Get Completed Dates Error:", err);
-    res.status(500).json({ success: false, message: "Failed to get completed dates", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to get completed dates",
+      error: err.message,
+    });
   }
 };
+
 
 
 // Check if any daily progress exists for a user considering their active meal/workout plan

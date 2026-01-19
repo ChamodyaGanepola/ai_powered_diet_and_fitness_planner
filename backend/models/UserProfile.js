@@ -12,7 +12,11 @@ const userProfileSchema = new mongoose.Schema({
   healthConditions: { type: [String], default: [] },
   workoutPreferences: { type: String, required: true, enum: ["Yoga", "Gym", "Home Workouts", "Walking", "Running", "Cycling", "Swimming"] },
   culturalDietaryPatterns: { type: [String], default: [] },
-  days:{type:Number, required:true},
+  days: {
+  type: Number,
+  required: true,
+  default: 0
+},
   bmi: { type:Number},
   bmiCategory: { type: String }, 
   

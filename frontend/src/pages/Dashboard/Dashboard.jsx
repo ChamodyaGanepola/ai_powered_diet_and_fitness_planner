@@ -48,6 +48,7 @@ export default function Dashboard() {
         const workoutPlanRes = await getLatestWorkoutPlan(user.id);
         const workoutPlan = workoutPlanRes?.workoutPlan || null;
         setActiveWorkoutPlan(workoutPlan);
+        
 
         if (!mealPlan && !workoutPlan) {
           setTimeout(() => (window.location.href = "/home"), 3000);
@@ -55,15 +56,17 @@ export default function Dashboard() {
           setTimeout(() => (window.location.href = "/dietPlan"), 3000);
         }
 
-        if (!workoutPlan && mealPlan) {
+        else if (!workoutPlan && mealPlan) {
           setTimeout(() => (window.location.href = "/workouts"), 3000);
         }
 
-        if (mealPlan?._id) {
+        else if (mealPlan?._id) {
           const completedRes = await getCompletedProgressDates(mealPlan._id);
           setCompletedDates(completedRes);
+          console.log("completeRes", completedRes);
         }
 
+console.log("workout start date",activeMealPlan.startDate); 
         const days = [];
         for (let i = 6; i >= 0; i--) {
           const d = new Date();

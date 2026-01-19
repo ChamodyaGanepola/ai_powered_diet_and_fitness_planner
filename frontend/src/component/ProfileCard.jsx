@@ -25,6 +25,8 @@ const ProfileCard = ({ onClose, edit = false }) => {
     healthConditions: "",
     workoutPreferences: "",
     culturalDietaryPatterns: "",
+    days: "",
+
   });
 
   const [loading, setLoading] = useState(false);
@@ -57,7 +59,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               workoutPreferences: data.workoutPreferences || "",
               culturalDietaryPatterns:
                 data.culturalDietaryPatterns?.join(", ") || "",
-              days: "",
+              days:  Number(formData.days),
             });
             setBMI(data.bmi || null);
             setBMICategory(data.bmiCategory || null);
@@ -90,7 +92,6 @@ const handleChange = (e) => {
     setPlanError(null);
 
     const payload = {
-      user_id: user.id,
       age: Number(formData.age),
       gender: formData.gender,
       weight: Number(formData.weight),

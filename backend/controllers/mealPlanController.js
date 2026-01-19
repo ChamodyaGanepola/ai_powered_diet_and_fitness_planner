@@ -35,11 +35,12 @@ const cleanAIResponse = (str) => {
 };
 
 export const createMealPlan = async (req, res) => {
+
   try {
     const user_id = req.user.id; // from authMiddleware
 
     if (!user_id) {
-      return res.status(400).json({ success: false, message: "user_id is required" });
+      return res.status(401).json({ success: false, message: "user_id is required" });
     }
 
     // Fetch user profile
@@ -78,7 +79,14 @@ If ${requestedDays} is less than 7, AI should decide a suitable duration (>=7).`
     }
     // AI Prompt
     const prompt = `
-Create a MEAL PLAN TEMPLATE (not a single-day log).
+Create a MEAL PLAN TEMPLATE according to  User Profile as below.
+User Profile:
+Age: ${profileData.age}
+Gender: ${profileData.gender}
+Weight: ${profileData.weight}kg
+Height: ${profileData.height}cm
+Fitness Goal: ${profileData.fitnessGoal}
+Dietary Restrictions: ${dietaryText}
 
 This meal plan provides MULTIPLE OPTIONS for each meal.
 User will choose ONLY ONE food item per meal per day.
@@ -112,16 +120,12 @@ Protein: ${macros.protein}g
 Carbs: ${macros.carbs}g
 Fat: ${macros.fat}g
 
-User Profile:
-Age: ${profileData.age}
-Gender: ${profileData.gender}
-Weight: ${profileData.weight}kg
-Height: ${profileData.height}cm
-Fitness Goal: ${profileData.fitnessGoal}
-Dietary Restrictions: ${dietaryText}
+
 
 
 Return ONLY valid JSON.
+Numbers must be plain digits ONLY. No units allowed.
+
 
 FORMAT:
 {
@@ -146,28 +150,22 @@ FORMAT:
 
 
 
-    // Call AI
     const aiResponseRaw = await generateMealPlan(prompt);
-    console.log("AI response from OpenRouter:", aiResponseRaw);
 
-    // Parse AI response safely
     let mealPlanData;
     try {
-      mealPlanData = JSON.parse(cleanAIResponse(aiResponseRaw));
+      mealPlanData = JSON.parse(aiResponseRaw);
+      console.log(mealPlanData);
     } catch (err) {
-      // Fallback: replace single quotes with double quotes
-      try {
-        const sanitized = cleanAIResponse(aiResponseRaw).replace(/'/g, '"');
-        mealPlanData = JSON.parse(sanitized);
-      } catch (err2) {
-        console.error("AI returned invalid JSON:", aiResponseRaw);
-        return res.status(500).json({
-          success: false,
-          message: "Meal plan generation failed due to invalid AI response",
-          aiResponse: aiResponseRaw,
-        });
-      }
+      console.error("AI returned invalid JSON:", aiResponseRaw);
+      return res.status(500).json({
+        success: false,
+        message: "AI returned invalid JSON"
+      });
     }
+
+
+
 
     const aiDuration = mealPlanData.durationDays && !isNaN(mealPlanData.durationDays)
       ? Number(mealPlanData.durationDays)
@@ -232,7 +230,11 @@ FORMAT:
         });
       }
     }
-
+    // AFTER SUCCESS -> mark old plan as updated
+    await MealPlan.updateMany(
+      { user_id, status: "active", _id: { $ne: newMealPlan._id } },
+      { status: "account-updated" }
+    );
     res.json({
       success: true,
       message: "Meal plan generated and saved successfully",

@@ -160,9 +160,11 @@ export default function DietPlan() {
         </div>
       ) : (
         <>
+        <div className="meal-plan-wrapper">
           {mealPlans.map((plan, index) => (
             <MealPlanCard key={index} plan={plan} index={index} />
           ))}
+          </div>
 
           <div className="delete-wrapper">
             <button

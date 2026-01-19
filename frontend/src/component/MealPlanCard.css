@@ -1,9 +1,15 @@
-.mealplan-card {
-  background: #e5efe9;;
- 
-  padding: 28px;
-  margin-bottom: 32px;
+.meal-card {
+  border-radius: 16px;
+  padding: 18px;
+  min-height: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
 }
+
 
 .mealplan-header {
   display: flex;
@@ -34,58 +40,18 @@
   border-radius: 12px;
 }
 
+/* GRID */
 .mealplan-card .meals-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 30px; /* IMPORTANT: space between meal cards */
+  padding: 10px 0;
 }
 
-.add-icon {
-  color: #28a745;
-  font-size: 24px;
-  cursor: pointer;
-  margin-left: 12px;
-  transition: transform 0.2s ease;
-}
-
-.add-icon:hover {
-  transform: scale(1.2);
-}
-
-.datepicker-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.add-button {
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.add-button:hover {
-  background-color: #1e7e34;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width: 768px) {
-  .mealplan-card {
-    padding: 20px;
-  }
-
+/* Mobile */
+@media (max-width: 968px) {
   .mealplan-card .meals-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .macros {
-    gap: 8px;
-    font-size: 0.9rem;
+    gap: 18px;
   }
 }

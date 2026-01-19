@@ -75,6 +75,7 @@ export const createWorkoutPlan = async (req, res) => {
 Create a weekly workout plan in JSON ONLY. User will follow this plan for number of ${durationDays}.
 Include exercises ONLY from user's preferred workout type: ${workoutPreferences}.
 Each exercise must have: name, targetMuscle, sets, reps, restTime, durationMinutes, caloriesBurned, day.
+Numbers must be plain digits ONLY. No units allowed.
 Include rest days as "Rest".
 
 User Info:
@@ -113,23 +114,19 @@ Output format:
 
     // Call AI
     const aiRaw = await generateWorkoutPlan(prompt);
-    console.log("AI Workout Response:", aiRaw);
 
-    // Parse safely
     let workoutData;
     try {
-      workoutData = JSON.parse(cleanAIResponse(aiRaw));
+      workoutData = JSON.parse(aiRaw);
+      console.log(workoutData);
     } catch (err) {
-      // Fallback: truncate at last bracket
-      const lastBracket = aiRaw.lastIndexOf("}");
-      const lastArrayBracket = aiRaw.lastIndexOf("]");
-      const cleaned = aiRaw.substring(0, Math.max(lastBracket, lastArrayBracket) + 1);
-      try {
-        workoutData = JSON.parse(cleanAIResponse(cleaned));
-      } catch (err2) {
-        return res.status(500).json({ message: "AI workout JSON invalid", aiRaw });
-      }
+      console.error("AI workout JSON invalid:", aiRaw);
+      return res.status(500).json({
+        success: false,
+        message: "AI workout JSON invalid"
+      });
     }
+
 
     const startDateUTC = new Date();
     startDateUTC.setUTCHours(0, 0, 0, 0);   // set time to 00:00:00 UTC
@@ -179,7 +176,11 @@ Output format:
     workoutPlan.totalCaloriesBurned = totalCalories;
     workoutPlan.duration = totalDuration;
     await workoutPlan.save();
-
+      // AFTER SUCCESS -> mark old plan as updated
+    await WorkoutPlan.updateMany(
+      { user_id, status: "active", _id: { $ne: workoutPlan._id } },
+      { status: "account-updated" }
+    );
 
     res.json({ success: true, workoutPlan });
   } catch (err) {

@@ -1,32 +1,30 @@
 .meal-card {
   border-radius: 16px;
   padding: 18px;
-  min-height: unset;          /*  important */
+  min-height: unset;
   display: flex;
   flex-direction: column;
-  gap: 12px;                  /*  spacing inside meal */
+  gap: 12px;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  /* make meal cards visible */
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+/* Hover */
+.meal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
 }
 
 .meal-title {
   font-size: 20px;
   font-weight: 700;
-  margin-bottom: 6px;
-}
-
-/* Hover effect */
-.meal-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.14);
-}
-
-
-.meal-title {
-  font-weight: 700;
   margin-bottom: 10px;
 }
 
-/* 🎨 Meal Colors */
+/* Meal colors */
 .meal-card.breakfast {
   background: linear-gradient(135deg, #fff4d2, #ffe8a3);
 }

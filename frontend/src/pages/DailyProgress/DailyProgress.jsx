@@ -25,8 +25,9 @@ export default function DailyProgress() {
   const [workoutPlanExists, setWorkoutPlanExists] = useState(false);
 
   const [completedDates, setCompletedDates] = useState([]);
+
+  // ✅ ONLY DATE STATE
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [date, setDate] = useState(formatDateUTC(new Date()));
 
   const [meals, setMeals] = useState([]);
   const [workouts, setWorkouts] = useState([]);
@@ -35,7 +36,8 @@ export default function DailyProgress() {
   const [loading, setLoading] = useState(false);
 
   const [showStartDateModal, setShowStartDateModal] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(date);
+
+  // Removed selectedStartDate state - using selectedDate instead
   const [calculatedEndDate, setCalculatedEndDate] = useState(null);
 
   const [planStartDate, setPlanStartDate] = useState(null);
@@ -55,6 +57,9 @@ export default function DailyProgress() {
     const dateObj = new Date(d);
     return dateObj.toISOString().split("T")[0];
   }
+
+  // Derived string from selectedDate
+  const selectedDateStr = formatDateUTC(selectedDate);
 
   const isDateWithinPlan = (selected) => {
     if (!planStartDate || !planEndDate) return false;
@@ -140,7 +145,9 @@ export default function DailyProgress() {
     setLocked(progress.completed || false);
     setWeight(progress.weight || "");
     setBodyFatPercentage(progress.bodyFatPercentage || "");
-    setMeasurements(progress.measurements || { chest: "", waist: "", hips: "" });
+    setMeasurements(
+      progress.measurements || { chest: "", waist: "", hips: "" },
+    );
   };
 
   const initDailyProgress = async () => {
@@ -155,7 +162,7 @@ export default function DailyProgress() {
 
           const completedRes = await getCompletedProgressDates(
             res.mealPlan.id,
-            res.workoutPlan?.id
+            res.workoutPlan?.id,
           );
           if (completedRes.success)
             setCompletedDates(completedRes.completedDates);
@@ -165,19 +172,19 @@ export default function DailyProgress() {
 
           const completedRes = await getCompletedProgressDates(
             null,
-            res.workoutPlan.id
+            res.workoutPlan.id,
           );
           if (completedRes.success)
             setCompletedDates(completedRes.completedDates);
         }
 
-        await fetchPlans();
+        await fetchPlans(selectedDateStr);
         setShowStartDateModal(false);
       } else {
         setShowStartDateModal(true);
       }
 
-      const progressRes = await getDailyProgressByDate(date);
+      const progressRes = await getDailyProgressByDate(selectedDateStr);
       if (progressRes.progress) loadProgress(progressRes.progress);
     } catch (err) {
       console.error(err);
@@ -189,27 +196,22 @@ export default function DailyProgress() {
   const handleStartDateConfirm = async () => {
     setLoading(true);
     try {
-      const resetRes = await resetPlanDatesIfNoProgress(selectedStartDate);
+      const resetRes = await resetPlanDatesIfNoProgress(selectedDateStr);
+
       if (resetRes.success) {
         if (resetRes.updatedPlans.mealPlan) {
           const meal = resetRes.updatedPlans.mealPlan;
-          const start = formatDateUTC(meal.startDate);
-          const end = formatDateUTC(meal.endDate);
-          setPlanStartDate(start);
-          setPlanEndDate(end);
-          setCalculatedEndDate(end);
-          setDate(start);
+          setPlanStartDate(formatDateUTC(meal.startDate));
+          setPlanEndDate(formatDateUTC(meal.endDate));
+          setCalculatedEndDate(formatDateUTC(meal.endDate));
         }
         if (resetRes.updatedPlans.workoutPlan) {
           const workout = resetRes.updatedPlans.workoutPlan;
-          const start = formatDateUTC(workout.startDate);
-          const end = formatDateUTC(workout.endDate);
-          setPlanStartDate(start);
-          setPlanEndDate(end);
-          setCalculatedEndDate(end);
-          setDate(start);
+          setPlanStartDate(formatDateUTC(workout.startDate));
+          setPlanEndDate(formatDateUTC(workout.endDate));
+          setCalculatedEndDate(formatDateUTC(workout.endDate));
         }
-        await fetchPlans();
+        await fetchPlans(selectedDateStr);
       } else {
         alert(resetRes.message);
       }
@@ -221,7 +223,7 @@ export default function DailyProgress() {
     }
   };
 
-  const fetchPlans = async (selectedDate = date) => {
+  const fetchPlans = async (selectedDate = selectedDateStr) => {
     try {
       const [mealRes, workoutRes] = await Promise.all([
         getLatestMealPlan(),
@@ -276,22 +278,25 @@ export default function DailyProgress() {
       alert("Please fill all body metrics before submitting.");
       return;
     }
-    if (!window.confirm("Are you sure you want to submit? You can't edit again!"))
+    if (
+      !window.confirm("Are you sure you want to submit? You can't edit again!")
+    )
       return;
 
     try {
       await createDailyProgress(
-        formatDateUTC(selectedDate),
+        selectedDateStr,
         weight,
         bodyFatPercentage,
         measurements,
         meals,
-        workouts
+        workouts,
       );
-
       setLocked(true);
-      setSuccessMessage(`✔ Progress saved successfully for ${formatDateUTC(selectedDate)}!`);
-      setCompletedDates((prev) => [...prev, formatDateUTC(selectedDate)]);
+      setSuccessMessage(
+        `✔ Progress saved successfully for ${selectedDateStr}!`,
+      );
+      setCompletedDates((prev) => [...prev, selectedDateStr]);
     } catch (err) {
       console.error(err);
       alert("Failed to save progress.");
@@ -309,10 +314,11 @@ export default function DailyProgress() {
       }
       return acc;
     },
-    { calories: 0, protein: 0, fat: 0, carbs: 0 }
+    { calories: 0, protein: 0, fat: 0, carbs: 0 },
   );
 
-  const dateValid = isDateWithinPlan(date);
+  // ✅ only use selectedDateStr
+  const dateValid = isDateWithinPlan(selectedDateStr);
 
   // ------------------------- RENDER -------------------------
   if (!profileExists) {
@@ -324,7 +330,7 @@ export default function DailyProgress() {
       </div>
     );
   }
- if (loading) {
+  if (loading) {
     return <Loading text="Loading Progress..." />;
   }
   if (!plansChecked) {
@@ -360,6 +366,8 @@ export default function DailyProgress() {
       </div>
     );
   }
+  const onlyNumbers = (value) => value.replace(/[^0-9]/g, "");
+  const onlyLetters = (value) => value.replace(/[^a-zA-Z\s]/g, "");
 
   return (
     <div className="app-container">
@@ -372,9 +380,8 @@ export default function DailyProgress() {
       <div className="progress-page">
         <input
           type="date"
-          value={date}
+          value={selectedDateStr}
           onChange={(e) => {
-            setDate(e.target.value);
             setSelectedDate(new Date(e.target.value));
           }}
           className="date-picker"
@@ -397,9 +404,9 @@ export default function DailyProgress() {
               <h3>Select Start Date for Your Meal & Workout Plans</h3>
               <input
                 type="date"
-                value={selectedStartDate}
+                value={selectedDateStr}
                 onChange={(e) => {
-                  setSelectedStartDate(e.target.value);
+                  setSelectedDate(new Date(e.target.value));
                   const start = new Date(e.target.value);
                   const end = new Date(start);
                   end.setDate(end.getDate() + 7 - 1);
@@ -520,58 +527,68 @@ export default function DailyProgress() {
                                 checked={item.selected || false}
                                 onChange={() => handleMealSelection(mIdx, iIdx)}
                               />
+
+                              {/* Meal Name: Letters Only */}
                               <input
                                 type="text"
                                 value={item.name || ""}
                                 onChange={(e) => {
                                   const newMeals = [...meals];
-                                  newMeals[mIdx].items[iIdx].name =
-                                    e.target.value;
-                                  setMeals(newMeals);
-                                }}
-                              />
-                              <input
-                                type="number"
-                                value={item.calories || 0}
-                                onChange={(e) => {
-                                  const newMeals = [...meals];
-                                  newMeals[mIdx].items[iIdx].calories =
-                                    Number(e.target.value);
-                                  setMeals(newMeals);
-                                }}
-                              />
-                              <span>kcal</span>
-                              <input
-                                type="number"
-                                value={item.protein || 0}
-                                onChange={(e) => {
-                                  const newMeals = [...meals];
-                                  newMeals[mIdx].items[iIdx].protein = Number(
-                                    e.target.value
+                                  newMeals[mIdx].items[iIdx].name = onlyLetters(
+                                    e.target.value,
                                   );
                                   setMeals(newMeals);
                                 }}
                               />
-                              <span>g protein</span>
+
+                              {/* Calories: Numbers Only */}
                               <input
-                                type="number"
-                                value={item.fat || 0}
+                                type="text"
+                                value={item.calories || ""}
                                 onChange={(e) => {
                                   const newMeals = [...meals];
-                                  newMeals[mIdx].items[iIdx].fat = Number(
-                                    e.target.value
+                                  newMeals[mIdx].items[iIdx].calories =
+                                    onlyNumbers(e.target.value);
+                                  setMeals(newMeals);
+                                }}
+                              />
+                              <span>kcal</span>
+
+                              {/* Protein: Numbers Only */}
+                              <input
+                                type="text"
+                                value={item.protein || ""}
+                                onChange={(e) => {
+                                  const newMeals = [...meals];
+                                  newMeals[mIdx].items[iIdx].protein =
+                                    onlyNumbers(e.target.value);
+                                  setMeals(newMeals);
+                                }}
+                              />
+                              <span>g protein</span>
+
+                              {/* Fat: Numbers Only */}
+                              <input
+                                type="text"
+                                value={item.fat || ""}
+                                onChange={(e) => {
+                                  const newMeals = [...meals];
+                                  newMeals[mIdx].items[iIdx].fat = onlyNumbers(
+                                    e.target.value,
                                   );
                                   setMeals(newMeals);
                                 }}
                               />
                               <span>g fat</span>
+
+                              {/* Carbs: Numbers Only */}
                               <input
-                                type="number"
-                                value={item.carbohydrates || 0}
+                                type="text"
+                                value={item.carbohydrates || ""}
                                 onChange={(e) => {
                                   const newMeals = [...meals];
                                   newMeals[mIdx].items[iIdx].carbohydrates =
-                                    Number(e.target.value);
+                                    onlyNumbers(e.target.value);
                                   setMeals(newMeals);
                                 }}
                               />
@@ -591,16 +608,26 @@ export default function DailyProgress() {
                             type="text"
                             value={w.name}
                             onChange={(e) =>
-                              handleWorkoutChange(idx, "name", e.target.value)
+                              handleWorkoutChange(
+                                idx,
+                                "name",
+                                onlyLetters(e.target.value),
+                              )
                             }
                           />
+
                           <input
-                            type="number"
+                            type="text"
                             value={w.sets}
                             onChange={(e) =>
-                              handleWorkoutChange(idx, "sets", e.target.value)
+                              handleWorkoutChange(
+                                idx,
+                                "sets",
+                                onlyNumbers(e.target.value),
+                              )
                             }
                           />
+
                           <input
                             type="text"
                             value={w.reps}
@@ -609,16 +636,17 @@ export default function DailyProgress() {
                             }
                           />
                           <input
-                            type="number"
+                            type="text"
                             value={w.caloriesBurned}
                             onChange={(e) =>
                               handleWorkoutChange(
                                 idx,
                                 "caloriesBurned",
-                                e.target.value
+                                onlyNumbers(e.target.value),
                               )
                             }
                           />
+
                           <span>kcal</span>
                         </div>
                       ))}

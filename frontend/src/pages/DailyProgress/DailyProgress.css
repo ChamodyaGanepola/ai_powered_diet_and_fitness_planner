@@ -4,9 +4,8 @@
   padding: 32px;
   background: #e5efe9;
   min-height: 100vh;
-  
 }
-/* Simple message without card */
+
 .simple-message {
   text-align: center;
   margin-top: 40px;
@@ -19,116 +18,18 @@
   padding: 32px;
   background: #f4f6fa;
   min-height: 100vh;
+   width: 100%;
 }
-.body-section {
-  margin-bottom: 30px;
-}
-
-.body-section h3 {
-  margin-bottom: 15px;
-  color: #1f2937;
-}
-
-.body-grid {
-  display: grid;
-  grid-template-columns: 120px 1fr; /* Label + Input */
-  row-gap: 12px;
-  column-gap: 20px;
-  align-items: center;
-}
-
-.body-field {
-  display: contents; /* Each label + input pair spans two columns */
-}
-
-.body-field label {
-  text-align: right;
-  padding-right: 10px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.body-field input {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.body-field input:disabled {
-  background-color: #f1f5f9;
-}
-.completed-day {
-  background-color: #4caf50 !important;
-  color: white !important;
-  border-radius: 50%;
-}
-/* ===== Centered Full-Height Messages ===== */
-
-.center-message {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
-  margin: 20px auto;
-}
-
-
-.center-message h2 {
-  font-size: 1.7rem;
-  margin-bottom: 6px;
-  color: #1e3a8a;
-}
-
-.center-message p {
-  font-size: 1rem;
-  margin-top: 4px;
-  color: #374151;
-}
-
-
-.center-message .generate-btn {
-  margin-top: 20px;
-  padding: 12px 24px;
-  background-color: #2563eb;
-  color: #fff;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.center-message .generate-btn:hover {
-  background-color: #1d4ed8;
-  transform: scale(1.05);
-}
-
 
 .progress-page {
   flex: 1;
-  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
   font-family: "Segoe UI", sans-serif;
   color: #1f2937;
 }
 
-h2 {
-  text-align: center;
-  color: #1e3a8a;
-  margin-bottom: 20px;
-}
-
+/* ===== Date Picker ===== */
 .date-picker {
   display: block;
   margin: 0 auto 25px auto;
@@ -138,12 +39,6 @@ h2 {
   border: 1px solid #cbd5e1;
   outline: none;
   transition: border 0.2s, box-shadow 0.2s;
-}
-.completed-day {
-  background-color: #4caf50 !important; /* green ticked */
-  color: white !important;
-  border-radius: 50%;
-  font-weight: bold;
 }
 
 .date-picker:focus {
@@ -168,6 +63,48 @@ h2 {
   font-size: 15px;
 }
 
+/* ===== Body Metrics ===== */
+.body-section {
+  margin-bottom: 30px;
+}
+
+.body-section h3 {
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.body-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  row-gap: 12px;
+  column-gap: 20px;
+  align-items: center;
+}
+
+.body-field {
+  display: contents;
+}
+
+.body-field label {
+  text-align: right;
+  padding-right: 10px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.body-field input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.body-field input:disabled {
+  background-color: #f1f5f9;
+}
+
 /* ===== Sections ===== */
 .section {
   margin-bottom: 30px;
@@ -183,6 +120,7 @@ h3 {
   padding: 15px 20px;
   border-radius: 12px;
   margin-bottom: 15px;
+  width:100%;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   color: #111827;
   transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
@@ -207,7 +145,8 @@ h4 {
 }
 
 /* ===== Meal & Workout Items ===== */
-.meal-item, .workout-item {
+.meal-item,
+.workout-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -227,15 +166,10 @@ h4 {
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #cbd5e1;
-  width: 90px;
+  width: 110px;
   font-size: 14px;
   outline: none;
   transition: border 0.2s, box-shadow 0.2s;
-}
-
-.meal-item input:disabled,
-.workout-item input:disabled {
-  background-color: #f1f5f9;
 }
 
 .meal-item input:focus,
@@ -244,17 +178,15 @@ h4 {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
+.meal-item input:disabled,
+.workout-item input:disabled {
+  background-color: #f1f5f9;
+}
+
 .selected-food {
   font-weight: bold;
   color: #065f46;
   text-decoration: underline;
-}
-
-/* ===== Meal Totals ===== */
-.meal-total {
-  font-weight: bold;
-  margin-top: 10px;
-  color: #1f2937;
 }
 
 /* ===== Submit Button ===== */
@@ -292,7 +224,16 @@ h4 {
   pointer-events: none;
 }
 
-/* ===== Modal for Start Date ===== */
+/* ===== Invalid Date Message ===== */
+.invalid-date-msg {
+  text-align: center;
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 16px;
+  margin: 25px 0;
+}
+
+/* ===== Modal ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -363,13 +304,6 @@ h4 {
   background-color: #ef4444;
   color: #fff;
 }
-.invalid-date-msg {
-  text-align: center;
-  color: #ef4444;
-  font-weight: bold;
-  font-size: 16px;
-  margin: 25px 0;
-}
 
 /* ===== Mobile Styles ===== */
 @media (max-width: 768px) {
@@ -394,29 +328,11 @@ h4 {
     flex-direction: column;
     gap: 12px;
   }
-   .center-message {
-    width: 90%;
-    min-height: auto;
-    padding: 15px;
-  }
-
-  .center-message h2 {
-    font-size: 1.5rem;
-  }
-
-  .center-message p {
-    font-size: 0.95rem;
-  }
-
-  .center-message .generate-btn {
-    width: 100%;
-  }
 }
-
 
 @media (max-width: 600px) {
   .body-grid {
-    grid-template-columns: 1fr; /* Stack labels and inputs on mobile */
+    grid-template-columns: 1fr;
   }
   .body-field label {
     text-align: left;
