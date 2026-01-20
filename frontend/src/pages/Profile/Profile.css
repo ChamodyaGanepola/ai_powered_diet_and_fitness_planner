@@ -109,7 +109,10 @@
   font-size: 22px;
   color: #2b7a4b;
 }
-
+.bmi-value svg{
+   font-size: 22px;
+  color: #2b7a4b;
+}
 .label {
   font-size: 13px;
   color: #5b6a5f;
