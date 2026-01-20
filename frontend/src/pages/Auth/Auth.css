@@ -89,18 +89,17 @@
 
 .pinkChampsTopic {
   margin-bottom: 1rem;
-  font-size: 34px;
+  font-size: 32px;
   color: #01280d;
   text-align: center;
   line-height: 1.1;
   font-weight: 800;
   letter-spacing: 0.2px;
-
   background: linear-gradient(90deg, #a3ffb8,
   #01280d, #6be29a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: fill;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
+
 }
 
 
@@ -177,6 +176,29 @@ button svg {
   margin-right: 8px;
   vertical-align: middle;
 }
+.password-field {
+  position: relative;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #111;
+}
+/* Chrome/Edge */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Chrome */
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none;
+}
+
 
 @keyframes spin {
   0% { transform: rotate(0deg); }

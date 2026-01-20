@@ -5,6 +5,8 @@ import { useAuth } from "../../context/authContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../context/alertContext.jsx";
 import { FaSignInAlt, FaUserPlus, FaSpinner } from "react-icons/fa";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
 import {
   validateEmail,
   validatePassword,
@@ -25,6 +27,8 @@ const Auth = () => {
   const [data, setData] = useState(initialState);
   const [isSignUp, setIsSignUp] = useState(false);
   const [confirmPass, setConfirmPass] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const resetForm = () => {
     setData(initialState);
@@ -56,6 +60,14 @@ const Auth = () => {
         });
         return;
       }
+      if (!validateEmail(data.email)) {
+        showAlert({
+          type: "error",
+          message: "Please enter a valid email address.",
+          autoClose: true,
+        });
+        return;
+      }
 
       if (data.email !== data.email.toLowerCase()) {
         showAlert({
@@ -70,7 +82,7 @@ const Auth = () => {
         showAlert({
           type: "error",
           message:
-            "Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Password must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (!@#$%^&*).",
           autoClose: true,
         });
         return;
@@ -117,16 +129,6 @@ const Auth = () => {
         return;
       }
 
-      if (!validatePassword(data.password)) {
-        showAlert({
-          type: "error",
-          message:
-            "Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, and 1 number.",
-          autoClose: true,
-        });
-        return;
-      }
-
       const success = await logIn({
         email: data.email,
         password: data.password,
@@ -137,6 +139,7 @@ const Auth = () => {
           type: "success",
           message: "Login successful!",
           autoClose: true,
+          duration: 6000,
         });
         navigate("/home");
       }
@@ -214,23 +217,40 @@ const Auth = () => {
             />
           )}
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={data.password}
-            onChange={handleChange}
-            required
-          />
-          {isSignUp && (
+          <div className="password-field">
             <input
-              type="password"
-              name="confirmpassword"
-              placeholder="Confirm Password"
-              value={data.confirmpassword}
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={data.password}
               onChange={handleChange}
               required
             />
+            <span
+              className="toggle-eye"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <FiEye /> : <FiEyeOff />}
+            </span>
+          </div>
+
+          {isSignUp && (
+            <div className="password-field">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmpassword"
+                placeholder="Confirm Password"
+                value={data.confirmpassword}
+                onChange={handleChange}
+                required
+              />
+              <span
+                className="toggle-eye"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+              >
+                {showConfirmPassword ? <FiEye /> : <FiEyeOff />}
+              </span>
+            </div>
           )}
 
           {!confirmPass && (
@@ -274,6 +294,8 @@ const Auth = () => {
             onClick={() => {
               setIsSignUp((prev) => !prev);
               resetForm();
+              setShowPassword(false);
+              setShowConfirmPassword(false);
             }}
           >
             {isSignUp
