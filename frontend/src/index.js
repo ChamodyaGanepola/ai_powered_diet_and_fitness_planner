@@ -3,12 +3,15 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/authContext";
+import { AlertProvider } from "./context/alertContext";
 import "./index.css";   // 
 import "./App.css";    
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
+      <AlertProvider>
       <App />
+      </AlertProvider>
     </AuthProvider>
   </BrowserRouter>
 );

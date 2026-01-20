@@ -46,7 +46,7 @@
 
 /* DELETE BUTTON */
 .delete-button {
-  background: linear-gradient(135deg, #ff6b6b, #e63946);
+  background-color: #dc2626;
   color: #fff;
   border: none;
   padding: 12px 26px;
@@ -54,13 +54,14 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(230, 57, 70, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
+.delete-button svg {
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: middle;
+}
 .delete-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(230, 57, 70, 0.4);
 }
 
 

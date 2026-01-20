@@ -7,6 +7,7 @@ import {
   updateWorkoutPlanStatus,
   createWorkoutPlan,
 } from "../../api/workoutPlan.js";
+import { FaTrash } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./Workouts.css";
 import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
@@ -182,25 +183,30 @@ export default function Workout() {
             />
           )}
           <div className="day-grid">
-          {plans.map((plan) =>
-            groupByDay(plan.workouts || []).map(({ day, workouts }) => (
-              <section key={day} className="day-section">
-                <h3 className="day-title">{day}</h3>
-                <div className="workouts-grid">
-                  {workouts.map((w) => (
-                    <WorkoutCard key={w._id} workout={w} />
-                  ))}
-                </div>
-              </section>
-            )),
-          )}
-        </div>
+            {plans.map((plan) =>
+              groupByDay(plan.workouts || []).map(({ day, workouts }) => (
+                <section key={day} className="day-section">
+                  <h3 className="day-title">{day}</h3>
+                  <div className="workouts-grid">
+                    {workouts.map((w) => (
+                      <WorkoutCard key={w._id} workout={w} />
+                    ))}
+                  </div>
+                </section>
+              )),
+            )}
+          </div>
         </div>
       )}
 
       {plans.length > 0 && (
         <div className="delete-plan-wrapper">
-          <button className="delete-button" onClick={handleDeleteWorkoutPlan}>
+          <button
+            className="delete-button"
+            onClick={handleDeleteWorkoutPlan}
+            disabled={loading}
+          >
+            <FaTrash />
             Delete Workout Plan
           </button>
         </div>

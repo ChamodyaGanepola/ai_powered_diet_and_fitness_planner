@@ -48,6 +48,7 @@
   margin-bottom: 12px;
 }
 
+
 .no-plan-text {
   font-size: 1.1rem;
   color: #374151;
@@ -86,7 +87,11 @@
   font-weight: 600;
   cursor: pointer;
 }
-
+.delete-button svg {
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: middle;
+}
 .delete-button:hover {
   background-color: #b91c1c;
 }

@@ -45,6 +45,11 @@
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
+.submit-day svg {
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: middle;
+}
 
 /* ===== Macro Summary ===== */
 .macro-summary {
@@ -194,7 +199,7 @@ h4 {
   display: block;
   margin: 25px auto;
   padding: 14px 28px;
-  background: #16a34a;
+  background: linear-gradient(135deg, #01280d, #295339);
   color: #fff;
   font-weight: 600;
   border: none;

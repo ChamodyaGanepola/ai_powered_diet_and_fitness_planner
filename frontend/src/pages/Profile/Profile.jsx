@@ -12,6 +12,7 @@ import {
   FaUtensils,
   FaHeart,
 } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { getProfileByUserId, deleteProfile } from "../../api/userProfileApi";
 import { createNotification } from "../../api/notificationApi.js";
 import PageLayout from "../../layouts/PageLayout.jsx";
@@ -123,6 +124,7 @@ const Profile = () => {
               className="delete-profile-btn"
               onClick={() => setShowConfirm(true)}
             >
+               <FaTrash />
               Delete Profile Details
             </button>
           </div>

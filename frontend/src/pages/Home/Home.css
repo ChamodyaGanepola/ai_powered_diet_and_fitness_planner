@@ -1,10 +1,9 @@
-
 .home {
   width: 100%;
   min-height: 100vh;
   display: flex;
-  flex-direction: column; 
- padding: 20px 10px;
+  flex-direction: column;
+  padding: 20px 10px;
 }
 
 .hero {
@@ -19,11 +18,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-
   width: 100%;
-
   margin: 0 auto;
-  padding: 0 20px; /* keep it from touching edges */
+  padding: 0 20px;
   box-sizing: border-box;
 }
 
@@ -32,7 +29,7 @@
 /* HERO BUTTON MAX WIDTH */
 .hero-btn {
   max-width: 320px;
-
+  margin-Right: "8px";
 }
 
 /* ===== COLORS FOR CARDS ===== */
@@ -150,7 +147,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 26px; 
+    margin-bottom: 26px;
   }
 
   .features {

@@ -111,6 +111,11 @@
 .primary-btn:hover {
   opacity: 0.95;
 }
+.primary-btn svg {
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: middle;
+}
 
 /* ===== BMI CARD ===== */
 .bmi-spinner-card {

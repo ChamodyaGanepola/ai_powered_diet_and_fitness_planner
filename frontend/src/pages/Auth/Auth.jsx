@@ -3,11 +3,13 @@ import "./Auth.css";
 import Logo from "../../images/cover-image.png";
 import { useAuth } from "../../context/authContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "../../context/alertContext.jsx";
+import { FaSignInAlt, FaUserPlus, FaSpinner } from "react-icons/fa";
 
 const Auth = () => {
   const { signUp, logIn, loading, error, setError } = useAuth();
   const navigate = useNavigate();
-
+  const { showAlert } = useAlert();
   const initialState = {
     username: "",
     email: "",
@@ -56,8 +58,13 @@ const Auth = () => {
       });
       console.log("Login success:", success);
       if (success) {
-        navigate("/home"); //  go to home page
-        resetForm();
+        showAlert({
+          type: "success",
+          message: "Login successful! ...",
+          autoClose: true,
+          duration: 5000, 
+        });
+        navigate("/home");
       }
     }
   };
@@ -162,8 +169,24 @@ const Auth = () => {
           )}
 
           <button type="submit" disabled={loading}>
-            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Login"}
+            {loading ? (
+              <>
+                <FaSpinner className="spin" />
+                Loading...
+              </>
+            ) : isSignUp ? (
+              <>
+                <FaUserPlus />
+                Sign Up
+              </>
+            ) : (
+              <>
+                <FaSignInAlt />
+                Login
+              </>
+            )}
           </button>
+
           {!isSignUp && (
             <div
               className="forgot-password"

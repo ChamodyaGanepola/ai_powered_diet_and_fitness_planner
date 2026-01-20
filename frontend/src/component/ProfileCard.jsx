@@ -7,7 +7,7 @@ import {
 import { createNotification } from "../api/notificationApi.js";
 import { createMealPlan } from "../api/mealPlanApi.js";
 import { createWorkoutPlan } from "../api/workoutPlan.js";
-
+import { FaSave } from "react-icons/fa";
 import "./ProfileCard.css";
 import { useAuth } from "../context/authContext.jsx";
 
@@ -26,7 +26,6 @@ const ProfileCard = ({ onClose, edit = false }) => {
     workoutPreferences: "",
     culturalDietaryPatterns: "",
     days: "",
-
   });
 
   const [loading, setLoading] = useState(false);
@@ -59,7 +58,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               workoutPreferences: data.workoutPreferences || "",
               culturalDietaryPatterns:
                 data.culturalDietaryPatterns?.join(", ") || "",
-              days:  Number(formData.days),
+              days: Number(formData.days),
             });
             setBMI(data.bmi || null);
             setBMICategory(data.bmiCategory || null);
@@ -74,15 +73,14 @@ const ProfileCard = ({ onClose, edit = false }) => {
     fetchProfile();
   }, [edit, user?.id]);
 
- 
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: name === "days" ? Number(value) : value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "days" ? Number(value) : value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -211,7 +209,6 @@ const handleChange = (e) => {
                   </select>
                 </div>
               </div>
-
               {/* Weight & Height */}
               <div className="form-row">
                 <div className="form-group">
@@ -241,7 +238,6 @@ const handleChange = (e) => {
                   />
                 </div>
               </div>
-
               {/* FITNESS GOAL + ACTIVITY LEVEL (same row) */}
               <div className="form-row">
                 <div className="form-group">
@@ -284,7 +280,6 @@ const handleChange = (e) => {
                   </select>
                 </div>
               </div>
-
               {/* WORKOUT PREFERENCE + HEALTH CONDITIONS (same row) */}
               <div className="form-row">
                 <div className="form-group">
@@ -341,7 +336,6 @@ const handleChange = (e) => {
                   <option value="60">60 Days</option>
                 </select>
               </div>
-
               {/* Optional Fields */}
               <div className="form-row">
                 <div className="form-group">
@@ -366,12 +360,21 @@ const handleChange = (e) => {
                   />
                 </div>
               </div>
+              import {FaSave} from "react-icons/fa";
               <button className="primary-btn" type="submit" disabled={loading}>
-                {loading
-                  ? "Saving..."
-                  : edit
-                    ? "💾 Update Profile & Continue"
-                    : "💾 Save Profile & Continue"}
+                {loading ? (
+                  "Saving..."
+                ) : edit ? (
+                  <>
+                    <FaSave  />
+                    Update Profile & Continue
+                  </>
+                ) : (
+                  <>
+                    <FaSave />
+                    Save Profile & Continue
+                  </>
+                )}
               </button>
             </form>
           </>

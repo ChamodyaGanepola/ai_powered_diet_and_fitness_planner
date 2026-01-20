@@ -9,9 +9,10 @@ import {
   getUnreadCount,
   markNotificationsRead,
 } from "../api/notificationApi.js";
-
+import { useAlert } from "../context/alertContext.jsx";
 const Header = ({ disableLinks }) => {
   const location = useLocation();
+   const { showAlert } = useAlert();
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -78,10 +79,16 @@ const Header = ({ disableLinks }) => {
   };
 
   const handleLogout = () => {
-    logOut();
-    navigate("/");
-    setOpen(false);
-  };
+  logOut();
+  showAlert({
+    type: "success",
+    message: "Logged out successfully.",
+    autoClose: true,
+    duration: 4000,
+  });
+  navigate("/");
+  setOpen(false);
+};
 
   useEffect(() => {
     const handleClickOutside = (e) => {

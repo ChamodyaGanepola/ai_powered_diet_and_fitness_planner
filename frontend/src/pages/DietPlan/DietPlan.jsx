@@ -13,7 +13,8 @@ import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
 import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
 import FeedbackList from "../../component/FeedbackList.jsx";
 import Loading from "../../component/Loading";
-import { FaAppleAlt } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
+
 export default function DietPlan() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -160,10 +161,10 @@ export default function DietPlan() {
         </div>
       ) : (
         <>
-        <div className="meal-plan-wrapper">
-          {mealPlans.map((plan, index) => (
-            <MealPlanCard key={index} plan={plan} index={index} />
-          ))}
+          <div className="meal-plan-wrapper">
+            {mealPlans.map((plan, index) => (
+              <MealPlanCard key={index} plan={plan} index={index} />
+            ))}
           </div>
 
           <div className="delete-wrapper">
@@ -172,6 +173,7 @@ export default function DietPlan() {
               onClick={handleDeleteMealPlan}
               disabled={loading}
             >
+              <FaTrash />
               Delete Meal Plan
             </button>
           </div>

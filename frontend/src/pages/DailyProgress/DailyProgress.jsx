@@ -13,6 +13,7 @@ import {
   checkDailyProgressForUser,
   getCompletedProgressDates,
 } from "../../api/dailyProgress.js";
+import { FaCheckCircle } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
@@ -653,7 +654,7 @@ export default function DailyProgress() {
                     </div>
 
                     <button className="submit-day" onClick={submitDay}>
-                      Submit Day
+                      <FaChartLine/> Submit Day
                     </button>
                   </>
                 )}

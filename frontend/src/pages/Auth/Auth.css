@@ -164,11 +164,26 @@
   font-size: 15px;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
-
 .authForm button:hover {
   transform: translateY(-2px);
   opacity: 0.95;
 }
+.spin {
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+button svg {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
 
 /* ===== LINKS ===== */
 .toggle,

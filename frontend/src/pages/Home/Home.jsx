@@ -9,13 +9,26 @@ import mealPlanImage from "../../images/meal-plan.jpg";
 import progressImage from "../../images/progress.jpg";
 import PageHeader from "../../component/PageHeader.jsx";
 import { FaHome } from "react-icons/fa";
+import { FaEdit, FaUserPlus } from "react-icons/fa";
+import Alert from "../../component/Alert.jsx";
+import { useLocation } from "react-router-dom";
+
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [alert, setAlert] = useState(location.state?.alert || null);
   const { user, profileUpdated } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
   const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (location.state?.alert) {
+      setAlert(location.state.alert);
+      // clear it so it doesn't show again on refresh
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -43,10 +56,19 @@ const Home = () => {
 
   return (
     <main className="home">
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          autoClose={alert.autoClose}
+          duration={alert.duration}
+          onClose={() => setAlert(null)}
+        />
+      )}
       <section className="hero">
         <div className="hero-row">
           <PageHeader
-            icon={<FaHome/>}
+            icon={<FaHome />}
             title={`Welcome${user ? `, ${user.username}` : ""} to Your AI Diet Fitness Planner`}
             subtitle="Your personalized health and fitness assistant powered by AI"
           />
@@ -56,7 +78,17 @@ const Home = () => {
               className="primary-btn hero-btn"
               onClick={() => setShowProfileCard(true)}
             >
-              {profile ? "Edit Your Profile Here" : "Get Started Here"}
+              {profile ? (
+                <>
+                  <FaEdit />
+                  Edit Your Profile Here
+                </>
+              ) : (
+                <>
+                  <FaUserPlus />
+                  Get Started Here
+                </>
+              )}
             </button>
           )}
         </div>

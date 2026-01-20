@@ -79,14 +79,18 @@
 
 .delete-profile-btn {
   margin-top: 15px;
-  background: #d9534f;
+  background-color: #dc2626;
   color: #fff;
   border: none;
   padding: 8px 16px;
   border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+.delete-profile-btn svg {
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: middle;
 }
 
 .delete-profile-btn:hover {
