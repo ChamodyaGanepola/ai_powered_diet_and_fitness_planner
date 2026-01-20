@@ -1,48 +1,31 @@
+/* ===== HOME ===== */
 .home {
   width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 20px 10px;
+  background: #e5efe9; /* subtle page background */
+   
 }
 
+/* ===== HERO ===== */
 .hero {
   width: 100%;
-  background: #e5efe9;
-  padding: 26px;
-  box-sizing: border-box;
+  padding: 80px 20px 40px;
+  background: linear-gradient(90deg, #a3ffb8,
+ #6be29a);
+  padding-top: 80px;
+  padding-bottom: 40px;
 }
 
 .hero-row {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-
-
-/* HERO BUTTON MAX WIDTH */
-.hero-btn {
-  max-width: 320px;
-  margin-Right: "8px";
-}
-
-/* ===== COLORS FOR CARDS ===== */
-.feature-card.diet-card {
-  background: #D9F7E3;
-}
-
-.feature-card.workout-card {
-  background: #FFE7D6;
-}
-
-.feature-card.progress-card {
-  background: #D9E8FF;
+  flex-wrap: wrap;
 }
 
 /* ===== BUTTON ===== */
@@ -50,7 +33,7 @@
   background: linear-gradient(135deg, #01280d, #295339);
   color: white;
   border: none;
-  padding: 14px 16px;
+  padding: 14px 18px;
   font-size: 16px;
   border-radius: 12px;
   cursor: pointer;
@@ -65,114 +48,97 @@
 /* ===== FEATURES ===== */
 .features {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
   width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 20px;
   box-sizing: border-box;
 }
 
+/* FEATURE CARD */
 .feature-card {
-  padding: 24px 20px;
-  border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-  text-align: center;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.10);
   cursor: pointer;
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  height: 280px;
+ 
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
 }
 
-.feature-card h3 {
+.feature-text {
+  padding: 18px;
+  flex: 1;
+}
+
+.feature-text h3 {
   font-size: 18px;
-  margin-bottom: 10px;
-  color: #111827;
+  margin-bottom: 8px;
 }
 
-.feature-card p {
-  color: #6b7280;
-  font-size: 15px;
-  line-height: 1.6;
+.feature-text p {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-/* ===== IMAGE STYLE ===== */
 .feature-image-wrap {
-  width: 100%;
-  height: 180px;
-  margin-top: 18px;
-  border-radius: 12px;
+  height: 150px;
   overflow: hidden;
 }
 
 .feature-image-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  display: block;
+  object-fit: cover;
 }
 
-/* DESKTOP */
-@media (min-width: 1024px) {
-  .hero-row {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .hero-btn {
-    margin-top: 12px;
-    white-space: nowrap;
-  }
+/* ===== COLOR CARDS ===== */
+.feature-card.diet-card {
+  background: #D9F7E3;
 }
 
-/* MOBILE */
-@media (max-width: 900px) {
-  .hero-row {
-    flex-direction: column;
-    align-items: center;
-  }
+.feature-card.workout-cards {
+  background: #FFE7D6;
+}
 
-  .hero-btn {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 26px;
-  }
+.feature-card.progress-cards {
+  background: #D9E8FF;
+}
 
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1000px) {
   .features {
     grid-template-columns: 1fr;
-    gap: 20px;
+    padding: 10px;
   }
 
   .feature-card {
-    padding: 22px;
-  }
-}
-
-/* IMAGE SIZE ADJUST */
-@media (max-width: 1200px) {
-  .feature-image-wrap {
-    height: 160px;
+    height: 220px;
   }
 }
 
 @media (max-width: 600px) {
-  .feature-image-wrap {
-    height: 120px;
+  .hero {
+    padding: 60px 15px 30px;
   }
 
-  .feature-card {
-    max-width: 100%;
+  .hero-row {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .primary-btn {
+    width: 100%;
+    max-width: 360px;
   }
 }

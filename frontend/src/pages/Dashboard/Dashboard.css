@@ -3,14 +3,17 @@
   width: 100%;
   min-height: 100vh;
   display: flex;
- padding: 20px 10px;
+  padding-top: 80px;
+  padding-bottom: 40px;
+   background: #e5efe9;
 }
 
 .dashboard-main {
-  width: 100%;
+ width: 100%;
+ background: #e5efe9;
+ padding-right: 80px;
+ padding-left: 40px;
   background: #e5efe9;
-  padding: 26px;
-  box-sizing: border-box;
 }
 
 /* ================= HEADER ================= */

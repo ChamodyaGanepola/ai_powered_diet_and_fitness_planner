@@ -95,7 +95,7 @@ export default function Dashboard() {
     );
   }
 
-  if (!activeMealPlan && !activeWorkoutPlan) {
+  else if (!activeMealPlan && !activeWorkoutPlan) {
     return (
       <div className="app-container">
         <p className="simple-message">
@@ -105,7 +105,7 @@ export default function Dashboard() {
     );
   }
 
-  if (activeWorkoutPlan && !activeMealPlan) {
+  else if (activeWorkoutPlan && !activeMealPlan) {
     return (
       <div className="app-container">
         <p className="simple-message">
@@ -115,7 +115,7 @@ export default function Dashboard() {
     );
   }
 
-  if (activeMealPlan && !activeWorkoutPlan) {
+  else if (activeMealPlan && !activeWorkoutPlan) {
     return (
       <div className="app-container">
         <p className="simple-message">

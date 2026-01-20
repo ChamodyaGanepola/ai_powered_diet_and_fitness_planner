@@ -22,6 +22,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
   const token = localStorage.getItem("token");
+  
   useEffect(() => {
     if (location.state?.alert) {
       setAlert(location.state.alert);
@@ -110,23 +111,28 @@ const Home = () => {
           </div>
         </div>
 
-        <div
-          className="feature-card workout-card"
-          onClick={() => navigate("/workouts")}
-        >
-          <h3>💪 Custom Workouts</h3>
-          <p>Tailored exercise routines for your fitness level and equipment</p>
+        <div className="feature-card workout-cards">
+          <div className="feature-text">
+            <h3>💪 Custom Workouts</h3>
+            <p>
+              Tailored exercise routines for your fitness level and equipment
+            </p>
+          </div>
+
           <div className="feature-image-wrap">
             <img src={workoutImage} alt="Workout Plan" />
           </div>
         </div>
 
         <div
-          className="feature-card progress-card"
+          className="feature-card progress-cards"
           onClick={() => navigate("/dailyprogress")}
         >
-          <h3>📊 Progress Tracking</h3>
-          <p>Monitor your journey with detailed analytics and insights</p>
+          <div className="feature-text">
+            <h3>📊 Progress Tracking</h3>
+            <p>Monitor your journey with detailed <br/> analytics and insights</p>
+          </div>
+
           <div className="feature-image-wrap">
             <img src={progressImage} alt="Progress" />
           </div>

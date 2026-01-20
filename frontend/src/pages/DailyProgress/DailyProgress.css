@@ -15,10 +15,10 @@
 
 .dailyprogress-root {
   margin: 0 auto;
-  padding: 32px;
+  padding: 0px;
   background: #f4f6fa;
   min-height: 100vh;
-   width: 100%;
+  width: 100%;
 }
 
 .progress-page {
