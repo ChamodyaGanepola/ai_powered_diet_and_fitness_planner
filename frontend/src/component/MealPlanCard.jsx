@@ -2,12 +2,15 @@ import MealSection from "./MealSection";
 import "react-datepicker/dist/react-datepicker.css";
 import "./MealPlanCard.css";
 import PageHeader from "./PageHeader.jsx";
+import { FaAppleAlt } from "react-icons/fa";
+
+
 export default function MealPlanCard({ plan, index }) {
   return (
     <div className="mealplan-card">
       <div className="mealplan-header">
                 <PageHeader
-          icon="🥗"
+          icon={<FaAppleAlt />}
           title="Your Diet Plan"
           subtitle="Personalized nutrition designed to support your goals"
         />

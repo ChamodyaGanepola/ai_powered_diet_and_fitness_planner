@@ -13,7 +13,7 @@ import {
   checkDailyProgressForUser,
   getCompletedProgressDates,
 } from "../../api/dailyProgress.js";
-
+import { FaChartLine } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
 import Loading from "../../component/Loading.jsx";
@@ -372,7 +372,7 @@ export default function DailyProgress() {
   return (
     <div className="app-container">
       <PageHeader
-        icon="👋"
+         icon={<FaChartLine />}
         title="Daily Progress Tracker"
         subtitle="Track your progress daily — stay consistent."
       />

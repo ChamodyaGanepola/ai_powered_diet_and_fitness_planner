@@ -1,27 +1,38 @@
+
 .home {
   width: 100%;
-  padding: 20px 10px;
-  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; 
+ padding: 20px 10px;
 }
 
 .hero {
-  padding: 20px 10px;
   width: 100%;
+  background: #e5efe9;
+  padding: 26px;
+  box-sizing: border-box;
 }
 
-/* HERO ROW */
 .hero-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+
   width: 100%;
+
+  margin: 0 auto;
+  padding: 0 20px; /* keep it from touching edges */
+  box-sizing: border-box;
 }
+
+
 
 /* HERO BUTTON MAX WIDTH */
 .hero-btn {
   max-width: 320px;
-  width: 100%;
+
 }
 
 /* ===== COLORS FOR CARDS ===== */

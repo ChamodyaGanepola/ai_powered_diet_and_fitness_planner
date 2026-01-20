@@ -14,7 +14,7 @@ import { getLatestWorkoutPlan } from "../../api/workoutPlan";
 import Loading from "../../component/Loading";
 import PageHeader from "../../component/PageHeader.jsx";
 import ProgressPercentage from "../../component/ProgressPercentage.jsx";
-
+import { MdDashboard } from "react-icons/md";
 export default function Dashboard() {
   const { user } = useAuth();
   const [last7Days, setLast7Days] = useState([]);
@@ -48,25 +48,20 @@ export default function Dashboard() {
         const workoutPlanRes = await getLatestWorkoutPlan(user.id);
         const workoutPlan = workoutPlanRes?.workoutPlan || null;
         setActiveWorkoutPlan(workoutPlan);
-        
 
         if (!mealPlan && !workoutPlan) {
           setTimeout(() => (window.location.href = "/home"), 3000);
         } else if (!mealPlan && workoutPlan) {
           setTimeout(() => (window.location.href = "/dietPlan"), 3000);
-        }
-
-        else if (!workoutPlan && mealPlan) {
+        } else if (!workoutPlan && mealPlan) {
           setTimeout(() => (window.location.href = "/workouts"), 3000);
-        }
-
-        else if (mealPlan?._id) {
+        } else if (mealPlan?._id) {
           const completedRes = await getCompletedProgressDates(mealPlan._id);
           setCompletedDates(completedRes);
           console.log("completeRes", completedRes);
         }
 
-console.log("workout start date",activeMealPlan.startDate); 
+        console.log("workout start date", activeMealPlan.startDate);
         const days = [];
         for (let i = 6; i >= 0; i--) {
           const d = new Date();
@@ -136,7 +131,7 @@ console.log("workout start date",activeMealPlan.startDate);
         {/* ===== ROW 1: HEADER ===== */}
         <div className="dashboard-header">
           <PageHeader
-            icon="👋"
+            icon={<MdDashboard />}
             title={`Hey ${user?.username}!`}
             subtitle="Let's start living healthy from today"
           />

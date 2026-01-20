@@ -1,5 +1,6 @@
 .meal-card {
   border-radius: 16px;
+  width: 100;
   padding: 18px;
   min-height: unset;
   display: flex;

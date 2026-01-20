@@ -13,7 +13,7 @@ import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
 import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
 import FeedbackList from "../../component/FeedbackList.jsx";
 import Loading from "../../component/Loading";
-
+import { FaAppleAlt } from "react-icons/fa";
 export default function DietPlan() {
   const { user } = useAuth();
   const navigate = useNavigate();

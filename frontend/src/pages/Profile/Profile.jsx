@@ -71,7 +71,7 @@ const Profile = () => {
       markProfileUpdated();
       setSuccessMsg("Successfully deleted your profile");
       await createNotification(
-        `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`
+        `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`,
       );
       setTimeout(() => {
         setShowConfirm(false);
@@ -112,54 +112,80 @@ const Profile = () => {
   return (
     <>
       <div className="profile-page">
-       <div className="profile-layout">
-  {/* HEADER */}
-  <div className="profile-header">
-    <div className="avatar-wrapper">{renderAvatar()}</div>
-    <h2>{user?.username}</h2>
-    <p>{user?.email}</p>
+        <div className="profile-layout">
+          {/* HEADER */}
+          <div className="profile-header">
+            <div className="avatar-wrapper">{renderAvatar()}</div>
+            <h2>{user?.username}</h2>
+            <p>{user?.email}</p>
 
-    <button className="delete-profile-btn" onClick={() => setShowConfirm(true)}>
-      Delete Profile Details
-    </button>
-  </div>
+            <button
+              className="delete-profile-btn"
+              onClick={() => setShowConfirm(true)}
+            >
+              Delete Profile Details
+            </button>
+          </div>
 
-  {/* CARDS (NO profile-grid wrapper) */}
-  <ProfileItem icon={<FaBirthdayCake />} label="Age" value={`${profile.age} yrs`} />
-  <ProfileItem icon={<FaWeight />} label="Weight" value={`${profile.weight} kg`} />
-  <ProfileItem icon={<FaRulerVertical />} label="Height" value={`${profile.height} cm`} />
-  <ProfileItem icon={<FaBullseye />} label="Fitness Goal" value={profile.fitnessGoal} />
-  <ProfileItem icon={<FaRunning />} label="Activity Level" value={profile.activityLevel} />
-  
-  {/* BMI CARD */}
-  <div className="bmi-card">
-    <div className="bmi-card-left">
-      <div className="bmi-value"><FaHeart /> BMI {profile.bmi}</div>
-      <div className="bmi-category">BMI Category {profile.bmiCategory}</div>
-      
-    </div>
+          {/* CARDS (NO profile-grid wrapper) */}
+          <ProfileItem
+            icon={<FaBirthdayCake />}
+            label="Age"
+            value={`${profile.age} yrs`}
+          />
+          <ProfileItem
+            icon={<FaWeight />}
+            label="Weight"
+            value={`${profile.weight} kg`}
+          />
+          <ProfileItem
+            icon={<FaRulerVertical />}
+            label="Height"
+            value={`${profile.height} cm`}
+          />
+          <ProfileItem
+            icon={<FaBullseye />}
+            label="Fitness Goal"
+            value={profile.fitnessGoal}
+          />
+          <ProfileItem
+            icon={<FaRunning />}
+            label="Activity Level"
+            value={profile.activityLevel}
+          />
 
-    <div className="bmi-card-right">
-      <div className="bmi-scale">
-        <span>Underweight</span>
-        <span>Normal</span>
-        <span>Overweight</span>
-        <span>Obese</span>
-      </div>
+          {/* BMI CARD */}
+          <div className="bmi-card">
+            <div className="bmi-card-left">
+              <div className="bmi-value">
+                <FaHeart /> BMI {profile.bmi}
+              </div>
+              <div className="bmi-category">
+                BMI Category {profile.bmiCategory}
+              </div>
+            </div>
 
-      <div className="bmi-bar">
-        <div
-          className={`bmi-progress ${getBMIClass(profile.bmiCategory)}`}
-          style={{ width: `${getBMIPercentage(profile.bmi)}%` }}
-        />
-      </div>
+            <div className="bmi-card-right">
+              <div className="bmi-scale">
+                <span>Underweight</span>
+                <span>Normal</span>
+                <span>Overweight</span>
+                <span>Obese</span>
+              </div>
 
-      <p className="bmi-note">
-        BMI shows your body weight relative to your height.
-      </p>
-    </div>
-  </div>
-</div>
+              <div className="bmi-bar">
+                <div
+                  className={`bmi-progress ${getBMIClass(profile.bmiCategory)}`}
+                  style={{ width: `${getBMIPercentage(profile.bmi)}%` }}
+                />
+              </div>
+
+              <p className="bmi-note">
+                BMI shows your body weight relative to your height.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* PROFILE SECTIONS */}
         <div className="profile-sections-row">
@@ -208,9 +234,7 @@ const Profile = () => {
           </div>
         </div>
       )}
-      
     </>
-   
   );
 };
 

@@ -8,6 +8,7 @@ import workoutImage from "../../images/workout-image.jpg";
 import mealPlanImage from "../../images/meal-plan.jpg";
 import progressImage from "../../images/progress.jpg";
 import PageHeader from "../../component/PageHeader.jsx";
+import { FaHome } from "react-icons/fa";
 const Home = () => {
   const navigate = useNavigate();
   const { user, profileUpdated } = useAuth();
@@ -45,7 +46,7 @@ const Home = () => {
       <section className="hero">
         <div className="hero-row">
           <PageHeader
-            icon="👋"
+            icon={<FaHome/>}
             title={`Welcome${user ? `, ${user.username}` : ""} to Your AI Diet Fitness Planner`}
             subtitle="Your personalized health and fitness assistant powered by AI"
           />

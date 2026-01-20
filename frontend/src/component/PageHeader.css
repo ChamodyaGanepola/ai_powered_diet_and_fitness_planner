@@ -17,6 +17,11 @@
   margin: 0;
 }
 
+.page-header-icon svg {
+  font-size: 42px;
+  color: #2b7a4b;
+}
+
 .page-header-subtitle {
   font-size: 1rem;
   color: #4b5563;
@@ -25,9 +30,17 @@
 
 /* subtle animation */
 @keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 /* Mobile */
@@ -43,4 +56,10 @@
   .page-header-title {
     font-size: 1.7rem;
   }
+
+  .page-header-icon svg {
+    font-size: 32px;
+    color: #2b7a4b;
+  }
+
 }

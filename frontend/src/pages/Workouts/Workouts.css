@@ -2,7 +2,8 @@
   padding: 20px 10px;
   min-height: 100vh;
   width: 100%;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column; 
 }
 
 /* DAY GRID WRAPPER */
@@ -12,11 +13,16 @@
   gap: 14px;
   margin-top: 30px;
 }
-
+.day-grid-box {
+  width: 100%;
+  background: #e5efe9;
+  padding: 26px;
+  box-sizing: border-box;
+}
 /* DAY SECTION */
 .day-section {
   width: 100%;
-  background: #fff;
+  background: #e5efe9;
   padding: 10px 10px;
   border-radius: 14px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);

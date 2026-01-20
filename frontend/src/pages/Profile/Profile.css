@@ -8,7 +8,7 @@
   align-items: center;
   background: #e5efe9;
   color: #1b2b22;
-  box-sizing: border-box;
+  
 }
 
 /* ===== Container & Layout ===== */
@@ -30,11 +30,12 @@
 /* ===== GRID LAYOUT ===== */
 .profile-layout {
   width: 100%;
-  max-width: 1200px;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(2, auto);
   gap: 16px;
+  box-sizing: border-box;
+  padding: 26px;
 }
 
 /* Header spans column 1 and 2 rows */

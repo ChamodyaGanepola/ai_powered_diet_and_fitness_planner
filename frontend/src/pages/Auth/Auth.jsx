@@ -73,8 +73,8 @@ const Auth = () => {
       <div className="a-left">
         <img src={Logo} alt="Logo" className="logoImage" />
         <div className="welcomeText">
-          <span className="helloText">Hello👋 </span>
-          <span className="pinkChampsText">HealthPilot 👋</span>
+          <span className="helloText"> Hello </span>
+          <span className="pinkChampsText">HealthPilot </span>
           <p className="description">
             Your personal AI-powered health companion.
             <br />

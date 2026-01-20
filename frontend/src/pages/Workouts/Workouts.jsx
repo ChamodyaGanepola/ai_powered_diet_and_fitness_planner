@@ -14,6 +14,7 @@ import PlanFeedbackModal from "../../component/PlanFeedbackModal.jsx";
 import FeedbackList from "../../component/FeedbackList.jsx";
 import PageHeader from "../../component/PageHeader";
 import Loading from "../../component/Loading.jsx";
+import { FaDumbbell } from "react-icons/fa";
 export default function Workout() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -147,14 +148,6 @@ export default function Workout() {
   return (
     <div className="workouts-page">
       {loading && <Loading text="Loading workout plans..." />}
-      {/* Header ONLY when plan exists */}
-      {plans.length > 0 && (
-        <PageHeader
-          icon="🏋️"
-          title="Your Workout Plan"
-          subtitle="Keep going, you’re doing great!"
-        />
-      )}
 
       {!loading && !profileExists && (
         <div className="centered-card">
@@ -179,7 +172,16 @@ export default function Workout() {
       )}
 
       {!loading && profileExists && plans.length > 0 && (
-        <div className="day-grid">
+        <div className="day-grid-box">
+          {/* Header ONLY when plan exists */}
+          {plans.length > 0 && (
+            <PageHeader
+              icon={<FaDumbbell />}
+              title="Your Workout Plan"
+              subtitle="Keep going, you’re doing great!"
+            />
+          )}
+          <div className="day-grid">
           {plans.map((plan) =>
             groupByDay(plan.workouts || []).map(({ day, workouts }) => (
               <section key={day} className="day-section">
@@ -192,6 +194,7 @@ export default function Workout() {
               </section>
             )),
           )}
+        </div>
         </div>
       )}
 
