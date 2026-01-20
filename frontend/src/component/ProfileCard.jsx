@@ -10,9 +10,24 @@ import { createWorkoutPlan } from "../api/workoutPlan.js";
 import { FaSave } from "react-icons/fa";
 import "./ProfileCard.css";
 import { useAuth } from "../context/authContext.jsx";
-
+import { FaCheck } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+import {
+  validateAge,
+  validateGender,
+  validateWeight,
+  validateHeight,
+  validateFitnessGoal,
+  validateActivityLevel,
+  validateWorkoutPreference,
+  validateDays,
+} from "../utils/validation.js";
+import ConfirmModal from "../component/ConfirmModal.jsx";
+import Alert from "../component/Alert.jsx";
 const ProfileCard = ({ onClose, edit = false }) => {
   const { user, markProfileUpdated } = useAuth();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [alert, setAlert] = useState(null);
 
   const [formData, setFormData] = useState({
     age: "",
@@ -35,10 +50,11 @@ const ProfileCard = ({ onClose, edit = false }) => {
   const [bmi, setBMI] = useState(null);
   const [bmiCategory, setBMICategory] = useState(null);
 
-  const [step, setStep] = useState("form"); // form | generating | done | failed
+  const [step, setStep] = useState("form");
   const [planError, setPlanError] = useState(null);
 
-  // Load existing profile if edit
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (edit && user?.id) {
@@ -58,7 +74,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
               workoutPreferences: data.workoutPreferences || "",
               culturalDietaryPatterns:
                 data.culturalDietaryPatterns?.join(", ") || "",
-              days: Number(formData.days),
+              days: data.days || 0,
             });
             setBMI(data.bmi || null);
             setBMICategory(data.bmiCategory || null);
@@ -73,6 +89,30 @@ const ProfileCard = ({ onClose, edit = false }) => {
     fetchProfile();
   }, [edit, user?.id]);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!validateAge(Number(formData.age)))
+      newErrors.age = "Age must be between 13 and 120";
+    if (!validateGender(formData.gender))
+      newErrors.gender = "Please select a valid gender";
+    if (!validateWeight(Number(formData.weight)))
+      newErrors.weight = "Weight must be greater than 0";
+    if (!validateHeight(Number(formData.height)))
+      newErrors.height = "Height must be greater than 0";
+    if (!validateFitnessGoal(formData.fitnessGoal))
+      newErrors.fitnessGoal = "Fitness goal is required";
+    if (!validateActivityLevel(formData.activityLevel))
+      newErrors.activityLevel = "Activity level is required";
+    if (!validateWorkoutPreference(formData.workoutPreferences))
+      newErrors.workoutPreferences = "Please select a workout preference";
+    if (!validateDays(formData.days))
+      newErrors.days = "Please select valid days";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -80,10 +120,19 @@ const ProfileCard = ({ onClose, edit = false }) => {
       ...prev,
       [name]: name === "days" ? Number(value) : value,
     }));
+
+    setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+    setConfirmOpen(true);
+  };
+  const handleConfirm = async () => {
+    setConfirmOpen(false);
+
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -110,40 +159,47 @@ const ProfileCard = ({ onClose, edit = false }) => {
     };
 
     try {
-      let actionType = "";
       let profile;
+      const actionType = edit ? "updated" : "created";
+
       if (edit) {
         const res = await updateProfile(payload);
-        console.log("payload for update:", payload);
         profile = res.profile;
-        actionType = "updated";
       } else {
         const res = await createProfile(payload);
         profile = res.profile;
-        actionType = "created";
       }
 
       setBMI(profile.bmi);
       setBMICategory(profile.bmiCategory);
 
       markProfileUpdated();
+
+      /* ✅ SUCCESS ALERT */
+      setAlert({
+        type: "success",
+        message:
+          actionType === "created"
+            ? "🎉 Profile created successfully!"
+            : "✅ Profile updated successfully!",
+        autoClose: true,
+        duration: 3000,
+      });
+
       await createNotification(
         `Hi ${user.username}, your profile has been successfully ${actionType}! 🙂`,
       );
 
-      // Show BMI + spinner card
       setStep("generating");
 
-      // Generate meal & workout plans
       try {
         await createMealPlan();
         await createWorkoutPlan();
         await createNotification("🍽️ Meal plan and 🏋️ Workout plan are ready!");
-        setStep("done"); // success
+        setStep("done");
       } catch (err) {
-        console.error(err);
         setPlanError("⚠️ Meal & Workout Plan generation failed.");
-        setStep("failed"); // failed state
+        setStep("failed");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Profile save failed");
@@ -155,26 +211,38 @@ const ProfileCard = ({ onClose, edit = false }) => {
   return (
     <div className="profile-overlay">
       <div className="profile-card">
+        {alert && (
+  <Alert
+    type={alert.type}
+    message={alert.message}
+    autoClose={alert.autoClose}
+    duration={alert.duration}
+    onClose={() => setAlert(null)}
+  />
+)}
+
         <button className="close-btn" onClick={onClose}>
           ✖
         </button>
 
-        {/* FORM STEP */}
         {step === "form" && (
           <>
-            <h2>
-              👤{" "}
-              {edit ? "Edit Your Health Profile" : "Set Up Your Health Profile"}
+            <h2 className="profile-card-icon">
+              <FaUser />{" "}
+              <span>
+                {edit
+                  ? "Edit Your Health Profile"
+                  : "Set Up Your Health Profile"}
+              </span>
             </h2>
             <p>
-              Complete your profile to get personalized AI-powered diet &
-              fitness plans
+              Complete your profile, get personalized AI-powered diet & fitness
+              plans
             </p>
 
             {error && <p style={{ color: "red" }}>{error}</p>}
 
             <form className="profile-form" onSubmit={handleSubmit}>
-              {/* Age & Gender */}
               <div className="form-row">
                 <div className="form-group">
                   <label>
@@ -189,7 +257,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     value={formData.age}
                     onChange={handleChange}
                   />
+                  {errors.age && <p className="error-text">{errors.age}</p>}
                 </div>
+
                 <div className="form-group">
                   <label>
                     Gender <span className="required">*</span>
@@ -207,9 +277,12 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                   </select>
+                  {errors.gender && (
+                    <p className="error-text">{errors.gender}</p>
+                  )}
                 </div>
               </div>
-              {/* Weight & Height */}
+
               <div className="form-row">
                 <div className="form-group">
                   <label>
@@ -223,7 +296,11 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     value={formData.weight}
                     onChange={handleChange}
                   />
+                  {errors.weight && (
+                    <p className="error-text">{errors.weight}</p>
+                  )}
                 </div>
+
                 <div className="form-group">
                   <label>
                     Height (cm) <span className="required">*</span>
@@ -236,9 +313,12 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     value={formData.height}
                     onChange={handleChange}
                   />
+                  {errors.height && (
+                    <p className="error-text">{errors.height}</p>
+                  )}
                 </div>
               </div>
-              {/* FITNESS GOAL + ACTIVITY LEVEL (same row) */}
+
               <div className="form-row">
                 <div className="form-group">
                   <label>
@@ -258,6 +338,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     <option value="Maintain Fitness">Maintain Fitness</option>
                     <option value="Improve Endurance">Improve Endurance</option>
                   </select>
+                  {errors.fitnessGoal && (
+                    <p className="error-text">{errors.fitnessGoal}</p>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -278,9 +361,12 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     <option value="Moderately Active">Moderately Active</option>
                     <option value="Very Active">Very Active</option>
                   </select>
+                  {errors.activityLevel && (
+                    <p className="error-text">{errors.activityLevel}</p>
+                  )}
                 </div>
               </div>
-              {/* WORKOUT PREFERENCE + HEALTH CONDITIONS (same row) */}
+
               <div className="form-row">
                 <div className="form-group">
                   <label>
@@ -303,6 +389,9 @@ const ProfileCard = ({ onClose, edit = false }) => {
                     <option value="Cycling">Cycling</option>
                     <option value="Swimming">Swimming</option>
                   </select>
+                  {errors.workoutPreferences && (
+                    <p className="error-text">{errors.workoutPreferences}</p>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -316,27 +405,32 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
               </div>
-              {/* DAYS  */}
-              <div className="form-group">
-                <label>
-                  Days <span className="required">*</span>
-                </label>
-                <select
-                  name="days"
-                  required
-                  value={formData.days}
-                  onChange={handleChange}
-                >
-                  <option value="" disabled>
-                    Select Days
-                  </option>
-                  <option value="0">AI Generated</option>
-                  <option value="7">7 Days</option>
-                  <option value="30">30 Days</option>
-                  <option value="60">60 Days</option>
-                </select>
+              {/* DAYS */}
+              <div className="form-group days-group">
+                <div className="days-row">
+                  <label>
+                    Number of days for your plan
+                    <span className="required">*</span>
+                  </label>
+
+                  <select
+                    name="days"
+                    required
+                    value={formData.days}
+                    onChange={handleChange}
+                  >
+                    <option value="" disabled>
+                      Select Days
+                    </option>
+                    <option value="0">AI Generated</option>
+                    <option value="7">7 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="60">60 Days</option>
+                  </select>
+                </div>
+
+                {errors.days && <p className="error-text">{errors.days}</p>}
               </div>
-              {/* Optional Fields */}
               <div className="form-row">
                 <div className="form-group">
                   <label>Dietary Restrictions</label>
@@ -360,31 +454,36 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
               </div>
-          
+
               <button className="primary-btn" type="submit" disabled={loading}>
                 {loading ? (
                   "Saving..."
-                ) : edit ? (
-                  <>
-                    <FaSave  />
-                    Update Profile & Continue
-                  </>
                 ) : (
                   <>
-                    <FaSave />
-                    Save Profile & Continue
+                    <FaSave /> {edit ? "Update Profile" : "Save Profile"}
                   </>
                 )}
               </button>
             </form>
           </>
         )}
+        <ConfirmModal
+          open={confirmOpen}
+          title="Confirm Submission"
+          message="Are you sure you want to submit your profile?"
+          onConfirm={handleConfirm}
+          onCancel={() => setConfirmOpen(false)}
+          loading={loading}
+        />
 
-        {/* GENERATING STEP */}
         {(step === "generating" || step === "done" || step === "failed") && (
           <div className="bmi-spinner-card">
-            <h3>
-              ✅ Your BMI: <strong>{bmi}</strong>
+            <h3 className="fa-check">
+              <FaCheck />{" "}
+              <span>
+                {" "}
+                Your BMI: <strong>{bmi}</strong>
+              </span>
             </h3>
             <h4>
               Category: <strong>{bmiCategory}</strong>

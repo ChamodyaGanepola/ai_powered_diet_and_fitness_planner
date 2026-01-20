@@ -58,7 +58,8 @@ export const createMealPlan = async (req, res) => {
       activityLevel: userProfile.activityLevel,
       fitnessGoal: userProfile.fitnessGoal,
       dietaryRestrictions: userProfile.dietaryRestrictions || [],
-      workoutPreferences: userProfile.workoutPreferences || [],
+      workoutPreferences: userProfile.workoutPreferences || "",
+      culturalDietaryPatterns: userProfile.culturalDietaryPatterns || [],
       days: userProfile.days,
     };
 
@@ -66,6 +67,10 @@ export const createMealPlan = async (req, res) => {
     const macros = calculateMacros(profileData);
     const dietaryText = profileData.dietaryRestrictions.length > 0
       ? profileData.dietaryRestrictions.join(", ")
+      : "None";
+
+    const culturalText = profileData.culturalDietaryPatterns.length > 0
+      ? profileData.culturalDietaryPatterns.join(", ")
       : "None";
     // ====== DAYS LOGIC ======
     const requestedDays = Number(profileData.days || 0);
@@ -79,55 +84,62 @@ If ${requestedDays} is less than 7, AI should decide a suitable duration (>=7).`
     }
     // AI Prompt
     const prompt = `
-Create a MEAL PLAN TEMPLATE according to  User Profile as below.
-User Profile:
-Age: ${profileData.age}
-Gender: ${profileData.gender}
-Weight: ${profileData.weight}kg
-Height: ${profileData.height}cm
-Fitness Goal: ${profileData.fitnessGoal}
-Dietary Restrictions: ${dietaryText}
+You are a certified nutritionist.
 
-This meal plan provides MULTIPLE OPTIONS for each meal.
-User will choose ONLY ONE food item per meal per day.
+Create a MEAL PLAN TEMPLATE based strictly on the following user profile.
 
-STRICT RULES:
-1. Include EXACTLY these meal types and each meal type MUST have:
-   - Breakfast (3 options)
-   - Lunch (3 options)
-   - Dinner (3 options)
-   - Snack (2 options)
+USER PROFILE:
+- Age: ${profileData.age}
+- Gender: ${profileData.gender}
+- Weight: ${profileData.weight} kg
+- Height: ${profileData.height} cm
+- Fitness Goal: ${profileData.fitnessGoal}
+- Dietary Restrictions: ${dietaryText}
+- Meals should come from this culture or countries: ${culturalText}
 
-2. Each food item represents ONE COMPLETE MEAL OPTION
-   (not components to be eaten together)
+PLAN PURPOSE:
+- This is a TEMPLATE, not a fixed plan
+- For EACH meal, provide MULTIPLE food OPTIONS
+- The user will select ONLY ONE food option per meal per day
 
-3. All food options within the SAME meal type must be
-   nutritionally similar (±10% calories/macros)
+MEAL STRUCTURE (STRICT — DO NOT CHANGE):
+- Breakfast → EXACTLY 3 food options
+- Lunch → EXACTLY 3 food options
+- Dinner → EXACTLY 3 food options
+- Snack → EXACTLY 2 food options
 
-4. All food items MUST include these fields:
-- name
-- calories (number, kcal)
-- protein (number, g)
-- fat (number, g)
-- carbohydrates (number, g)
-- unit (string, e.g., "cup", "serving")
+IMPORTANT MEAL RULES:
+1. Each food item represents ONE COMPLETE MEAL OPTION
+   (do NOT split meals into components or combinations)
+2. All food options within the SAME meal type must be
+   nutritionally similar (within ±10% calories and macros)
+3. Meals must respect dietary restrictions and food culture
+4. Meals should be realistic, safe, and commonly eaten foods
 
-6. ${daysPrompt}  
+REQUIRED FIELDS FOR EVERY FOOD ITEM:
+- name (string)
+- calories (number)
+- protein (number)
+- fat (number)
+- carbohydrates (number)
+- unit (string, e.g., "1 cup", "1 serving", "2 slices")
 
-DAILY TARGETS (user chooses options to match these):
-Calories: ${macros.calories}
-Protein: ${macros.protein}g
-Carbs: ${macros.carbs}g
-Fat: ${macros.fat}g
+DURATION in days: ${daysPrompt}
 
+DAILY NUTRITION TARGETS
+(User chooses meal options to approximately meet these):
+- Calories: ${macros.calories}
+- Protein: ${macros.protein} g
+- Carbohydrates: ${macros.carbs} g
+- Fat: ${macros.fat} g
 
+OUTPUT RULES:
+- Return ONLY valid JSON
+- No explanations or extra text
+- Numbers must be plain digits ONLY (no units in numbers)
+- Do NOT include comments or trailing commas
 
-
-Return ONLY valid JSON.
-Numbers must be plain digits ONLY. No units allowed.
-
-
-FORMAT:
+OUTPUT FORMAT (STRICT):
 {
   "meals": [
     {
@@ -138,8 +150,8 @@ FORMAT:
           "calories": number,
           "protein": number,
           "fat": number,
-          "unit": "string",
-          "carbohydrates": number
+          "carbohydrates": number,
+          "unit": "string"
         }
       ]
     }

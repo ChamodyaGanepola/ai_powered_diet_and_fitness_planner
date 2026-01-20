@@ -72,28 +72,51 @@ export const createWorkoutPlan = async (req, res) => {
       : 7;
     // AI prompt
     const prompt = `
-Create a weekly workout plan in JSON ONLY. User will follow this plan for number of ${durationDays}.
-Include exercises ONLY from user's preferred workout type: ${workoutPreferences}.
-Each exercise must have: name, targetMuscle, sets, reps, restTime, durationMinutes, caloriesBurned, day.
-Numbers must be plain digits ONLY. No units allowed.
-Include rest days as "Rest".
+You are a certified fitness coach.
 
-User Info:
-Age: ${age}
-Weight: ${weight} kg
-Height: ${height} cm
-Activity Level: ${activityLevel}
-Fitness Goal: ${fitnessGoal}
-Workout Preferences: ${workoutPreferences}
-Health Conditions: ${healthText}
+Create a WEEKLY WORKOUT PLAN in STRICT VALID JSON ONLY.
+The user will follow this plan for ${durationDays} days.
 
-Rules:
-- Safe for teens
-- Avoid exercises worsening user's health conditions
-- Do not truncate reps
-- No explanations
+INCLUDE ONLY exercises that match this workout preference:
+${workoutPreferences}
 
-Output format:
+EACH exercise MUST include ALL of the following fields:
+- name
+- targetMuscle
+- sets
+- reps
+- restTime
+- durationMinutes
+- caloriesBurned
+- day
+
+USER PROFILE (must be considered):
+- Age: ${age}
+- Weight: ${weight} kg
+- Height: ${height} cm
+- Activity Level: ${activityLevel}
+- Fitness Goal: ${fitnessGoal}
+- Workout Preferences: ${workoutPreferences}
+- Health Conditions: ${healthText}
+
+STRICT RULES (VERY IMPORTANT):
+1. Strength / resistance exercises (e.g. gym, bodyweight, weights):
+   - reps MUST be a STRING range like "8-12", "10-15"
+2. Cardio exercises (e.g. running, walking, cycling, swimming):
+   - reps MUST be exactly "N/A"
+3. Reps MUST ALWAYS be a STRING
+   - Never a number
+   - Never empty
+4. DurationMinutes MUST be provided for ALL exercises
+5. Sets MUST be a number
+   - For cardio exercises, sets = 1
+6. Numbers must be plain digits ONLY (no units)
+7. Rest days are OPTIONAL (do NOT add unless necessary)
+8. Safe for teens
+9. Avoid exercises that worsen health conditions
+10. NO explanations, NO comments, NO markdown
+
+OUTPUT FORMAT (STRICT):
 {
   "difficulty": "${mapActivityLevelToDifficulty(activityLevel)}",
   "exercises": [
@@ -101,7 +124,7 @@ Output format:
       "name": "string",
       "targetMuscle": "string",
       "sets": number,
-      "reps": "8-12",
+      "reps": "string",
       "restTime": number,
       "durationMinutes": number,
       "caloriesBurned": number,
@@ -110,6 +133,7 @@ Output format:
   ]
 }
 `;
+
 
 
     // Call AI
@@ -156,13 +180,17 @@ Output format:
     for (const ex of workoutData.exercises || []) {
       const calories = ex.caloriesBurned || Math.round(weight * (ex.durationMinutes || 30) * 5);
       const duration = ex.durationMinutes || 30;
+      const reps =
+        typeof ex.reps === "string" && ex.reps.trim() !== ""
+          ? ex.reps
+          : "N/A";
 
       await Exercise.create({
         workoutplan_id: workoutPlan._id,
         name: ex.name || "Unknown Exercise",
         targetMuscle: ex.targetMuscle || "General",
         sets: Math.min(Math.max(ex.sets || 3, 1), 5),
-        reps: ex.reps || "8-12",
+        reps: reps || "8-12",
         restTime: Math.min(Math.max(ex.restTime || 60, 0), 120),
         durationMinutes: duration,
         caloriesBurned: calories,
@@ -176,7 +204,7 @@ Output format:
     workoutPlan.totalCaloriesBurned = totalCalories;
     workoutPlan.duration = totalDuration;
     await workoutPlan.save();
-      // AFTER SUCCESS -> mark old plan as updated
+    // AFTER SUCCESS -> mark old plan as updated
     await WorkoutPlan.updateMany(
       { user_id, status: "active", _id: { $ne: workoutPlan._id } },
       { status: "account-updated" }
