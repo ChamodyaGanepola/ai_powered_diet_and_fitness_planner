@@ -360,7 +360,7 @@ const ProfileCard = ({ onClose, edit = false }) => {
                   />
                 </div>
               </div>
-              import {FaSave} from "react-icons/fa";
+          
               <button className="primary-btn" type="submit" disabled={loading}>
                 {loading ? (
                   "Saving..."
