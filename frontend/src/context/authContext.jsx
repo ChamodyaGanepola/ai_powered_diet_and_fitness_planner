@@ -73,17 +73,21 @@ export const AuthProvider = ({ children }) => {
 
   // REGISTER
   const signUp = async (data) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await registerUser(data);
-      alert("Registration successful. Please login.");
-    } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    setError(null);
+
+    await registerUser(data);
+    return { success: true };
+  } catch (err) {
+    const msg = err.response?.data?.message || "Registration failed";
+    setError(msg);
+    return { success: false, message: msg };
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <AuthContext.Provider

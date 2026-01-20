@@ -10,6 +10,9 @@ exports.createUser = async (req, res) => {
         message: "Username, email, and password are required"
       });
     }
+    if (email !== email.toLowerCase()) {
+      return res.status(400).json({ message: "Email must be lowercase." });
+    }
 
     const usernameExists = await User.findOne({ username });
     if (usernameExists) {

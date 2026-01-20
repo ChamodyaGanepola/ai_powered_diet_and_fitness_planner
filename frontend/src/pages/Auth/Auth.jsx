@@ -5,6 +5,11 @@ import { useAuth } from "../../context/authContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../context/alertContext.jsx";
 import { FaSignInAlt, FaUserPlus, FaSpinner } from "react-icons/fa";
+import {
+  validateEmail,
+  validatePassword,
+  validateUsername,
+} from "../../utils/validation";
 
 const Auth = () => {
   const { signUp, logIn, loading, error, setError } = useAuth();
@@ -40,29 +45,98 @@ const Auth = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ===== SIGNUP VALIDATION =====
     if (isSignUp) {
-      if (data.password === data.confirmpassword) {
-        setConfirmPass(true);
-        const email = data.email; // keep email for login UX
-        await signUp(data);
-        resetForm();
-        setIsSignUp(false); // switch to LOGIN automatically
-        setData((prev) => ({ ...prev, email })); // optional
-      } else {
-        setConfirmPass(false);
+      if (!validateUsername(data.username)) {
+        showAlert({
+          type: "error",
+          message:
+            "Username must be at least 3 characters and contain only letters or numbers.",
+          autoClose: true,
+        });
+        return;
       }
+
+      if (data.email !== data.email.toLowerCase()) {
+        showAlert({
+          type: "error",
+          message: "Email must be in lowercase only.",
+          autoClose: true,
+        });
+        return;
+      }
+
+      if (!validatePassword(data.password)) {
+        showAlert({
+          type: "error",
+          message:
+            "Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, and 1 number.",
+          autoClose: true,
+        });
+        return;
+      }
+
+      if (data.password !== data.confirmpassword) {
+        setConfirmPass(false);
+        showAlert({
+          type: "error",
+          message: "Passwords do not match.",
+          autoClose: true,
+        });
+        return;
+      }
+
+      // If all validations passed
+      setConfirmPass(true);
+      const { success, message } = await signUp(data);
+
+      if (!success) {
+        showAlert({
+          type: "error",
+          message: message,
+          autoClose: true,
+        });
+        return;
+      }
+
+      resetForm();
+      setIsSignUp(false);
+      showAlert({
+        type: "success",
+        message: "Registration successful. Please login.",
+        autoClose: true,
+      });
     } else {
+      // ===== LOGIN VALIDATION =====
+      if (!validateEmail(data.email)) {
+        showAlert({
+          type: "error",
+          message: "Please enter a valid email address.",
+          autoClose: true,
+        });
+        return;
+      }
+
+      if (!validatePassword(data.password)) {
+        showAlert({
+          type: "error",
+          message:
+            "Password must be at least 8 characters, include 1 uppercase letter, 1 lowercase letter, and 1 number.",
+          autoClose: true,
+        });
+        return;
+      }
+
       const success = await logIn({
         email: data.email,
         password: data.password,
       });
-      console.log("Login success:", success);
+
       if (success) {
         showAlert({
           type: "success",
-          message: "Login successful! ...",
+          message: "Login successful!",
           autoClose: true,
-          duration: 5000, 
         });
         navigate("/home");
       }
