@@ -5,13 +5,13 @@ const dailyProgressSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
 
     mealplan_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "MealPlan",
-      required: true,
+      required: false,
     },
 
     workoutplan_id: {
@@ -66,7 +66,7 @@ const dailyProgressSchema = new mongoose.Schema(
           totalCalories: { type: Number, required: true },
         },
       ],
-      required: true,
+      required: false,
     },
 
     /* Workouts done */
@@ -82,25 +82,25 @@ const dailyProgressSchema = new mongoose.Schema(
           caloriesBurned: { type: Number, required: true },
         },
       ],
-      required: true,
+      required: false,
     },
 
     totalCaloriesTaken: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     totalCaloriesBurned: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     /* Adherence metrics */
-    mealAdherenceScore: { type: Number, min: 0, max: 100, required: true },
-    workoutAdherenceScore: { type: Number, min: 0, max: 100, required: true },
+    mealAdherenceScore: { type: Number, min: 0, max: 100, required: false},
+    workoutAdherenceScore: { type: Number, min: 0, max: 100, required: false },
 
-    deviatedMealPlan: { type: Boolean, required: true },
-    deviatedWorkoutPlan: { type: Boolean, required: true },
+    deviatedMealPlan: { type: Boolean, required: false },
+    deviatedWorkoutPlan: { type: Boolean, required: false },
 
     completed: { type: Boolean, required: true },
   },

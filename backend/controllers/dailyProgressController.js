@@ -101,32 +101,36 @@ export const saveDailyProgress = async (req, res) => {
     const { date, weight, bodyFatPercentage, measurements, meals, workouts } = req.body;
     const user_id = req.user.id;
 
-    if (!user_id || !date || weight == null || bodyFatPercentage == null || !measurements || !meals || !workouts) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!user_id || !date || weight == null || bodyFatPercentage == null || !measurements) {
+      return res.status(400).json({ message: "Required fields missing" });
     }
 
-    const dayStr = new Date(date).toISOString().split("T")[0]; 
+    const dayStr = new Date(date).toISOString().split("T")[0];
 
     const mealPlan = await MealPlan.findOne({ user_id, status: "active" });
-    if (!mealPlan) return res.status(400).json({ message: "No active meal plan found" });
-
     const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" });
 
-    const totalCaloriesTaken = meals.reduce((sum, meal) => {
+    // Must have at least one plan or data
+    if (!mealPlan && !workoutPlan) {
+      return res.status(400).json({ message: "No active meal or workout plan found" });
+    }
+
+    // Calculate calories only if meals/workouts exist
+    const totalCaloriesTaken = (meals || []).reduce((sum, meal) => {
       const mealTotal = (meal.items || []).reduce((s, item) => s + (Number(item.calories) || 0), 0);
       return sum + mealTotal;
     }, 0);
 
-    const totalCaloriesBurned = workouts.reduce((sum, w) => sum + (Number(w.caloriesBurned) || 0), 0);
+    const totalCaloriesBurned = (workouts || []).reduce((sum, w) => sum + (Number(w.caloriesBurned) || 0), 0);
 
-    const plannedMeals = await getPlannedMealsFull(mealPlan._id);
+    const plannedMeals = mealPlan ? await getPlannedMealsFull(mealPlan._id) : [];
     const plannedWorkouts = workoutPlan ? await getPlannedWorkoutsFull(workoutPlan._id) : [];
 
-    const deviatedMealPlan = isMealPlanDeviated(plannedMeals, meals);
-    const deviatedWorkoutPlan = workoutPlan ? isWorkoutPlanDeviated(plannedWorkouts, workouts) : false;
+    const deviatedMealPlan = meals ? isMealPlanDeviated(plannedMeals, meals) : false;
+    const deviatedWorkoutPlan = workouts ? isWorkoutPlanDeviated(plannedWorkouts, workouts) : false;
 
-    const mealAdherenceScore = deviatedMealPlan ? 0 : 100;
-    const workoutAdherenceScore = deviatedWorkoutPlan ? 0 : 100;
+    const mealAdherenceScore = meals ? (deviatedMealPlan ? 0 : 100) : null;
+    const workoutAdherenceScore = workouts ? (deviatedWorkoutPlan ? 0 : 100) : null;
 
     const progress = await DailyProgress.findOneAndUpdate(
       { user_id, date: dayStr },
@@ -136,15 +140,15 @@ export const saveDailyProgress = async (req, res) => {
         weight,
         bodyFatPercentage,
         measurements,
-        meals,
-        workouts,
+        meals: meals || [],
+        workouts: workouts || [],
         totalCaloriesTaken,
         totalCaloriesBurned,
         mealAdherenceScore,
         workoutAdherenceScore,
         deviatedMealPlan,
         deviatedWorkoutPlan,
-        mealplan_id: mealPlan._id,
+        mealplan_id: mealPlan?._id,
         workoutplan_id: workoutPlan?._id,
         completed: true,
       },
@@ -153,11 +157,9 @@ export const saveDailyProgress = async (req, res) => {
 
     res.json({ success: true, progress });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Failed to save daily progress", error: err.message });
   }
 };
-
 
 /* ---------------------------
    GET DAILY PROGRESS BY DATE
@@ -191,8 +193,18 @@ export const getDailyProgress = async (req, res) => {
       date: { $gte: dayUTC, $lt: nextDayUTC },
     };
 
-    if (activeMealPlan) query.mealplan_id = activeMealPlan._id;
-    if (activeWorkoutPlan) query.workoutplan_id = activeWorkoutPlan._id;
+    // **IMPORTANT**
+    // Use $or when both plans exist
+    if (activeMealPlan && activeWorkoutPlan) {
+      query.$or = [
+        { mealplan_id: activeMealPlan._id },
+        { workoutplan_id: activeWorkoutPlan._id },
+      ];
+    } else if (activeMealPlan) {
+      query.mealplan_id = activeMealPlan._id;
+    } else if (activeWorkoutPlan) {
+      query.workoutplan_id = activeWorkoutPlan._id;
+    }
 
     const progress = await DailyProgress.findOne(query);
 
@@ -207,28 +219,19 @@ export const getDailyProgress = async (req, res) => {
 };
 
 
-/**
- * Reset start/end dates for latest active plans if no progress exists
- * @param selectedStartDate - new start date selected by user
- */
 
 export const resetPlanDatesIfNoProgress = async (req, res) => {
   try {
-    const { selectedStartDate } = req.body;
+    const { selectedMealStartDate, selectedWorkoutStartDate } = req.body;
     const user_id = req.user.id;
 
-    if (!user_id || !selectedStartDate) {
+    if (!user_id) {
       return res.status(400).json({
         success: false,
-        message: "user_id and selectedStartDate are required",
+        message: "user_id is required",
       });
     }
 
-    // Parse new start date as UTC midnight
-    const newStart = new Date(selectedStartDate);
-    newStart.setUTCHours(0, 0, 0, 0); // UTC midnight
-
-    // Get latest active MealPlan & WorkoutPlan
     const mealPlan = await MealPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
     const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
 
@@ -236,35 +239,53 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
       return res.status(404).json({ success: false, message: "No active meal or workout plans found" });
     }
 
-    // Check if any DailyProgress exists for these plans
-    const progressExists = await DailyProgress.exists({
-      user_id,
-      $or: [
-        { mealplan_id: mealPlan?._id },
-        { workoutplan_id: workoutPlan?._id },
-      ],
-    });
+    // CHECK progress separately for each plan
+    const mealProgressExists = mealPlan
+      ? await DailyProgress.exists({
+          user_id,
+          mealplan_id: mealPlan._id,
+          completed: true,
+        })
+      : false;
 
-    if (progressExists) {
+    const workoutProgressExists = workoutPlan
+      ? await DailyProgress.exists({
+          user_id,
+          workoutplan_id: workoutPlan._id,
+          completed: true,
+        })
+      : false;
+
+    // If BOTH have progress => cannot reset anything
+    if (mealProgressExists && workoutProgressExists) {
       return res.json({
         success: false,
-        message: "Daily progress already exists. Cannot reset plan dates.",
+        message: "Progress already exists for both plans. Cannot reset dates.",
       });
     }
 
     const updates = {};
     const defaultDurationDays = 30;
 
-    // Helper: calculate end date as UTC midnight
     const calcEndDateUTC = (start, durationDays) => {
       const end = new Date(start);
-      end.setUTCDate(end.getUTCDate() + durationDays - 1); // inclusive
+      end.setUTCDate(end.getUTCDate() + durationDays - 1);
       end.setUTCHours(0, 0, 0, 0);
       return end;
     };
 
-    // Reset MealPlan dates safely
-    if (mealPlan) {
+    // RESET ONLY MEAL PLAN if no meal progress
+    if (mealPlan && !mealProgressExists) {
+      if (!selectedMealStartDate) {
+        return res.status(400).json({
+          success: false,
+          message: "selectedMealStartDate is required",
+        });
+      }
+
+      const newMealStart = new Date(selectedMealStartDate);
+      newMealStart.setUTCHours(0, 0, 0, 0);
+
       let durationDays = defaultDurationDays;
 
       if (mealPlan.startDate && mealPlan.endDate) {
@@ -273,8 +294,8 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
         );
       }
 
-      mealPlan.startDate = newStart;
-      mealPlan.endDate = calcEndDateUTC(newStart, durationDays);
+      mealPlan.startDate = newMealStart;
+      mealPlan.endDate = calcEndDateUTC(newMealStart, durationDays);
       await mealPlan.save();
 
       updates.mealPlan = {
@@ -284,10 +305,18 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
       };
     }
 
+    // RESET ONLY WORKOUT PLAN if no workout progress
+    if (workoutPlan && !workoutProgressExists) {
+      if (!selectedWorkoutStartDate) {
+        return res.status(400).json({
+          success: false,
+          message: "selectedWorkoutStartDate is required",
+        });
+      }
 
-    // Reset WorkoutPlan dates safely
+      const newWorkoutStart = new Date(selectedWorkoutStartDate);
+      newWorkoutStart.setUTCHours(0, 0, 0, 0);
 
-    if (workoutPlan) {
       let durationDays = defaultDurationDays;
 
       if (workoutPlan.startDate && workoutPlan.endDate) {
@@ -296,8 +325,8 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
         );
       }
 
-      workoutPlan.startDate = newStart;
-      workoutPlan.endDate = calcEndDateUTC(newStart, durationDays);
+      workoutPlan.startDate = newWorkoutStart;
+      workoutPlan.endDate = calcEndDateUTC(newWorkoutStart, durationDays);
       await workoutPlan.save();
 
       updates.workoutPlan = {
@@ -323,6 +352,7 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
 };
 
 
+
 /**
  * GET all completed progress dates for a user filtered by meal/workout plan
  * Returns array of date strings (YYYY-MM-DD)
@@ -339,7 +369,7 @@ export const getCompletedProgressDates = async (req, res) => {
       });
     }
 
-    // 1) Get active plans
+    // Get active plans
     const activeMealPlan = await MealPlan.findOne({
       user_id,
       status: "active",
@@ -350,23 +380,51 @@ export const getCompletedProgressDates = async (req, res) => {
       status: "active",
     });
 
-    // 2) Build query using only active plan IDs
-    const query = { user_id, completed: true };
+    // Prepare sets
+    const mealCompletedDatesSet = new Set();
+    const workoutCompletedDatesSet = new Set();
 
-    if (activeMealPlan) query.mealplan_id = activeMealPlan._id;
-    if (activeWorkoutPlan) query.workoutplan_id = activeWorkoutPlan._id;
+    // Fetch meal progress dates
+    if (activeMealPlan) {
+      const mealProgress = await DailyProgress.find(
+        {
+          user_id,
+          completed: true,
+          mealplan_id: activeMealPlan._id,
+        },
+        "date"
+      );
 
-    // 3) Fetch dates
-    const progresses = await DailyProgress.find(query, "date").sort({
-      date: 1,
+      mealProgress.forEach(p => {
+        mealCompletedDatesSet.add(
+          new Date(p.date).toISOString().split("T")[0]
+        );
+      });
+    }
+
+    // Fetch workout progress dates
+    if (activeWorkoutPlan) {
+      const workoutProgress = await DailyProgress.find(
+        {
+          user_id,
+          completed: true,
+          workoutplan_id: activeWorkoutPlan._id,
+        },
+        "date"
+      );
+
+      workoutProgress.forEach(p => {
+        workoutCompletedDatesSet.add(
+          new Date(p.date).toISOString().split("T")[0]
+        );
+      });
+    }
+
+    res.json({
+      success: true,
+      mealCompletedDates: Array.from(mealCompletedDatesSet),
+      workoutCompletedDates: Array.from(workoutCompletedDatesSet),
     });
-
-    // 4) Convert dates to YYYY-MM-DD
-    const completedDates = progresses.map((p) =>
-      new Date(p.date).toISOString().split("T")[0]
-    );
-
-    res.json({ success: true, completedDates });
   } catch (err) {
     console.error("Get Completed Dates Error:", err);
     res.status(500).json({
@@ -379,40 +437,97 @@ export const getCompletedProgressDates = async (req, res) => {
 
 
 
+
 // Check if any daily progress exists for a user considering their active meal/workout plan
 
 export const checkDailyProgressForUser = async (req, res) => {
   try {
     const user_id = req.user.id;
-    if (!user_id) return res.status(400).json({ success: false, message: "user_id required" });
+    if (!user_id)
+      return res.status(400).json({ success: false, message: "user_id required" });
 
-    // Get active meal/workout plans
     const mealPlan = await MealPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
     const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
 
-    // Check if there’s any progress for these plans
-    let exists = false;
-    if (mealPlan || workoutPlan) {
-      const query = { user_id, completed: true };
-      if (mealPlan) query.mealplan_id = mealPlan._id;
-      if (workoutPlan) query.workoutplan_id = workoutPlan._id;
+    let mealProgressExists = false;
+    let workoutProgressExists = false;
 
-      const progress = await DailyProgress.findOne(query);
-      exists = !!progress;
+    if (mealPlan) {
+      mealProgressExists = !!(await DailyProgress.findOne({
+        user_id,
+        mealplan_id: mealPlan._id,
+        completed: true,
+      }));
+    }
+
+    if (workoutPlan) {
+      workoutProgressExists = !!(await DailyProgress.findOne({
+        user_id,
+        workoutplan_id: workoutPlan._id,
+        completed: true,
+      }));
     }
 
     res.json({
       success: true,
-      exists,
       mealPlan: mealPlan
-        ? { id: mealPlan._id, startDate: mealPlan.startDate, endDate: mealPlan.endDate }
+        ? { id: mealPlan._id, startDate: mealPlan.startDate, endDate: mealPlan.endDate, progressExists: mealProgressExists }
         : null,
       workoutPlan: workoutPlan
-        ? { id: workoutPlan._id, startDate: workoutPlan.startDate, endDate: workoutPlan.endDate }
+        ? { id: workoutPlan._id, startDate: workoutPlan.startDate, endDate: workoutPlan.endDate, progressExists: workoutProgressExists }
         : null,
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Failed to check progress", error: err.message });
+  }
+};
+
+/**
+ * UPDATE Daily Progress (supports partial update for meal OR workout)
+ * Useful when user already logged meal and later adds workout (or vice versa)
+ */
+export const updateDailyProgress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const {
+      date,
+      weight,
+      bodyFatPercentage,
+      measurements,
+      meals,
+      workouts,
+    } = req.body;
+
+    const existing = await DailyProgress.findOne({ userId, date });
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: "No progress found for this date. Please create it first.",
+      });
+    }
+
+    // Update only provided fields (optional meals/workouts)
+    if (weight !== undefined) existing.weight = weight;
+    if (bodyFatPercentage !== undefined)
+      existing.bodyFatPercentage = bodyFatPercentage;
+    if (measurements !== undefined) existing.measurements = measurements;
+    if (meals !== undefined) existing.meals = meals;
+    if (workouts !== undefined) existing.workouts = workouts;
+
+    existing.completed = true;  // once updated, mark completed
+
+    await existing.save();
+
+    return res.json({
+      success: true,
+      message: "Progress updated successfully",
+      progress: existing,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };

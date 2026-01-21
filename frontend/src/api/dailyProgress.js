@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/daily-progress";
 
-
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return {
@@ -13,12 +12,7 @@ const getAuthHeader = () => {
 };
 
 export const checkDailyProgressForUser = async () => {
-  const res = await axios.get(
-    `${API_URL}/checkProgress`,
-    {
-      ...getAuthHeader(),
-    }
-  );
+  const res = await axios.get(`${API_URL}/checkProgress`, getAuthHeader());
   return res.data;
 };
 
@@ -50,9 +44,7 @@ export const createDailyProgress = async (
   }
 };
 
-
-// Get daily progress for a specific date
-export const getDailyProgressByDate = async ( date) => {
+export const getDailyProgressByDate = async (date) => {
   try {
     const res = await axios.get(`${API_URL}/daily`, {
       params: { date },
@@ -64,38 +56,65 @@ export const getDailyProgressByDate = async ( date) => {
     throw err;
   }
 };
-// RESET PLAN DATES IF NO PROGRESS EXISTS
 
-export const resetPlanDatesIfNoProgress = async ( selectedStartDate) => {
+
+export const resetPlanDatesIfNoProgress = async ({
+  selectedMealStartDate,
+  selectedWorkoutStartDate,
+}) => {
   try {
+    console.log("selectedMealStartDate -", selectedMealStartDate);
+    console.log("selectedWorkoutStartDate -", selectedWorkoutStartDate);
+
     const res = await axios.post(
       `${API_URL}/reset-plan-dates`,
-      { selectedStartDate },
+      {
+        selectedMealStartDate,
+        selectedWorkoutStartDate,
+      },
       getAuthHeader()
     );
+
     return res.data;
   } catch (err) {
-    console.error("Reset Plan Dates API error:", err.response?.data || err.message);
+    console.error(
+      "Reset Plan Dates API error:",
+      err.response?.data || err.message
+    );
     throw err;
   }
 };
 
 
-export const getCompletedProgressDates = async (
-  mealplanId,
-  workoutplanId
+export const getCompletedProgressDates = async () => {
+  const res = await axios.get(`${API_URL}/completed-dates`, getAuthHeader());
+  return res.data;
+};
+
+export const updateDailyProgress = async (
+  date,
+  weight,
+  bodyFatPercentage,
+  measurements,
+  meals = [],
+  workouts = []
 ) => {
-  const params = { };
-  if (mealplanId) params.mealplan_id = mealplanId;
-  if (workoutplanId) params.workoutplan_id = workoutplanId;
-
-  const res = await axios.get(
-    `${API_URL}/completed-dates`,
-    {
-      params,
-      ...getAuthHeader(),
-    }
-  );
-
-  return res.data.completedDates || [];
+  try {
+    const response = await axios.put(
+      `${API_URL}/daily`,
+      { 
+        date,
+        weight,
+        bodyFatPercentage,
+        measurements,
+        meals,
+        workouts
+      },
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (err) {
+    console.error("Update Daily Progress API error:", err.response?.data || err.message);
+    throw err;
+  }
 };
