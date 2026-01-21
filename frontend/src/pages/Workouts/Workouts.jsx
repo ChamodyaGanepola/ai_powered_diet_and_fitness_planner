@@ -146,42 +146,39 @@ export default function Workout() {
     }
   };
 
-  return (
-    <div className="workouts-page">
-      {loading && <Loading text="Loading workout plans..." />}
+if (loading) return <Loading text="Loading dashboard..." />;
 
-      {!loading && !profileExists && (
-        <div className="centered-card">
-          <h2 className="greeting">Hey {user.username}</h2>
-          <p className="no-plan-text">
-            {" "}
-            First create your profile. Redirecting to home...
-          </p>
-        </div>
-      )}
-
-      {!loading && profileExists && plans.length === 0 && (
-        <div className="centered-card">
-          <h2 className="greeting">No Workout Plan Yet</h2>
-          <p className="no-plan-text">
-            Generate a personalized workout plan based on your profile
-          </p>
+  if (!profileExists) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          Hey {user.username}, first create your profile. Redirecting to home...
+        </p>
+      </div>
+    );
+  } else if (plans.length === 0) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          No active workout  plan available. You can generate one based on your
+          profile.
           <button className="generate-btn" onClick={handleGenerateWorkoutPlan}>
-            Generate Workout Plan
+            Generate Meal Plan
           </button>
-        </div>
-      )}
+        </p>
+      </div>
+    );
+  }
 
-      {!loading && profileExists && plans.length > 0 && (
-        <div className="day-grid-box">
-          {/* Header ONLY when plan exists */}
-          {plans.length > 0 && (
-            <PageHeader
+  return (
+   <div className="workouts-page">
+    <div className="workouts-inner">
+      <PageHeader
               icon={<FaDumbbell />}
               title="Your Workout Plan"
               subtitle="Keep going, you’re doing great!"
             />
-          )}
+      
           <div className="day-grid">
             {plans.map((plan) =>
               groupByDay(plan.workouts || []).map(({ day, workouts }) => (
@@ -196,10 +193,8 @@ export default function Workout() {
               )),
             )}
           </div>
-        </div>
-      )}
-
-      {plans.length > 0 && (
+    
+   
         <div className="delete-plan-wrapper">
           <button
             className="delete-button"
@@ -210,10 +205,8 @@ export default function Workout() {
             Delete Workout Plan
           </button>
         </div>
-      )}
-
-      {/* Feedback Section */}
-      {plans.length > 0 && (
+    
+   
         <div className="feedback-section">
           <div
             className="feedback-header-toggle"
@@ -240,7 +233,7 @@ export default function Workout() {
             />
           </div>
         </div>
-      )}
+   
 
       <PlanFeedbackModal
         open={showFeedback}
@@ -248,6 +241,7 @@ export default function Workout() {
         onConfirm={confirmWorkoutFeedback}
         title="Why is this workout plan not suitable?"
       />
+    </div>
     </div>
   );
 }

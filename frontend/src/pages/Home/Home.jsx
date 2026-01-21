@@ -22,7 +22,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showProfileCard, setShowProfileCard] = useState(false);
   const token = localStorage.getItem("token");
-  
+
   useEffect(() => {
     if (location.state?.alert) {
       setAlert(location.state.alert);
@@ -66,34 +66,34 @@ const Home = () => {
           onClose={() => setAlert(null)}
         />
       )}
-    <section className="hero">
-  <div className="hero-inner">
-    <div className="hero-row">
-          <PageHeader
-            icon={<FaHome />}
-            title={`Welcome${user ? `, ${user.username}` : ""} to Your AI Diet Fitness Planner`}
-            subtitle="Your personalized health and fitness assistant powered by AI"
-          />
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-row">
+            <PageHeader
+              icon={<FaHome />}
+              title={`Welcome${user ? `, ${user.username}` : ""} to Your AI Diet Fitness Planner`}
+              subtitle="Your personalized health and fitness assistant powered by AI"
+            />
 
-          {!loading && (
-            <button
-              className="primary-btn hero-btn"
-              onClick={() => setShowProfileCard(true)}
-            >
-              {profile ? (
-                <>
-                  <FaEdit />
-                  Edit Your Profile Here
-                </>
-              ) : (
-                <>
-                  <FaUserPlus />
-                  Get Started Here
-                </>
-              )}
-            </button>
-          )}
-        </div>
+            {!loading && (
+              <button
+                className="primary-btn hero-btn"
+                onClick={() => setShowProfileCard(true)}
+              >
+                {profile ? (
+                  <>
+                    <FaEdit />
+                    Edit Your Profile Here
+                  </>
+                ) : (
+                  <>
+                    <FaUserPlus />
+                    Get Started Here
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -132,7 +132,9 @@ const Home = () => {
         >
           <div className="feature-text">
             <h3>📊 Progress Tracking</h3>
-            <p>Monitor your journey with detailed <br/> analytics and insights</p>
+            <p>
+              Monitor your journey with detailed <br /> analytics and insights
+            </p>
           </div>
 
           <div className="feature-image-wrap">

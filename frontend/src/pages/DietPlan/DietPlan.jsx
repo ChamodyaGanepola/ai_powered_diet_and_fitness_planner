@@ -136,7 +136,8 @@ export default function DietPlan() {
       console.error("Failed to generate meal plan:", err);
     }
   };
-  if (loading) return <Loading text="Loading dashboard..." />;
+
+  if (loading) {return <Loading text="Loading dashboard..." />};
 
   if (!profileExists) {
     return (

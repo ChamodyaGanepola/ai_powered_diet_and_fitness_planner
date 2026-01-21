@@ -1,13 +1,18 @@
 .workout-card {
-  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
   border-radius: 14px;
   padding: 14px;
   color: #000;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.10);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
-  min-height: 160px; /* keeps cards equal height */
+  min-height: 160px;
+  overflow: hidden;
 }
+div.workout-card {
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
+}
+
 
 .workout-card:hover {
   transform: translateY(-3px);
@@ -30,13 +35,41 @@
 }
 
 .workout-info span {
-  background: rgba(255, 255, 255, 0.65);
+ 
   padding: 6px 8px;
   border-radius: 10px;
+   background-color: #fbf7f7;
 }
 
-.workout-info b {
-  color: #031a2a;
+
+.workout-metric.kcal {
+  color: #1d9bf0;
+
+}
+
+.workout-metric.sets {
+  color: #ec4899;
+
+}
+
+.workout-metric.reps {
+  color: #22c55e;
+
+}
+
+.workout-metric.rest {
+  color: #f97316;
+
+}
+
+.workout-metric.duration {
+  color: #8b5cf6;
+   
+}
+
+.workout-metric.target {
+  color: #0ea5e9;
+ 
 }
 
 /* MOBILE */

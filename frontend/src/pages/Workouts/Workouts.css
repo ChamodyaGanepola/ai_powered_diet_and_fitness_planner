@@ -1,11 +1,35 @@
 .workouts-page {
-  padding: 20px 10px;
-  min-height: 100vh;
   width: 100%;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px - 64px);
+  
 }
 
+.workouts-inner {
+  width: 100%;
+  padding: 84px 10px 20px; /* <-- add top padding */
+  box-sizing: border-box;
+  
+}
+
+
+.app-container {
+  margin: 0 auto;
+  padding: 32px;
+  background: #e5efe9;
+  min-height: 100vh;
+}
+
+
+
+.simple-message {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
 /* DAY GRID WRAPPER */
 .day-grid {
   display: grid;
@@ -18,21 +42,22 @@
   background: #e5efe9;
   padding: 26px;
   box-sizing: border-box;
+  border:none;
 }
 /* DAY SECTION */
 .day-section {
   width: 100%;
   background: #e5efe9;
   padding: 10px 10px;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+  
   box-sizing: border-box;
 }
 
 .day-title {
   font-size: 22px;
   font-weight: 700;
-  color: #1e3a8a;
+  color: #0f0f10;
   margin-bottom: 10px;
 }
 /* DELETE PLAN WRAPPER */
