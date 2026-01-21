@@ -66,8 +66,9 @@ const Home = () => {
           onClose={() => setAlert(null)}
         />
       )}
-      <section className="hero">
-        <div className="hero-row">
+    <section className="hero">
+  <div className="hero-inner">
+    <div className="hero-row">
           <PageHeader
             icon={<FaHome />}
             title={`Welcome${user ? `, ${user.username}` : ""} to Your AI Diet Fitness Planner`}
@@ -92,6 +93,7 @@ const Home = () => {
               )}
             </button>
           )}
+        </div>
         </div>
       </section>
 

@@ -1,25 +1,64 @@
-.food-item-card {
+.food-plan-card {
+  width: 100%;
+  box-sizing: border-box;
   background: #ffffff;
-  border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.10);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.food-item-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.18);
-}
-
-.food-name {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.food-macros {
+  border-radius: 18px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  color: #555;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.food-plan-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+}
+
+.food-left {
+  flex: 1;
+}
+
+.food-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.food-right {
+  display: flex;
+  gap: 20px;
+}
+
+.food-metric {
+  text-align: center;
+}
+
+.food-metric .value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.food-metric .label {
+  font-size: 12px;
+}
+
+/* Colors */
+.food-metric.kcal .value { color: #1d9bf0; }
+.food-metric.carbs .value { color: #ec4899; }
+.food-metric.protein .value { color: #22c55e; }
+.food-metric.fat .value { color: #f97316; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .food-plan-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .food-right {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

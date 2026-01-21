@@ -136,79 +136,81 @@ export default function DietPlan() {
       console.error("Failed to generate meal plan:", err);
     }
   };
+  if (loading) return <Loading text="Loading dashboard..." />;
 
-  return (
-    <div className="diet-page">
-      {loading ? (
-        <Loading text="Loading meal plans..." />
-      ) : !profileExists ? (
-        <div className="centered-card">
-          <h1 className="greeting">Hey {user.username},</h1>
-          <p className="no-plan-text">
-            First create your profile. Redirecting to home...
-          </p>
-        </div>
-      ) : mealPlans.length === 0 ? (
-        <div className="centered-card">
-          <h1 className="greeting">Hey {user.username},</h1>
-          <p className="no-plan-text">
-            No active meal plan available. You can generate one based on your
-            profile.
-          </p>
+  if (!profileExists) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          Hey {user.username}, first create your profile. Redirecting to home...
+        </p>
+      </div>
+    );
+  } else if (mealPlans.length === 0) {
+    return (
+      <div className="app-container">
+        <p className="simple-message">
+          No active meal plan available. You can generate one based on your
+          profile.
           <button className="generate-btn" onClick={handleGenerateMealPlan}>
             Generate Meal Plan
           </button>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="diet-page">
+      <div className="meal-plan-wrapper">
+        <div className="meal-plan-inner">
+          {mealPlans.map((plan, index) => (
+            <MealPlanCard
+              key={index}
+              plan={plan}
+              index={index}
+              showHeader={true} // show header on DietPlan page
+            />
+          ))}
         </div>
-      ) : (
-        <>
-          <div className="meal-plan-wrapper">
-            {mealPlans.map((plan, index) => (
-              <MealPlanCard key={index} plan={plan} index={index} />
-            ))}
-          </div>
+      </div>
 
-          <div className="delete-wrapper">
-            <button
-              className="delete-button"
-              onClick={handleDeleteMealPlan}
-              disabled={loading}
-            >
-              <FaTrash />
-              Delete Meal Plan
-            </button>
-          </div>
-          {/* Meal Feedback Section */}
-          <div className="feedback-section">
-            <div
-              className="feedback-header-toggle"
-              onClick={() => setShowFeedbackList((prev) => !prev)}
-            >
-              <span
-                className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}
-              >
-                ▾
-              </span>
+      <div className="delete-wrapper">
+        <button
+          className="delete-button"
+          onClick={handleDeleteMealPlan}
+          disabled={loading}
+        >
+          <FaTrash />
+          Delete Meal Plan
+        </button>
+      </div>
+      {/* Meal Feedback Section */}
+      <div className="feedback-section">
+        <div
+          className="feedback-header-toggle"
+          onClick={() => setShowFeedbackList((prev) => !prev)}
+        >
+          <span className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}>
+            ▾
+          </span>
 
-              <h2 className="feedback-title">
-                Your Previous Meal Plan Feedback (Not suitable)
-              </h2>
-            </div>
+          <h2 className="feedback-title">
+            Your Previous Meal Plan Feedback (Not suitable)
+          </h2>
+        </div>
 
-            {/* Collapsible content */}
-            <div
-              className={`feedback-content ${
-                showFeedbackList ? "show" : "hide"
-              }`}
-            >
-              <FeedbackList
-                userId={user.id}
-                userProfileId={userProfileId}
-                type="meal"
-              />
-            </div>
-          </div>
-        </>
-      )}
+        {/* Collapsible content */}
+        <div
+          className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}
+        >
+          <FeedbackList
+            userId={user.id}
+            userProfileId={userProfileId}
+            type="meal"
+          />
+        </div>
+      </div>
       <PlanFeedbackModal
         open={showFeedback}
         onCancel={() => setShowFeedback(false)}

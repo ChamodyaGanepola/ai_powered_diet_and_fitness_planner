@@ -113,6 +113,7 @@ const Profile = () => {
   return (
     <>
       <div className="profile-page">
+         <div className="profile-layout-inner">
         <div className="profile-layout">
           {/* HEADER */}
           <div className="profile-header">
@@ -188,7 +189,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
-
+  </div>
         {/* PROFILE SECTIONS */}
         <div className="profile-sections-row">
           <Section
@@ -208,6 +209,7 @@ const Profile = () => {
               profile.workoutPreferences ? [profile.workoutPreferences] : []
             }
           />
+        
         </div>
       </div>
 
