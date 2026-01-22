@@ -598,18 +598,18 @@ export default function DailyProgress() {
             }}
           />
         )}
-
-        <input
-          type="date"
-          value={selectedDateStr}
-          onChange={(e) => {
-            setSelectedDate(new Date(e.target.value));
-          }}
-          className="date-picker"
-          min={globalMinDate}
-          max={globalMaxDate}
-          disabled={!globalMinDate || !globalMaxDate}
-        />
+        <div className="date-container">
+          <p>Select a date that falls between the start and end dates.</p>
+          <input
+            type="date"
+            value={selectedDateStr}
+            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            className="date-picker"
+            min={globalMinDate}
+            max={globalMaxDate}
+            disabled={!globalMinDate || !globalMaxDate}
+          />
+        </div>
 
         {((mealPlanExists && !planMealStartDate) ||
           (workoutPlanExists && !planWorkoutStartDate)) && (
@@ -838,7 +838,7 @@ export default function DailyProgress() {
                         <div className="macro-summary">
                           <h3>
                             <FaLeaf className="icon-green" />{" "}
-                            <span>Your Total Intake for  {selectedDateStr}</span>
+                            <span>Your Total Intake for {selectedDateStr}</span>
                           </h3>
                           <div className="food-right">
                             <div className="food-metric kcal">
