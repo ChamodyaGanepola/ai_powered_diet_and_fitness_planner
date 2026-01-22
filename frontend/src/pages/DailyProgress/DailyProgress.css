@@ -7,6 +7,17 @@
   min-height: calc(100vh - 64px - 64px);
   background: #e5efe9;
 }
+.done {
+  text-align: center;
+  font-size: 18px;
+  color: #2b7a4b;
+  font-weight: 600;
+  margin: 20px 0;
+  padding: 10px 15px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 .progress-inner {
   width: 100%;
@@ -15,9 +26,9 @@
   max-width: 1200px;
   margin: 0 auto;
 }
-svg {
-  font-size: 16px;
+.icon-green {
   color: #2b7a4b;
+  font-size: 16px;
 }
 
 /* ===== Date Picker ===== */
@@ -38,7 +49,7 @@ svg {
 
 /* ===== Macro Summary (Right side display) ===== */
 .macro-summary {
-  background: #fff;
+  background: linear-gradient(90deg, #a3ffb8, #ecf0ed);
   padding: 12px 14px;
   border-radius: 12px;
   margin-bottom: 20px;
@@ -53,6 +64,7 @@ svg {
   display: flex;
   gap: 18px;
   align-items: center;
+  
 }
 
 .food-metric {
@@ -94,7 +106,7 @@ svg {
 }
 
 /* ===== Cards ===== */
-.meal-card, .workout-card {
+.meal-card{
   padding: 12px 14px;
   border-radius: 12px;
   margin-bottom: 12px;
@@ -103,13 +115,38 @@ svg {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.workout-card {
+  padding: 10px 14px; 
+  border-radius: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
+   min-height: 0;
+}
+
+
+
 .meal-card:hover, .workout-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
-.meal-card {
-  background: linear-gradient(135deg, #fff7d6, #fcd34d);
+.meal-card.breakfast {
+  background: linear-gradient(135deg, #fff4d2, #ffe8a3);
+}
+
+.meal-card.lunch {
+  background: linear-gradient(135deg, #e6f6ff, #cceaff);
+}
+
+.meal-card.snack {
+  background: linear-gradient(135deg, #f3e8ff, #e0cfff);
+}
+
+.meal-card.dinner {
+  background: linear-gradient(135deg, #e8f8ef, #c8eed9);
 }
 
 .workout-card {
@@ -117,13 +154,23 @@ svg {
 }
 
 /* ===== Meal & Workout Items (Reduced Size) ===== */
-.meal-item,
-.workout-item {
+.meal-item{
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
   margin-bottom: 8px;
+}
+.workout-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;    
+  margin-bottom: 0;       
+}
+
+.workout-item input[type="text"] {
+  width: 90px;
 }
 
 .meal-item input[type="text"],

@@ -19,7 +19,14 @@ import {
   onlyPositiveNumbers,
   onlyLettersAllowEmpty,
 } from "../../utils/validation.js";
-import { FaChartLine, FaDumbbell, FaWeight, FaAppleAlt } from "react-icons/fa";
+import {
+  FaChartLine,
+  FaDumbbell,
+  FaWeight,
+  FaAppleAlt,
+  FaCalendarPlus,
+  FaLeaf,
+} from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
 import Loading from "../../component/Loading.jsx";
@@ -496,10 +503,10 @@ export default function DailyProgress() {
         message: "Are you sure you didn’t complete any workouts today?",
         onConfirm: async () => {
           setConfirmedSkips((prev) => {
-  const updated = { ...prev, workouts: true };
-  confirmedSkipsRef.current = updated;
-  return updated;
-});
+            const updated = { ...prev, workouts: true };
+            confirmedSkipsRef.current = updated;
+            return updated;
+          });
 
           await submitDay();
         },
@@ -611,7 +618,8 @@ export default function DailyProgress() {
             style={{ marginTop: "15px" }}
             onClick={() => setShowStartDateModal(true)}
           >
-            Set Start Dates
+            <FaCalendarPlus className="icon-white" />{" "}
+            <span>Set Start Dates</span>
           </button>
         )}
 
@@ -746,13 +754,18 @@ export default function DailyProgress() {
             ) : (
               <>
                 {locked ? (
-                  <p className="done">{successMessage}</p>
+                  <p className="done">{successMessage} </p>
                 ) : (
                   <>
                     {/* Body Metrics */}
                     <div className="section body-section">
-                      <h3> <FaWeight /> <span>
-                        Please enter your body measurements for the selected date.</span>
+                      <h3>
+                        {" "}
+                        <FaWeight className="icon-green" />{" "}
+                        <span>
+                          Please enter your body measurements for the selected
+                          date.
+                        </span>
                       </h3>
                       <div className="body-grid">
                         <div className="body-field">
@@ -819,117 +832,137 @@ export default function DailyProgress() {
                       </div>
                     </div>
 
-                  
-
                     {/* Meals */}
                     {!isLockedMeal && (
-                    <>
-                    <div className="macro-summary">
-                      <h3><span>Your Total Intake for the Day</span></h3>
-                      <div className="food-right">
-                        <div className="food-metric kcal">
-                          <div className="value">{totalMacros.calories}</div>
-                          <div className="label">kcal</div>
-                        </div>
-                        <div className="food-metric protein">
-                          <div className="value">{totalMacros.protein}</div>
-                          <div className="label">Protein</div>
-                        </div>
-                        <div className="food-metric fat">
-                          <div className="value">{totalMacros.fat}</div>
-                          <div className="label">Fat</div>
-                        </div>
-                        <div className="food-metric carbs">
-                          <div className="value">{totalMacros.carbs}</div>
-                          <div className="label">Carbs</div>
-                        </div>
-                      </div>
-                    </div>
-                      <div className="section meals-section">
-                        <h3> <FaAppleAlt /> <span>Select/Edit Meals to Record Your Daily Real Progress</span></h3>
-                        {meals.map((meal, mIdx) => (
-                          <div key={mIdx} className="meal-card">
-                            <h4>{meal.mealType}</h4>
-                            {meal.items.map((item, iIdx) => (
-                              <div key={iIdx} className="meal-item">
-                                <input
-                                  type="radio"
-                                  name={`meal-${mIdx}`}
-                                  checked={item.selected || false}
-                                  onChange={() =>
-                                    handleMealSelection(mIdx, iIdx)
-                                  }
-                                />
-                                <input
-                                  type="text"
-                                  value={item.name || ""}
-                                  onChange={(e) => {
-                                    const newMeals = [...meals];
-                                    newMeals[mIdx].items[iIdx].name =
-                                      onlyLettersAllowEmpty(e.target.value);
-                                    setMeals(newMeals);
-                                  }}
-                                />
-
-                                <input
-                                  type="text"
-                                  value={item.calories || ""}
-                                  onChange={(e) => {
-                                    const newMeals = [...meals];
-                                    newMeals[mIdx].items[iIdx].calories =
-                                      onlyPositiveNumbers(e.target.value);
-                                    setMeals(newMeals);
-                                  }}
-                                />
-                                <span>kcal</span>
-
-                                <input
-                                  type="text"
-                                  value={item.protein || ""}
-                                  onChange={(e) => {
-                                    const newMeals = [...meals];
-                                    newMeals[mIdx].items[iIdx].protein =
-                                      onlyPositiveNumbers(e.target.value);
-                                    setMeals(newMeals);
-                                  }}
-                                />
-                                <span>g protein</span>
-
-                                <input
-                                  type="text"
-                                  value={item.fat || ""}
-                                  onChange={(e) => {
-                                    const newMeals = [...meals];
-                                    newMeals[mIdx].items[iIdx].fat =
-                                      onlyPositiveNumbers(e.target.value);
-                                    setMeals(newMeals);
-                                  }}
-                                />
-                                <span>g fat</span>
-
-                                <input
-                                  type="text"
-                                  value={item.carbohydrates || ""}
-                                  onChange={(e) => {
-                                    const newMeals = [...meals];
-                                    newMeals[mIdx].items[iIdx].carbohydrates =
-                                      onlyPositiveNumbers(e.target.value);
-                                    setMeals(newMeals);
-                                  }}
-                                />
-                                <span>g carbs</span>
+                      <>
+                        <div className="macro-summary">
+                          <h3>
+                            <FaLeaf className="icon-green" />{" "}
+                            <span>Your Total Intake for  {selectedDateStr}</span>
+                          </h3>
+                          <div className="food-right">
+                            <div className="food-metric kcal">
+                              <div className="value">
+                                {totalMacros.calories}
                               </div>
-                            ))}
+                              <div className="label">kcal</div>
+                            </div>
+                            <div className="food-metric protein">
+                              <div className="value">{totalMacros.protein}</div>
+                              <div className="label">Protein</div>
+                            </div>
+                            <div className="food-metric fat">
+                              <div className="value">{totalMacros.fat}</div>
+                              <div className="label">Fat</div>
+                            </div>
+                            <div className="food-metric carbs">
+                              <div className="value">{totalMacros.carbs}</div>
+                              <div className="label">Carbs</div>
+                            </div>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                        <div className="section meals-section">
+                          <h3>
+                            {" "}
+                            <FaAppleAlt className="icon-green" />{" "}
+                            <span>
+                              Select/Edit Meals to Record Your Daily Real
+                              Progress
+                            </span>
+                          </h3>
+                          {meals.map((meal, mIdx) => (
+                            <div
+                              key={mIdx}
+                              className={`meal-card ${meal.mealType.toLowerCase()}`}
+                            >
+                              <h4>{meal.mealType}</h4>
+                              {meal.items.map((item, iIdx) => (
+                                <div key={iIdx} className="meal-item">
+                                  <input
+                                    type="radio"
+                                    name={`meal-${mIdx}`}
+                                    checked={item.selected || false}
+                                    onChange={() =>
+                                      handleMealSelection(mIdx, iIdx)
+                                    }
+                                  />
+                                  <input
+                                    type="text"
+                                    value={item.name || ""}
+                                    onChange={(e) => {
+                                      const newMeals = [...meals];
+                                      newMeals[mIdx].items[iIdx].name =
+                                        onlyLettersAllowEmpty(e.target.value);
+                                      setMeals(newMeals);
+                                    }}
+                                  />
+
+                                  <input
+                                    type="text"
+                                    value={item.calories || ""}
+                                    onChange={(e) => {
+                                      const newMeals = [...meals];
+                                      newMeals[mIdx].items[iIdx].calories =
+                                        onlyPositiveNumbers(e.target.value);
+                                      setMeals(newMeals);
+                                    }}
+                                  />
+                                  <span>kcal</span>
+
+                                  <input
+                                    type="text"
+                                    value={item.protein || ""}
+                                    onChange={(e) => {
+                                      const newMeals = [...meals];
+                                      newMeals[mIdx].items[iIdx].protein =
+                                        onlyPositiveNumbers(e.target.value);
+                                      setMeals(newMeals);
+                                    }}
+                                  />
+                                  <span>g protein</span>
+
+                                  <input
+                                    type="text"
+                                    value={item.fat || ""}
+                                    onChange={(e) => {
+                                      const newMeals = [...meals];
+                                      newMeals[mIdx].items[iIdx].fat =
+                                        onlyPositiveNumbers(e.target.value);
+                                      setMeals(newMeals);
+                                    }}
+                                  />
+                                  <span>g fat</span>
+
+                                  <input
+                                    type="text"
+                                    value={item.carbohydrates || ""}
+                                    onChange={(e) => {
+                                      const newMeals = [...meals];
+                                      newMeals[mIdx].items[iIdx].carbohydrates =
+                                        onlyPositiveNumbers(e.target.value);
+                                      setMeals(newMeals);
+                                    }}
+                                  />
+                                  <span>g carbs</span>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
                       </>
                     )}
 
                     {/* Workouts */}
                     {!isLockedWorkout && (
                       <div className="section workouts-section">
-                        <h3><FaDumbbell /> <span> Select/Edit Workout to Record Your Daily Real Progress</span></h3>
+                        <h3>
+                          <FaDumbbell className="icon-green" />
+                          <span>
+                            {" "}
+                            Select/Edit Workout to Record Your Daily Real
+                            Progress
+                          </span>
+                        </h3>
                         {workouts.map((w, idx) => (
                           <div key={idx} className="workout-card">
                             <div className="workout-item">
@@ -965,7 +998,7 @@ export default function DailyProgress() {
                                 }
                                 placeholder="Sets"
                               />
-
+                              <span>sets</span>
                               <input
                                 type="text"
                                 value={w.reps || ""}
@@ -978,7 +1011,7 @@ export default function DailyProgress() {
                                 }
                                 placeholder="Reps"
                               />
-
+                              <span>reps</span>
                               <input
                                 type="text"
                                 value={w.caloriesBurned || ""}
