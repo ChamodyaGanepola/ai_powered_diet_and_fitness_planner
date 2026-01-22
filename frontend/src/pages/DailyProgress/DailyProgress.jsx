@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./DailyProgress.css";
 import { useAuth } from "../../context/authContext.jsx";
 import {
@@ -15,7 +15,10 @@ import {
   getCompletedProgressDates,
   updateDailyProgress,
 } from "../../api/dailyProgress.js";
-
+import {
+  onlyPositiveNumbers,
+  onlyLettersAllowEmpty,
+} from "../../utils/validation.js";
 import { FaChartLine } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
@@ -32,7 +35,6 @@ export default function DailyProgress() {
   const [mealCompletedDates, setMealCompletedDates] = useState([]);
   const [workoutCompletedDates, setWorkoutCompletedDates] = useState([]);
 
-  // ✅ ONLY DATE STATE
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [meals, setMeals] = useState([]);
@@ -41,12 +43,22 @@ export default function DailyProgress() {
   const [locked, setLocked] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmData, setConfirmData] = useState(null);
 
-  // ONE modal
+  const [confirmedSkips, setConfirmedSkips] = useState({
+    meals: {},
+    workouts: false,
+  });
+
+  // <--- IMPORTANT
+  const confirmedSkipsRef = useRef({
+    meals: {},
+    workouts: false,
+  });
+
   const [showStartDateModal, setShowStartDateModal] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  // Dates
   const [mealModalDate, setMealModalDate] = useState("");
   const [workoutModalDate, setWorkoutModalDate] = useState("");
 
@@ -64,7 +76,6 @@ export default function DailyProgress() {
   const [mealPlanDurationDays, setMealPlanDurationDays] = useState(0);
   const [workoutPlanDurationDays, setWorkoutPlanDurationDays] = useState(0);
 
-  // NEW
   const [isLockedMeal, setIsLockedMeal] = useState(false);
   const [isLockedWorkout, setIsLockedWorkout] = useState(false);
 
@@ -127,14 +138,10 @@ export default function DailyProgress() {
       const mealRes = await getLatestMealPlan();
       const workoutRes = await getLatestWorkoutPlan();
       const workoutDetails = await getWorkoutPlanDetails();
-      //console.log("meal plan start date", mealRes.mealPlan.startDate);
-      //console.log("workout plan start date",workoutDetails.workoutPlan.startDate );
-      //console.log("meal plan end date", mealRes.mealPlan.endDate);
-      //console.log("workout plan end date", workoutDetails.workoutPlan.endDate);
+
       const mealExists = !!mealRes?.mealPlan;
       const workoutExists = !!workoutRes?.workoutPlan;
-      //console.log("meal exists",!!mealRes?.mealPlan);
-      // console.log("workout exists",!!workoutRes?.workoutPlan);
+
       setMealPlanExists(mealExists);
       setWorkoutPlanExists(workoutExists);
       setPlansChecked(true);
@@ -146,11 +153,9 @@ export default function DailyProgress() {
       if (mealExists) {
         const start = new Date(mealRes.mealPlan.startDate);
         const end = new Date(mealRes.mealPlan.endDate);
-        console.log("start", start);
         const durationDays =
           Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
         setMealPlanDurationDays(durationDays);
-        console.log("Active meal plan durations", durationDays);
       }
       if (workoutExists) {
         const start = new Date(workoutDetails.workoutPlan.startDate);
@@ -158,36 +163,7 @@ export default function DailyProgress() {
         const durationDays =
           Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
         setWorkoutPlanDurationDays(durationDays);
-        console.log("Active workout plan durations", durationDays);
       }
-
-      /*const progressRes = await checkDailyProgressForUser();
-      console.log("progress meal", progressRes);
-      if (
-        (mealExists && !progressRes.mealPlan.progressExists) ||
-        (workoutExists && !progressRes.workoutPlan.progressExists)
-      ) {
-        
-        setShowStartDateModal(true);
-        console.log("1 start show true ", showStartDateModal);
-        console.log("progressRes.mealPlan.progressExists", progressRes.mealPlan.progressExists);
-      }
-      if (mealExists && progressRes.mealPlan.progressExists) {
-       console.log("mealExists && progressRes.mealPlan.progressExists", mealExists && progressRes.mealPlan.progressExists);
-        setPlanMealStartDate(formatDateUTC(mealRes.mealPlan.startDate));
-        setPlanMealEndDate(formatDateUTC(mealRes.mealPlan.endDate));
-        console.log("Progress meal exist", progressRes.mealPlan.progressExists);
-      }
-      if (workoutExists && progressRes.workoutPlan.progressExists) {
-        setPlanWorkoutStartDate(
-          formatDateUTC(workoutRes.workoutPlan.startDate),
-        );
-        setPlanWorkoutEndDate(formatDateUTC(workoutRes.workoutPlan.endDate));
-        console.log(
-          "Progress workout exist",
-          progressRes.workoutPlan.progressExists,
-        );
-      }*/
     } catch (err) {
       console.error(err);
     } finally {
@@ -205,7 +181,6 @@ export default function DailyProgress() {
 
     try {
       const progressRes = await getDailyProgressByDate(formattedDate);
-      console.log("progressRes", progressRes);
       if (progressRes.progress) {
         loadProgress(progressRes.progress);
         setLocked(true);
@@ -223,6 +198,7 @@ export default function DailyProgress() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (showStartDateModal) {
       const today = selectedDateStr;
@@ -250,12 +226,8 @@ export default function DailyProgress() {
   const loadProgress = (progress) => {
     setMeals(progress.meals || []);
     setWorkouts(progress.workouts || []);
-    console.log("meals", progress.meals);
-
-    // NEW
     setIsLockedMeal(progress.mealAdherenceScore != null);
     setIsLockedWorkout(progress.workoutAdherenceScore != null);
-
     setLocked(progress.completed || false);
     setWeight(progress.weight || "");
     setBodyFatPercentage(progress.bodyFatPercentage || "");
@@ -268,7 +240,6 @@ export default function DailyProgress() {
     setLoading(true);
     try {
       const res = await checkDailyProgressForUser();
-      console.log("checkDailyProgressForUser", res);
       if (res.mealPlan.progressExists === true) {
         setPlanMealStartDate(formatDateUTC(res.mealPlan.startDate));
         setPlanMealEndDate(formatDateUTC(res.mealPlan.endDate));
@@ -280,7 +251,6 @@ export default function DailyProgress() {
       }
 
       const completedRes = await getCompletedProgressDates();
-
       if (completedRes.success) {
         setMealCompletedDates(completedRes.mealCompletedDates || []);
         setWorkoutCompletedDates(completedRes.workoutCompletedDates || []);
@@ -294,7 +264,6 @@ export default function DailyProgress() {
   };
 
   const fetchPlans = async (selectedDate = selectedDateStr) => {
-    console.log("selectedDate", selectedDate);
     try {
       const [mealRes, workoutRes] = await Promise.all([
         getLatestMealPlan(),
@@ -306,7 +275,7 @@ export default function DailyProgress() {
         items: (m.foods || []).map((f) => ({ ...f, selected: false })),
       }));
       setMeals(mealData);
-      console.log("meal data 1", mealData);
+
       const workoutData = (workoutRes?.exercises || []).map((w) => ({
         name: w.name,
         targetMuscle: w.targetMuscle,
@@ -314,18 +283,19 @@ export default function DailyProgress() {
         reps: w.reps,
         caloriesBurned: w.caloriesBurned,
         duration: w.durationMinutes,
+        selected: false,
       }));
+
       setWorkouts(workoutData);
     } catch (err) {
       console.error(err);
     }
   };
+
   useEffect(() => {
     const today = formatDateUTC(new Date());
 
-    // -------- GLOBAL MIN (earliest start) --------
     let minDate = "";
-
     if (planMealStartDate && planWorkoutStartDate) {
       minDate =
         planMealStartDate < planWorkoutStartDate
@@ -335,9 +305,7 @@ export default function DailyProgress() {
       minDate = planMealStartDate || planWorkoutStartDate || "";
     }
 
-    // -------- GLOBAL MAX (latest end) --------
     let maxDate = "";
-
     if (planMealEndDate && planWorkoutEndDate) {
       maxDate =
         planMealEndDate > planWorkoutEndDate
@@ -347,15 +315,12 @@ export default function DailyProgress() {
       maxDate = planMealEndDate || planWorkoutEndDate || "";
     }
 
-    // -------- CAP TO TODAY --------
     if (maxDate && maxDate > today) {
       maxDate = today;
     }
 
     setGlobalMinDate(minDate);
     setGlobalMaxDate(maxDate);
-    console.log("mindate", minDate);
-    console.log("maxDate", maxDate);
   }, [
     planMealStartDate,
     planMealEndDate,
@@ -372,43 +337,92 @@ export default function DailyProgress() {
     setMeals(newMeals);
   };
 
+  const handleWorkoutSelection = (idx) => {
+    const newWorkouts = workouts.map((w, i) => ({
+      ...w,
+      selected: i === idx,
+    }));
+    setWorkouts(newWorkouts);
+  };
+
   const handleWorkoutChange = (idx, key, value) => {
     const newWorkouts = [...workouts];
-    if (["sets", "caloriesBurned", "duration"].includes(key))
+    if (["sets", "reps", "caloriesBurned", "duration"].includes(key))
       value = Number(value);
+
     newWorkouts[idx][key] = value;
     setWorkouts(newWorkouts);
   };
 
-  const submitDay = async () => {
-    if (
-      !weight ||
-      !bodyFatPercentage ||
-      !measurements.chest ||
-      !measurements.waist ||
-      !measurements.hips
-    ) {
-      alert("Please fill all body metrics before submitting.");
-      return;
+  const isInvalidNumber = (v) => !v || Number(v) <= 0;
+  const isPositiveNumber = (v) => v && Number(v) > 0;
+  const isEmpty = (v) => {
+    if (v === null || v === undefined) return true;
+
+    if (typeof v === "string" || v instanceof String) {
+      return v.toString().trim() === "";
     }
 
-    if (
-      !window.confirm("Are you sure you want to submit? You can't edit again!")
-    )
-      return;
+    if (typeof v === "number") return v <= 0;
 
+    if (Array.isArray(v)) return v.length === 0;
+    if (typeof v === "object") return Object.keys(v).length === 0;
+
+    return false;
+  };
+
+  const getPayloadMeals = () => {
+    return meals.map((meal) => {
+      const selectedItem = meal.items.find((i) => i.selected);
+
+      if (selectedItem) {
+        return {
+          mealType: meal.mealType,
+          items: [selectedItem],
+        };
+      }
+
+      if (confirmedSkipsRef.current.meals[meal.mealType]) {
+        return {
+          mealType: meal.mealType,
+          items: [],
+        };
+      }
+
+      return {
+        mealType: meal.mealType,
+        items: [],
+      };
+    });
+  };
+
+  const getPayloadWorkouts = () => {
+    const selectedWorkout = workouts.find((w) => w.selected);
+
+    if (selectedWorkout) {
+      return [selectedWorkout];
+    }
+
+    if (confirmedSkipsRef.current.workouts) {
+      return [];
+    }
+
+    return [];
+  };
+
+  const actuallySubmit = async () => {
     try {
+      const payloadMeals = getPayloadMeals();
+      const payloadWorkouts = getPayloadWorkouts();
+
       await createDailyProgress(
         selectedDateStr,
         weight,
         bodyFatPercentage,
         measurements,
-        meals,
-        workouts,
+        payloadMeals,
+        payloadWorkouts,
       );
-
-      if (isMealDateValid(selectedDateStr)) setIsLockedMeal(true);
-      if (isWorkoutDateValid(selectedDateStr)) setIsLockedWorkout(true);
 
       setLocked(true);
       setSuccessMessage(
@@ -418,6 +432,99 @@ export default function DailyProgress() {
       console.error(err);
       alert("Failed to save progress.");
     }
+  };
+
+  const submitDay = async () => {
+    // Body metrics validation
+    if (
+      isEmpty(weight) ||
+      isEmpty(bodyFatPercentage) ||
+      isEmpty(measurements.chest) ||
+      isEmpty(measurements.waist) ||
+      isEmpty(measurements.hips)
+    ) {
+      alert(
+        "Please fill all body metrics (weight, body fat, chest, waist, hips).",
+      );
+      return;
+    }
+
+    // Meals validation + skip confirm
+    for (const meal of meals) {
+      const selectedItem = meal.items.find((i) => i.selected);
+
+      if (!selectedItem && !confirmedSkipsRef.current.meals[meal.mealType]) {
+        setConfirmData({
+          message: `Are you sure you didn’t complete ${meal.mealType}?`,
+          onConfirm: async () => {
+            setConfirmedSkips((prev) => {
+              const updated = {
+                ...prev,
+                meals: { ...prev.meals, [meal.mealType]: true },
+              };
+              confirmedSkipsRef.current = updated;
+              return updated;
+            });
+            await submitDay();
+          },
+        });
+        return;
+      }
+
+      if (selectedItem) {
+        if (isEmpty(selectedItem.name)) {
+          alert(`${meal.mealType}: Meal name is required.`);
+          return;
+        }
+        if (
+          !isPositiveNumber(selectedItem.calories) ||
+          !isPositiveNumber(selectedItem.protein) ||
+          !isPositiveNumber(selectedItem.fat) ||
+          !isPositiveNumber(selectedItem.carbohydrates)
+        ) {
+          alert(`${meal.mealType}: All macros must be filled and > 0.`);
+          return;
+        }
+      }
+    }
+
+    // Workout validation + skip confirm
+    const selectedWorkout = workouts.find((w) => w.selected);
+
+    if (!selectedWorkout && !confirmedSkipsRef.current.workouts) {
+      setConfirmData({
+        message: "Are you sure you didn’t complete any workouts today?",
+        onConfirm: async () => {
+          setConfirmedSkips((prev) => {
+  const updated = { ...prev, workouts: true };
+  confirmedSkipsRef.current = updated;
+  return updated;
+});
+
+          await submitDay();
+        },
+      });
+      return;
+    }
+
+    if (selectedWorkout) {
+      if (isEmpty(selectedWorkout.name)) {
+        alert("Workout name is required.");
+        return;
+      }
+      if (!isPositiveNumber(selectedWorkout.caloriesBurned)) {
+        alert("Workout calories must be filled and > 0.");
+        return;
+      }
+    }
+
+    // Final submit confirm
+    setConfirmData({
+      message: "Are you sure you want to submit? You can't edit again!",
+      onConfirm: async () => {
+        await actuallySubmit();
+      },
+    });
   };
 
   const totalMacros = meals.reduce(
@@ -462,9 +569,6 @@ export default function DailyProgress() {
     );
   }
 
-  const onlyNumbers = (value) => value.replace(/[^0-9]/g, "");
-  const onlyLetters = (value) => value.replace(/[^a-zA-Z\s]/g, "");
-
   return (
     <div className="progress-page">
       <div className="progress-inner">
@@ -473,6 +577,20 @@ export default function DailyProgress() {
           title="Daily Progress Tracker"
           subtitle="Track your progress daily — stay consistent."
         />
+
+        {confirmData && (
+          <ConfirmModal
+            open={true}
+            title="Please Confirm"
+            message={confirmData.message}
+            onCancel={() => setConfirmData(null)}
+            onConfirm={async () => {
+              const fn = confirmData?.onConfirm;
+              if (fn) await fn(); // run the function FIRST
+              setConfirmData(null); // close modal AFTER
+            }}
+          />
+        )}
 
         <input
           type="date"
@@ -486,7 +604,6 @@ export default function DailyProgress() {
           disabled={!globalMinDate || !globalMaxDate}
         />
 
-        {/* SHOW BUTTON ONLY IF ANY START DATE IS MISSING */}
         {((mealPlanExists && !planMealStartDate) ||
           (workoutPlanExists && !planWorkoutStartDate)) && (
           <button
@@ -498,14 +615,12 @@ export default function DailyProgress() {
           </button>
         )}
 
-        {/* MODAL */}
-
+        {/* Start Date Modal */}
         {showStartDateModal &&
           ((mealPlanExists && !planMealStartDate) ||
             (workoutPlanExists && !planWorkoutStartDate)) && (
             <div className="modal-overlay">
               <div className="modal-content">
-                {/* MEAL */}
                 {mealPlanExists && !planMealStartDate && (
                   <>
                     <h3>Select Meal Plan Start Date</h3>
@@ -528,7 +643,6 @@ export default function DailyProgress() {
                   </>
                 )}
 
-                {/* WORKOUT */}
                 {workoutPlanExists && !planWorkoutStartDate && (
                   <>
                     <h3>Select Workout Plan Start Date</h3>
@@ -568,7 +682,7 @@ export default function DailyProgress() {
             </div>
           )}
 
-        {/* CONFIRM MODAL */}
+        {/* Start Date Confirm */}
         {showStartDateModal && (
           <ConfirmModal
             open={confirmOpen}
@@ -599,7 +713,6 @@ export default function DailyProgress() {
                 selectedWorkoutStartDate: workoutModalDate || undefined,
               });
 
-              // UPDATE STATE AFTER SUCCESS
               if (res.updatedPlans?.mealPlan) {
                 setPlanMealStartDate(
                   formatDateUTC(res.updatedPlans.mealPlan.startDate),
@@ -636,37 +749,43 @@ export default function DailyProgress() {
                   <p className="done">{successMessage}</p>
                 ) : (
                   <>
-                    {/* BODY METRICS */}
+                    {/* Body Metrics */}
                     <div className="section body-section">
-                      <h3>FPlease fill these Body Metrics for the Selected Date</h3>
+                      <h3>
+                        Please fill these Body Metrics for the Selected Date
+                      </h3>
                       <div className="body-grid">
                         <div className="body-field">
                           <label>Weight (kg)</label>
                           <input
-                            type="number"
+                            type="text"
                             value={weight}
-                            onChange={(e) => setWeight(e.target.value)}
+                            onChange={(e) =>
+                              setWeight(onlyPositiveNumbers(e.target.value))
+                            }
                           />
                         </div>
                         <div className="body-field">
                           <label>Body Fat (%)</label>
                           <input
-                            type="number"
+                            type="text"
                             value={bodyFatPercentage}
                             onChange={(e) =>
-                              setBodyFatPercentage(e.target.value)
+                              setBodyFatPercentage(
+                                onlyPositiveNumbers(e.target.value),
+                              )
                             }
                           />
                         </div>
                         <div className="body-field">
                           <label>Chest (cm)</label>
                           <input
-                            type="number"
+                            type="text"
                             value={measurements.chest}
                             onChange={(e) =>
                               setMeasurements({
                                 ...measurements,
-                                chest: e.target.value,
+                                chest: onlyPositiveNumbers(e.target.value),
                               })
                             }
                           />
@@ -674,12 +793,12 @@ export default function DailyProgress() {
                         <div className="body-field">
                           <label>Waist (cm)</label>
                           <input
-                            type="number"
+                            type="text"
                             value={measurements.waist}
                             onChange={(e) =>
                               setMeasurements({
                                 ...measurements,
-                                waist: e.target.value,
+                                waist: onlyPositiveNumbers(e.target.value),
                               })
                             }
                           />
@@ -687,12 +806,12 @@ export default function DailyProgress() {
                         <div className="body-field">
                           <label>Hips (cm)</label>
                           <input
-                            type="number"
+                            type="text"
                             value={measurements.hips}
                             onChange={(e) =>
                               setMeasurements({
                                 ...measurements,
-                                hips: e.target.value,
+                                hips: onlyPositiveNumbers(e.target.value),
                               })
                             }
                           />
@@ -700,16 +819,30 @@ export default function DailyProgress() {
                       </div>
                     </div>
 
-                    {/* MACROS */}
+                    {/* Macros */}
                     <div className="macro-summary">
                       <h3>Selected Meal Macros</h3>
-                      <p>Calories: {totalMacros.calories} kcal</p>
-                      <p>Protein: {totalMacros.protein} g</p>
-                      <p>Fat: {totalMacros.fat} g</p>
-                      <p>Carbs: {totalMacros.carbs} g</p>
+                      <div className="food-right">
+                        <div className="food-metric kcal">
+                          <div className="value">{totalMacros.calories}</div>
+                          <div className="label">kcal</div>
+                        </div>
+                        <div className="food-metric protein">
+                          <div className="value">{totalMacros.protein}</div>
+                          <div className="label">Protein</div>
+                        </div>
+                        <div className="food-metric fat">
+                          <div className="value">{totalMacros.fat}</div>
+                          <div className="label">Fat</div>
+                        </div>
+                        <div className="food-metric carbs">
+                          <div className="value">{totalMacros.carbs}</div>
+                          <div className="label">Carbs</div>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* MEALS */}
+                    {/* Meals */}
                     {!isLockedMeal && (
                       <div className="section meals-section">
                         <h3>Meals</h3>
@@ -732,50 +865,54 @@ export default function DailyProgress() {
                                   onChange={(e) => {
                                     const newMeals = [...meals];
                                     newMeals[mIdx].items[iIdx].name =
-                                      onlyLetters(e.target.value);
+                                      onlyLettersAllowEmpty(e.target.value);
                                     setMeals(newMeals);
                                   }}
                                 />
+
                                 <input
                                   type="text"
                                   value={item.calories || ""}
                                   onChange={(e) => {
                                     const newMeals = [...meals];
                                     newMeals[mIdx].items[iIdx].calories =
-                                      onlyNumbers(e.target.value);
+                                      onlyPositiveNumbers(e.target.value);
                                     setMeals(newMeals);
                                   }}
                                 />
                                 <span>kcal</span>
+
                                 <input
                                   type="text"
                                   value={item.protein || ""}
                                   onChange={(e) => {
                                     const newMeals = [...meals];
                                     newMeals[mIdx].items[iIdx].protein =
-                                      onlyNumbers(e.target.value);
+                                      onlyPositiveNumbers(e.target.value);
                                     setMeals(newMeals);
                                   }}
                                 />
                                 <span>g protein</span>
+
                                 <input
                                   type="text"
                                   value={item.fat || ""}
                                   onChange={(e) => {
                                     const newMeals = [...meals];
                                     newMeals[mIdx].items[iIdx].fat =
-                                      onlyNumbers(e.target.value);
+                                      onlyPositiveNumbers(e.target.value);
                                     setMeals(newMeals);
                                   }}
                                 />
                                 <span>g fat</span>
+
                                 <input
                                   type="text"
                                   value={item.carbohydrates || ""}
                                   onChange={(e) => {
                                     const newMeals = [...meals];
                                     newMeals[mIdx].items[iIdx].carbohydrates =
-                                      onlyNumbers(e.target.value);
+                                      onlyPositiveNumbers(e.target.value);
                                     setMeals(newMeals);
                                   }}
                                 />
@@ -787,53 +924,73 @@ export default function DailyProgress() {
                       </div>
                     )}
 
-                    {/* WORKOUTS */}
+                    {/* Workouts */}
                     {!isLockedWorkout && (
                       <div className="section workouts-section">
                         <h3>Workouts</h3>
                         {workouts.map((w, idx) => (
                           <div key={idx} className="workout-card">
-                            <input
-                              type="text"
-                              value={w.name}
-                              onChange={(e) =>
-                                handleWorkoutChange(
-                                  idx,
-                                  "name",
-                                  onlyLetters(e.target.value),
-                                )
-                              }
-                            />
-                            <input
-                              type="text"
-                              value={w.sets}
-                              onChange={(e) =>
-                                handleWorkoutChange(
-                                  idx,
-                                  "sets",
-                                  onlyNumbers(e.target.value),
-                                )
-                              }
-                            />
-                            <input
-                              type="text"
-                              value={w.reps}
-                              onChange={(e) =>
-                                handleWorkoutChange(idx, "reps", e.target.value)
-                              }
-                            />
-                            <input
-                              type="text"
-                              value={w.caloriesBurned}
-                              onChange={(e) =>
-                                handleWorkoutChange(
-                                  idx,
-                                  "caloriesBurned",
-                                  onlyNumbers(e.target.value),
-                                )
-                              }
-                            />
-                            <span>kcal</span>
+                            <div className="workout-item">
+                              <input
+                                type="radio"
+                                name="workout"
+                                checked={w.selected || false}
+                                onChange={() => handleWorkoutSelection(idx)}
+                              />
+
+                              <input
+                                type="text"
+                                value={w.name || ""}
+                                onChange={(e) =>
+                                  handleWorkoutChange(
+                                    idx,
+                                    "name",
+                                    onlyLettersAllowEmpty(e.target.value),
+                                  )
+                                }
+                                placeholder="Workout Name"
+                              />
+
+                              <input
+                                type="text"
+                                value={w.sets || ""}
+                                onChange={(e) =>
+                                  handleWorkoutChange(
+                                    idx,
+                                    "sets",
+                                    onlyPositiveNumbers(e.target.value),
+                                  )
+                                }
+                                placeholder="Sets"
+                              />
+
+                              <input
+                                type="text"
+                                value={w.reps || ""}
+                                onChange={(e) =>
+                                  handleWorkoutChange(
+                                    idx,
+                                    "reps",
+                                    onlyPositiveNumbers(e.target.value),
+                                  )
+                                }
+                                placeholder="Reps"
+                              />
+
+                              <input
+                                type="text"
+                                value={w.caloriesBurned || ""}
+                                onChange={(e) =>
+                                  handleWorkoutChange(
+                                    idx,
+                                    "caloriesBurned",
+                                    onlyPositiveNumbers(e.target.value),
+                                  )
+                                }
+                                placeholder="kcal"
+                              />
+                              <span>kcal</span>
+                            </div>
                           </div>
                         ))}
                       </div>

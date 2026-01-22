@@ -24,3 +24,11 @@ export const validateActivityLevel = (level) => level.length > 0;
 export const validateWorkoutPreference = (pref) =>
   ["Yoga", "Gym", "Home Workouts", "Walking", "Running", "Cycling", "Swimming"].includes(pref);
 export const validateDays = (days) => [0, 7, 30, 60].includes(Number(days));
+
+export const onlyPositiveNumbers = (value) =>
+  value.replace(/[^0-9]/g, "").replace(/^0+/, "");
+
+export const onlyLettersAllowEmpty = (value) =>
+  value.replace(/[^a-zA-Z\s]/g, "");
+
+
