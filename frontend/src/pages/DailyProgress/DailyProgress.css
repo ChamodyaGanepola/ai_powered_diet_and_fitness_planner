@@ -30,6 +30,23 @@
   color: #2b7a4b;
   font-size: 16px;
 }
+.invalid-date-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin: 20px auto;
+  padding: 12px 18px;
+  width: fit-content;
+
+  background: #fff6f3;
+  border: 1px solid #f5c2c2;
+  color: #b45309;
+  border-radius: 14px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
 
 /* ===== Date Picker ===== */
 .date-container {
@@ -223,7 +240,121 @@
   font-weight: 700;
   cursor: pointer;
 }
+/* ===== Modal Overlay ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 999;
+}
 
+/* ===== Card Style ===== */
+.startdate-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  padding: 22px;
+  position: relative;
+  background: #e5efe9;
+  
+  
+}
+
+.startdate-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #1f3a2d;
+}
+
+.startdate-header p {
+  margin: 6px 0 14px;
+  color: #55606a;
+  font-size: 14px;
+  
+}
+.startdate-header {
+  text-align: center; /* CENTER HEADER */
+}
+
+.startdate-header h2 {
+  margin: 0;
+}
+
+/* ===== Section Style ===== */
+.startdate-section {
+  margin: 16px 0;
+  padding: 14px;
+  border-radius: 14px;
+   background: linear-gradient(90deg, #a3ffb8, #6be29a);
+  border: 1px solid #d7e8d6;
+}
+
+.startdate-section h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #1f3a2d;
+}
+
+.startdate-section input[type="date"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* FIX INPUT OUTSIDE CARD */
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.end-date {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #3b4a57;
+  text-align: center; /* CENTER */
+}
+
+/* ===== Buttons ===== */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-confirm,
+.btn-cancel {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #2b7a4b, #1f5f3a);
+  color: white;
+}
+
+.btn-cancel {
+  background: #f8efef;
+  color: #19191a;
+  
+}
+.btn-confirm:hover {
+   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12); 
+
+}
+.btn-cancel:hover {
+   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12); 
+
+}
 /* ===== Mobile ===== */
 @media (max-width: 991px) {
   .body-grid {

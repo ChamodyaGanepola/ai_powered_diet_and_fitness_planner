@@ -26,6 +26,7 @@ import {
   FaAppleAlt,
   FaCalendarPlus,
   FaLeaf,
+  FaInfoCircle, 
 } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
@@ -624,14 +625,23 @@ export default function DailyProgress() {
         )}
 
         {/* Start Date Modal */}
+        {/* Start Date Modal */}
         {showStartDateModal &&
           ((mealPlanExists && !planMealStartDate) ||
             (workoutPlanExists && !planWorkoutStartDate)) && (
             <div className="modal-overlay">
-              <div className="modal-content">
+              <div className="startdate-card">
+                <div className="startdate-header">
+                  <h2>Set Plan Start Dates</h2>
+                  <p>
+                    Choose the start date. End date will be calculated
+                    automatically according to your user profile.
+                  </p>
+                </div>
+
                 {mealPlanExists && !planMealStartDate && (
-                  <>
-                    <h3>Select Meal Plan Start Date</h3>
+                  <div className="startdate-section">
+                    <h3>Meal Plan Start Date</h3>
                     <input
                       type="date"
                       value={mealModalDate || selectedDateStr}
@@ -644,16 +654,16 @@ export default function DailyProgress() {
                       }}
                     />
                     {mealEndDate && (
-                      <div>
+                      <div className="end-date">
                         Calculated End Date: <strong>{mealEndDate}</strong>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
 
                 {workoutPlanExists && !planWorkoutStartDate && (
-                  <>
-                    <h3>Select Workout Plan Start Date</h3>
+                  <div className="startdate-section">
+                    <h3>Workout Plan Start Date</h3>
                     <input
                       type="date"
                       value={workoutModalDate || selectedDateStr}
@@ -668,16 +678,22 @@ export default function DailyProgress() {
                       }}
                     />
                     {workoutEndDate && (
-                      <div>
+                      <div className="end-date">
                         Calculated End Date: <strong>{workoutEndDate}</strong>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
 
                 <div className="modal-buttons">
-                  <button onClick={() => setConfirmOpen(true)}>Confirm</button>
                   <button
+                    className="btn-confirm"
+                    onClick={() => setConfirmOpen(true)}
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    className="btn-cancel"
                     onClick={() => {
                       setShowStartDateModal(false);
                       setConfirmOpen(false);
@@ -748,9 +764,10 @@ export default function DailyProgress() {
         {!loading && (
           <>
             {!dateValid ? (
-              <p className="invalid-date-msg">
-                No progress available for this date.
-              </p>
+               <p className="invalid-date-msg">
+    <FaInfoCircle className="icon-green" />
+    No progress available for this date.
+  </p>
             ) : (
               <>
                 {locked ? (

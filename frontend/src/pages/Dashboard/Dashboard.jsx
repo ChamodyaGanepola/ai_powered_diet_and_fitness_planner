@@ -10,7 +10,10 @@ import {
 } from "../../api/dailyProgress";
 import { getProfileByUserId } from "../../api/userProfileApi";
 import { getLatestMealPlan } from "../../api/mealPlanApi";
-import { getLatestWorkoutPlan } from "../../api/workoutPlan";
+import {
+  getLatestWorkoutPlan,
+  getWorkoutPlanDetails,
+} from "../../api/workoutPlan";
 import Loading from "../../component/Loading";
 import PageHeader from "../../component/PageHeader.jsx";
 import ProgressPercentage from "../../component/ProgressPercentage.jsx";
@@ -22,7 +25,10 @@ export default function Dashboard() {
   const [initialWeight, setInitialWeight] = useState(null);
   const [activeMealPlan, setActiveMealPlan] = useState(null);
   const [activeWorkoutPlan, setActiveWorkoutPlan] = useState(null);
-  const [completedDates, setCompletedDates] = useState([]);
+  const [completedDates, setCompletedDates] = useState({
+    meal: [],
+    workout: [],
+  });
   const [loading, setLoading] = useState(true);
   const [profileExists, setProfileExists] = useState(true);
 
@@ -44,11 +50,22 @@ export default function Dashboard() {
         const mealPlanRes = await getLatestMealPlan();
         const mealPlan = mealPlanRes?.mealPlan || null;
         setActiveMealPlan(mealPlan);
+        console.log("Meal Plan", mealPlanRes);
 
-        const workoutPlanRes = await getLatestWorkoutPlan(user.id);
+        const workoutPlanRes = await getWorkoutPlanDetails();
+
         const workoutPlan = workoutPlanRes?.workoutPlan || null;
         setActiveWorkoutPlan(workoutPlan);
-
+        console.log("Meal Plan start date", mealPlanRes.mealPlan.startDate);
+        console.log("Meal Plan end date", mealPlanRes.mealPlan.endDate);
+        console.log(
+          "Workout Plan start date",
+          workoutPlanRes.workoutPlan.startDate,
+        );
+        console.log(
+          "Workout Plan end date",
+          workoutPlanRes.workoutPlan.endDate,
+        );
         if (!mealPlan && !workoutPlan) {
           setTimeout(() => (window.location.href = "/home"), 3000);
         } else if (!mealPlan && workoutPlan) {
@@ -57,17 +74,21 @@ export default function Dashboard() {
           setTimeout(() => (window.location.href = "/workouts"), 3000);
         } else if (mealPlan?._id) {
           const completedRes = await getCompletedProgressDates(mealPlan._id);
-          setCompletedDates(completedRes);
-          console.log("completeRes", completedRes);
+
+          setCompletedDates({
+            meal: completedRes.mealCompletedDates || [],
+            workout: completedRes.workoutCompletedDates || [],
+          });
         }
 
-        console.log("workout start date", activeMealPlan.startDate);
         const days = [];
         for (let i = 6; i >= 0; i--) {
           const d = new Date();
           d.setDate(d.getDate() - i);
           const dateStr = d.toISOString().split("T")[0];
+          console.log("dateSTr", dateStr);
           const res = await getDailyProgressByDate(dateStr);
+          console.log("getDailyProgress", res);
           if (res.progress) days.push(res.progress);
         }
 
@@ -93,9 +114,7 @@ export default function Dashboard() {
         </p>
       </div>
     );
-  }
-
-  else if (!activeMealPlan && !activeWorkoutPlan) {
+  } else if (!activeMealPlan && !activeWorkoutPlan) {
     return (
       <div className="app-container">
         <p className="simple-message">
@@ -103,9 +122,7 @@ export default function Dashboard() {
         </p>
       </div>
     );
-  }
-
-  else if (activeWorkoutPlan && !activeMealPlan) {
+  } else if (activeWorkoutPlan && !activeMealPlan) {
     return (
       <div className="app-container">
         <p className="simple-message">
@@ -113,9 +130,7 @@ export default function Dashboard() {
         </p>
       </div>
     );
-  }
-
-  else if (activeMealPlan && !activeWorkoutPlan) {
+  } else if (activeMealPlan && !activeWorkoutPlan) {
     return (
       <div className="app-container">
         <p className="simple-message">
@@ -176,9 +191,12 @@ export default function Dashboard() {
           {activeMealPlan && (
             <div className="calendar-col">
               <ProgressCalendar
-                startDate={activeMealPlan.startDate}
-                endDate={activeMealPlan.endDate}
-                completedDates={completedDates}
+                mealStart={activeMealPlan.startDate}
+                mealEnd={activeMealPlan.endDate}
+                workoutStart={activeWorkoutPlan.startDate}
+                workoutEnd={activeWorkoutPlan.endDate}
+                completedMeals={completedDates.meal}
+                completedWorkouts={completedDates.workout}
               />
             </div>
           )}

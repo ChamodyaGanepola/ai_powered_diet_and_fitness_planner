@@ -13,45 +13,34 @@ import "./ProgressPercentage.css"
 const ProgressPercentage = () => {
   const [mealPlan, setMealPlan] = useState(null);
   const [workoutPlan, setWorkoutPlan] = useState(null);
-  const [progress, setProgress] = useState(null);
+  const [mealProgress, setMealProgress] = useState(null);
+const [workoutProgress, setWorkoutProgress] = useState(null);
+
   const [error, setError] = useState("");
 
-  const areDatesSame = (mealPlan, workoutPlan) => {
-    if (!mealPlan || !workoutPlan) return false;
 
-    const mealStart = new Date(mealPlan.startDate).toISOString().slice(0, 10);
-    const mealEnd = new Date(mealPlan.endDate).toISOString().slice(0, 10);
-
-    const workoutStart = new Date(workoutPlan.startDate).toISOString().slice(0, 10);
-    const workoutEnd = new Date(workoutPlan.endDate).toISOString().slice(0, 10);
-
-    return mealStart === workoutStart && mealEnd === workoutEnd;
-  };
-
-  const calculateProgress = (startDate, endDate, completedDates) => {
+  const calculateProgress = (startDate, endDate, completedDates = []) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const today = new Date();
+  
   today.setHours(0, 0, 0, 0);
-
-  const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+   
+  const totalDays =
+    Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
   const completedDays = completedDates.length;
 
-  // Count only days that are before today AND not completed
-  const dayList = [];
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const dateStr = d.toISOString().split("T")[0];
-    dayList.push(dateStr);
+  let pastDays = 0;
+  for (let d = new Date(start); d <= end && d <= today; d.setDate(d.getDate() + 1)) {
+    pastDays++;
   }
-
-  const notCompletedDays = dayList.filter(
-    (d) => !completedDates.includes(d) && new Date(d) <= today
-  ).length;
-
-  const remainingDays = notCompletedDays;
-
-  const progressPercent = Math.round((completedDays / totalDays) * 100);
+console.log("complete", completedDays);
+  const remainingDays = Math.max(pastDays - completedDays, 0);
+console.log("remain", remainingDays);
+  const progressPercent = Math.round(
+    (completedDays / totalDays) * 100
+  );
 
   return {
     totalDays,
@@ -62,47 +51,38 @@ const ProgressPercentage = () => {
 };
 
 
+
   useEffect(() => {
   const fetchPlans = async () => {
-    setError("");
     try {
       const [mealRes, workoutRes] = await Promise.all([
         getLatestMealPlan(),
-        getWorkoutPlanDetails(),
+         getWorkoutPlanDetails(),
       ]);
 
       const meal = mealRes.mealPlan;
       const workout = workoutRes.workoutPlan;
+     console.log("workout", workoutRes);
+      const completedDates = await getCompletedProgressDates(meal._id);
 
-      console.log("meal", meal);
-      console.log("workout", workout);
-
-      // Use local variables instead of state
-      if (!areDatesSame(meal, workout)) {
-        setError("Meal and Workout plan dates do not match.");
-        return;
-      }
-      console.log("data same", areDatesSame(meal, workout))
-
-      const completedDates = await getCompletedProgressDates(
-        meal._id,
-        workout.id
-      );
-
-      console.log("completed dates", completedDates);
-
-      const progressObj = calculateProgress(
+      const mealProg = calculateProgress(
         meal.startDate,
         meal.endDate,
-        completedDates
+        completedDates.mealCompletedDates
       );
 
-      console.log("progressObj", progressObj);
-      setProgress(progressObj);
+      const workoutProg = calculateProgress(
+        workout.startDate,
+        workout.endDate,
+        completedDates.workoutCompletedDates
+      );
+
+      setMealProgress(mealProg);
+      setWorkoutProgress(workoutProg);
 
     } catch (err) {
-      setError("Failed to fetch plans.");
       console.error(err);
+      setError("Failed to load progress");
     }
   };
 
@@ -110,31 +90,56 @@ const ProgressPercentage = () => {
 }, []);
 
 
-  if (error) return <div>{error}</div>;
-  if (!progress) return <div>Loading...</div>;
+
+if (error) return <div>{error}</div>;
+if (!mealProgress || !workoutProgress) return <div>Loading...</div>;
+
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-center relative">
-        <ProgressCircle progress={progress.progressPercent} />
-      </div>
+    <div className="p-6 grid grid-cols-2 gap-6">
 
-     <div className="progress-info">
-  <div className="info-card">
-    <p className="label">Total Days</p>
-    <p className="value">{progress.totalDays}</p>
+  {/* MEAL PROGRESS */}
+  <div>
+    <h3 className="text-center font-semibold mb-2">Meal Plan</h3>
+    <ProgressCircle progress={mealProgress.progressPercent} />
+    <div className="progress-info">
+      <div className="info-card">
+        <p className="label">Total</p>
+        <p className="value">{mealProgress.totalDays}</p>
+      </div>
+      <div className="info-card">
+        <p className="label">Completed</p>
+        <p className="value">{mealProgress.completedDays}</p>
+      </div>
+      <div className="info-card">
+        <p className="label">Remaining</p>
+        <p className="value">{mealProgress.remainingDays}</p>
+      </div>
+    </div>
   </div>
-  <div className="info-card">
-    <p className="label">Completed</p>
-    <p className="value">{progress.completedDays}</p>
+
+  {/* WORKOUT PROGRESS */}
+  <div>
+    <h3 className="text-center font-semibold mb-2">Workout Plan</h3>
+    <ProgressCircle progress={workoutProgress.progressPercent} />
+    <div className="progress-info">
+      <div className="info-card">
+        <p className="label">Total</p>
+        <p className="value">{workoutProgress.totalDays}</p>
+      </div>
+      <div className="info-card">
+        <p className="label">Completed</p>
+        <p className="value">{workoutProgress.completedDays}</p>
+      </div>
+      <div className="info-card">
+        <p className="label">Remaining</p>
+        <p className="value">{workoutProgress.remainingDays}</p>
+      </div>
+    </div>
   </div>
-  <div className="info-card">
-    <p className="label">Remaining</p>
-    <p className="value">{progress.remainingDays}</p>
-  </div>
+
 </div>
 
-    </div>
   );
 };
 

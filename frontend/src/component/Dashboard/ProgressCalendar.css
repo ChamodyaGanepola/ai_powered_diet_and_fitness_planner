@@ -2,8 +2,8 @@
   background: #fff;
   padding: 14px;
   border-radius: 16px;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 520px;
   margin: 0 auto;
@@ -54,28 +54,54 @@
   position: relative;
 }
 
-.calendar-cell.completed {
-  background: #d1fae5;
-  color: #065f46;
+.calendar-cell.empty {
+  background: transparent;
 }
 
+/* Start / End circle */
+.calendar-cell.start {
+  border: 2px solid #3b82f6; /* blue circle */
+  border-radius: 50%;
+  background: #eef2ff;
+}
+
+.calendar-cell.end {
+  border: 2px solid #ef4444; /* red circle */
+  border-radius: 50%;
+  background: #ffe4e6;
+}
+
+/* Today highlight */
 .calendar-cell.today {
   background: #bfdbfe;
   color: #1e40af;
 }
 
+/* Past days missed */
+.calendar-cell.past {
+  background: #fef3c7; /* soft yellow */
+  color: #92400e;
+}
+
+/* Tick mark */
 .tick {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -3px;
+  right: -3px;
   font-size: 10px;
-  color: #16a34a;
 }
 
-.calendar-cell.empty {
-  background: transparent;
+.tick.meal {
+  color: #facc15; /* yellow */
 }
 
+.tick.workout {
+  color: #3b82f6; /* blue */
+}
+
+.tick.both {
+  color: #16a34a; /* green */
+}
 
 /* Tooltip */
 .calendar-cell:hover::after {
@@ -111,7 +137,6 @@
   animation: pop 0.15s forwards;
 }
 
-/* Pop animation */
 @keyframes pop {
   from {
     opacity: 0;
@@ -123,49 +148,16 @@
   }
 }
 
-/* Empty cells */
-.calendar-cell.empty {
-  background: transparent;
-}
-
-/* Start / End circle */
-.calendar-cell.start { 
-  border: 2px solid #4f46e5; 
-  border-radius: 50%;
-  background: #eef2ff;
-}
-
-.calendar-cell.end { 
-  border: 2px solid #ef4444; 
-  border-radius: 50%;
-  background: #ffe4e6;
-}
-
-/* Completed progress */
-.calendar-cell.completed { 
-  background: #d1fae5; 
-  color: #065f46; 
-}
-
-/* Tick mark */
-.tick { 
-  position: absolute; 
-  top: -3px; 
-  right: -3px; 
-  font-size: 10px; 
-  color: #16a34a; 
-}
-
-/* Past days before today (from start) */
-.calendar-cell.past:not(.completed):not(.start):not(.end) {
-  background: #fef3c7; /* soft yellow */
-  color: #92400e;
-}
-
-/* Today */
-.calendar-cell.today:not(.start):not(.end) {
-  background: #bfdbfe; /* light blue */
-  color: #1e40af;
+/* Mobile */
+@media (max-width: 600px) {
+  .calendar-cell {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+  .tick {
+    font-size: 8px;
+  }
 }
 
 /* Mobile: 1 month per row */
