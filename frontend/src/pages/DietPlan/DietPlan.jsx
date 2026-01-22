@@ -137,7 +137,7 @@ export default function DietPlan() {
     }
   };
 
-  if (loading) {return <Loading text="Loading dashboard..." />};
+  if (loading) {return <Loading text="Loading Meal Plan..." />};
 
   if (!profileExists) {
     return (

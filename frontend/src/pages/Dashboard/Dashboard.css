@@ -33,6 +33,7 @@
     "progress stats calendar";
 }
 
+
 .progress-col {
   grid-area: progress;
   display: flex;
@@ -49,7 +50,11 @@
 
 .calendar-col {
   grid-area: calendar;
+  display: flex;
+   justify-content: center;
+  align-items: center;
 }
+
 
 /* Calendar compact */
 .calendar-col .calendar-wrapper {
@@ -61,6 +66,7 @@
   width: 22px;
   height: 22px;
   font-size: 10px;
+  
 }
 
 .calendar-col .calendar-header-day {
@@ -75,9 +81,11 @@
 .activities {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 116px; /* consistent gap */
+  
 }
+
 /* ===== Container & Layout ===== */
 .app-container {
   margin: 0 auto;
@@ -99,8 +107,9 @@
     grid-template-columns: 200px 1fr 300px;
   }
 
-  .activities {
+.activities {
     grid-template-columns: repeat(2, 1fr);
+    gap: 114px;
   }
 }
 
@@ -127,6 +136,6 @@
 
   .activities {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
   }
 }

@@ -139,7 +139,7 @@ const Auth = () => {
           type: "success",
           message: "Login successful!",
           autoClose: true,
-          duration: 6000,
+          duration: 3000,
         });
         navigate("/home");
       }

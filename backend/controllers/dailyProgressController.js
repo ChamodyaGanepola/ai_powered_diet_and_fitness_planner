@@ -91,9 +91,57 @@ const isWorkoutPlanDeviated = (plannedExercises, actualExercises) => {
 
 
 /* Get planned workouts full */
-const getPlannedWorkoutsFull = async (workoutPlanId) => {
-  return await Exercise.find({ workoutplan_id: workoutPlanId });
+export const getAllProgressForUser = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    if (!user_id)
+      return res.status(400).json({ success: false, message: "user_id required" });
+
+    const mealPlan = await MealPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
+    const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
+
+    // If no plan exists
+    if (!mealPlan && !workoutPlan) {
+      return res.json({ success: true, progress: [] });
+    }
+
+    // Fetch progress (all, but filtered by active plan ids)
+    const query = {
+      user_id,
+      $or: [],
+    };
+
+    if (mealPlan) query.$or.push({ mealplan_id: mealPlan._id });
+    if (workoutPlan) query.$or.push({ workoutplan_id: workoutPlan._id });
+
+    const progress = await DailyProgress.find(query)
+      .select({
+        date: 1,
+        mealAdherenceScore: 1,
+        workoutAdherenceScore: 1,
+        totalCaloriesTaken: 1,
+        totalCaloriesBurned: 1,
+        weight: 1,
+        completed: 1,
+      })
+      .sort({ date: 1 });
+
+    res.json({
+      success: true,
+      mealPlan: mealPlan
+        ? { id: mealPlan._id, startDate: mealPlan.startDate, endDate: mealPlan.endDate }
+        : null,
+      workoutPlan: workoutPlan
+        ? { id: workoutPlan._id, startDate: workoutPlan.startDate, endDate: workoutPlan.endDate }
+        : null,
+      progress,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to get progress", error: err.message });
+  }
 };
+
 
 /* --------------------------- SAVE DAILY PROGRESS --------------------------- */
 export const saveDailyProgress = async (req, res) => {

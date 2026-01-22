@@ -18,7 +18,7 @@ import { createNotification } from "../../api/notificationApi.js";
 import PageLayout from "../../layouts/PageLayout.jsx";
 import "./Profile.css";
 import { useAuth } from "../../context/authContext.jsx";
-
+import Loading from "../../component/Loading.jsx";
 const Profile = () => {
   const { user, markProfileUpdated } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -98,7 +98,7 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <p className="loading">Loading profile...</p>;
+   if (loading) {return <Loading text="Loading Profile..." />};
 
   if (!profile) {
     return (

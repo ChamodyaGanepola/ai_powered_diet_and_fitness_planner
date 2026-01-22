@@ -12,7 +12,7 @@ import { FaHome } from "react-icons/fa";
 import { FaEdit, FaUserPlus } from "react-icons/fa";
 import Alert from "../../component/Alert.jsx";
 import { useLocation } from "react-router-dom";
-
+import Loading from "../../component/Loading.jsx";
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -54,7 +54,7 @@ const Home = () => {
 
     fetchProfile();
   }, [user?.id, profileUpdated, token]);
-
+  if (loading) {return <Loading text="Loading Home Page..." />};
   return (
     <main className="home">
       {alert && (

@@ -11,40 +11,48 @@ export default function ProgressCalendar({
 }) {
   const [index, setIndex] = useState(0);
 
-  // ---------- fallback logic ----------
-  const today = new Date();
-  const todayStr = toDateStr(today);
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+function toDateStr(d) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+const todayStr = toDateStr(today);   // <-- IMPORTANT
+
+  // ------------------ normalize to date only ------------------
   const effectiveMealStart = mealStart
-    ? new Date(mealStart)
+    ? toDateOnly(new Date(mealStart))
     : new Date(today.getFullYear(), today.getMonth(), 1);
 
   const effectiveMealEnd = mealEnd
-    ? new Date(mealEnd)
+    ? toDateOnly(new Date(mealEnd))
     : new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
   const effectiveWorkoutStart = workoutStart
-    ? new Date(workoutStart)
+    ? toDateOnly(new Date(workoutStart))
     : effectiveMealStart;
 
   const effectiveWorkoutEnd = workoutEnd
-    ? new Date(workoutEnd)
+    ? toDateOnly(new Date(workoutEnd))
     : effectiveMealEnd;
 
-  const start = new Date(
-    Math.min(effectiveMealStart, effectiveWorkoutStart)
+  const start = toDateOnly(
+    new Date(Math.min(effectiveMealStart, effectiveWorkoutStart))
   );
-  const end = new Date(
-    Math.max(effectiveMealEnd, effectiveWorkoutEnd)
+  const end = toDateOnly(
+    new Date(Math.max(effectiveMealEnd, effectiveWorkoutEnd))
   );
 
-  // ---------- safe arrays ----------
   const safeMeals = Array.isArray(completedMeals) ? completedMeals : [];
   const safeWorkouts = Array.isArray(completedWorkouts)
     ? completedWorkouts
     : [];
 
-  // ---------- generate months ----------
+  // ------------------ generate months ------------------
   const months = [];
   const current = new Date(start.getFullYear(), start.getMonth(), 1);
 
@@ -64,9 +72,11 @@ export default function ProgressCalendar({
   const nextMonth = () =>
     setIndex((i) => Math.min(months.length - 1, i + 1));
 
-  // helper
-  function toDateStr(d) {
-    return d.toISOString().split("T")[0];
+
+
+
+  function toDateOnly(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }
 
   return (
@@ -105,7 +115,7 @@ export default function ProgressCalendar({
         {Array(daysInMonth)
           .fill(null)
           .map((_, i) => {
-            const date = new Date(year, month.getMonth(), i + 1);
+            const date = toDateOnly(new Date(year, month.getMonth(), i + 1));
             const dateStr = toDateStr(date);
 
             const mealDone = safeMeals.includes(dateStr);

@@ -19,37 +19,53 @@ const [workoutProgress, setWorkoutProgress] = useState(null);
   const [error, setError] = useState("");
 
 
-  const calculateProgress = (startDate, endDate, completedDates = []) => {
+const calculateProgress = (startDate, endDate, completedDates = []) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const today = new Date();
-  
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-   
+
   const totalDays =
     Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
-  const completedDays = completedDates.length;
-
-  let pastDays = 0;
-  for (let d = new Date(start); d <= end && d <= today; d.setDate(d.getDate() + 1)) {
-    pastDays++;
-  }
-console.log("complete", completedDays);
-  const remainingDays = Math.max(pastDays - completedDays, 0);
-console.log("remain", remainingDays);
-  const progressPercent = Math.round(
-    (completedDays / totalDays) * 100
+  const completedSet = new Set(
+    completedDates.map((d) => {
+      const dd = new Date(d);
+      dd.setHours(0, 0, 0, 0);
+      return dd.getTime();
+    })
   );
+
+  let completedDays = 0;
+  let missedDays = 0;
+  let remainingDays = 0;
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const time = d.getTime();
+
+    if (completedSet.has(time)) {
+      completedDays++;
+    } else if (time < today.getTime()) {
+      missedDays++;
+    } else {
+      // today OR future
+      remainingDays++;
+    }
+  }
+
+  const progressPercent = Math.round((completedDays / totalDays) * 100);
 
   return {
     totalDays,
     completedDays,
+    missedDays,
     remainingDays,
     progressPercent,
   };
 };
-
 
 
   useEffect(() => {
@@ -63,7 +79,7 @@ console.log("remain", remainingDays);
       const meal = mealRes.mealPlan;
       const workout = workoutRes.workoutPlan;
      console.log("workout", workoutRes);
-      const completedDates = await getCompletedProgressDates(meal._id);
+      const completedDates = await getCompletedProgressDates();
 
       const mealProg = calculateProgress(
         meal.startDate,
