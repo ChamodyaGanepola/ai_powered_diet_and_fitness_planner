@@ -19,7 +19,7 @@ import {
   onlyPositiveNumbers,
   onlyLettersAllowEmpty,
 } from "../../utils/validation.js";
-import { FaChartLine } from "react-icons/fa";
+import { FaChartLine, FaDumbbell, FaWeight, FaAppleAlt } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
 import Loading from "../../component/Loading.jsx";
@@ -751,8 +751,8 @@ export default function DailyProgress() {
                   <>
                     {/* Body Metrics */}
                     <div className="section body-section">
-                      <h3>
-                        Please fill these Body Metrics for the Selected Date
+                      <h3> <FaWeight /> <span>
+                        Please enter your body measurements for the selected date.</span>
                       </h3>
                       <div className="body-grid">
                         <div className="body-field">
@@ -819,9 +819,13 @@ export default function DailyProgress() {
                       </div>
                     </div>
 
-                    {/* Macros */}
+                  
+
+                    {/* Meals */}
+                    {!isLockedMeal && (
+                    <>
                     <div className="macro-summary">
-                      <h3>Selected Meal Macros</h3>
+                      <h3><span>Your Total Intake for the Day</span></h3>
                       <div className="food-right">
                         <div className="food-metric kcal">
                           <div className="value">{totalMacros.calories}</div>
@@ -841,11 +845,8 @@ export default function DailyProgress() {
                         </div>
                       </div>
                     </div>
-
-                    {/* Meals */}
-                    {!isLockedMeal && (
                       <div className="section meals-section">
-                        <h3>Meals</h3>
+                        <h3> <FaAppleAlt /> <span>Select/Edit Meals to Record Your Daily Real Progress</span></h3>
                         {meals.map((meal, mIdx) => (
                           <div key={mIdx} className="meal-card">
                             <h4>{meal.mealType}</h4>
@@ -922,12 +923,13 @@ export default function DailyProgress() {
                           </div>
                         ))}
                       </div>
+                      </>
                     )}
 
                     {/* Workouts */}
                     {!isLockedWorkout && (
                       <div className="section workouts-section">
-                        <h3>Workouts</h3>
+                        <h3><FaDumbbell /> <span> Select/Edit Workout to Record Your Daily Real Progress</span></h3>
                         {workouts.map((w, idx) => (
                           <div key={idx} className="workout-card">
                             <div className="workout-item">

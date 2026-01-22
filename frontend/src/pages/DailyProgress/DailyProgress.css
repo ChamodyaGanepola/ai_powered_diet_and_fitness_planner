@@ -15,7 +15,10 @@
   max-width: 1200px;
   margin: 0 auto;
 }
-
+svg {
+  font-size: 16px;
+  color: #2b7a4b;
+}
 
 /* ===== Date Picker ===== */
 .date-picker {
