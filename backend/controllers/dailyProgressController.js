@@ -67,6 +67,10 @@ const isMealPlanDeviated = (plannedMeals, actualMeals) => {
   return false; // everything matches
 };
 
+/* Get planned workouts full */
+const getPlannedWorkoutsFull = async (workoutPlanId) => {
+  return await Exercise.find({ workoutplan_id: workoutPlanId });
+};
 
 /* Check if workouts deviate */
 const isWorkoutPlanDeviated = (plannedExercises, actualExercises) => {

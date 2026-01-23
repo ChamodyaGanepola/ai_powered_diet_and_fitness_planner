@@ -15,10 +15,12 @@ import {
   getCompletedProgressDates,
   updateDailyProgress,
 } from "../../api/dailyProgress.js";
+import { useAlert } from "../../context/alertContext.jsx";
 import {
   onlyPositiveNumbers,
   onlyLettersAllowEmpty,
 } from "../../utils/validation.js";
+import { createNotification } from "../../api/notificationApi.js";
 import {
   FaChartLine,
   FaDumbbell,
@@ -26,7 +28,7 @@ import {
   FaAppleAlt,
   FaCalendarPlus,
   FaLeaf,
-  FaInfoCircle, 
+  FaInfoCircle,
 } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import PageHeader from "../../component/PageHeader.jsx";
@@ -35,7 +37,7 @@ import ConfirmModal from "../../component/ConfirmModal.jsx";
 
 export default function DailyProgress() {
   const { user } = useAuth();
-
+  const { showAlert } = useAlert();
   const [profileExists, setProfileExists] = useState(true);
   const [mealPlanExists, setMealPlanExists] = useState(false);
   const [workoutPlanExists, setWorkoutPlanExists] = useState(false);
@@ -436,9 +438,28 @@ export default function DailyProgress() {
       setSuccessMessage(
         `✔ Progress saved successfully for ${selectedDateStr}!`,
       );
+      showAlert({
+          type: "success",
+          message: `✔ Progress saved successfully for ${selectedDateStr}!`,
+          autoClose: true,
+          duration: 3000,
+        });
+      try {
+        await createNotification(
+          `Hi ${user.username}! 🌟 Progress saved for ${selectedDateStr}. Keep going!!`,
+        );
+      } catch (e) {
+        console.warn("Notification failed", e);
+      }
     } catch (err) {
       console.error(err);
-      alert("Failed to save progress.");
+
+      showAlert({
+        type: "error",
+        message: "Failed to save progress. ",
+        autoClose: true,
+        duration: 3000,
+      });
     }
   };
 
@@ -451,9 +472,14 @@ export default function DailyProgress() {
       isEmpty(measurements.waist) ||
       isEmpty(measurements.hips)
     ) {
-      alert(
-        "Please fill all body metrics (weight, body fat, chest, waist, hips).",
-      );
+      showAlert({
+        type: "error",
+        message:
+          "Please fill all body metrics (weight, body fat, chest, waist, hips).",
+        autoClose: true,
+        duration: 3000,
+      });
+
       return;
     }
 
@@ -481,7 +507,12 @@ export default function DailyProgress() {
 
       if (selectedItem) {
         if (isEmpty(selectedItem.name)) {
-          alert(`${meal.mealType}: Meal name is required.`);
+          showAlert({
+            type: "error",
+            message: `${meal.mealType}: Meal name is required.`,
+            autoClose: true,
+            duration: 3000,
+          });
           return;
         }
         if (
@@ -490,7 +521,13 @@ export default function DailyProgress() {
           !isPositiveNumber(selectedItem.fat) ||
           !isPositiveNumber(selectedItem.carbohydrates)
         ) {
-          alert(`${meal.mealType}: All macros must be filled and > 0.`);
+          
+          showAlert({
+            type: "error",
+            message: `${meal.mealType}: All macros must be filled and > 0.`,
+            autoClose: true,
+            duration: 3000,
+          });
           return;
         }
       }
@@ -517,11 +554,21 @@ export default function DailyProgress() {
 
     if (selectedWorkout) {
       if (isEmpty(selectedWorkout.name)) {
-        alert("Workout name is required.");
+          showAlert({
+            type: "error",
+            message: "Workout name is required.",
+            autoClose: true,
+            duration: 3000,
+          });
         return;
       }
       if (!isPositiveNumber(selectedWorkout.caloriesBurned)) {
-        alert("Workout calories must be filled and > 0.");
+        showAlert({
+            type: "error",
+            message: "Workout calories must be filled and > 0.",
+            autoClose: true,
+            duration: 3000,
+          });
         return;
       }
     }
@@ -764,10 +811,10 @@ export default function DailyProgress() {
         {!loading && (
           <>
             {!dateValid ? (
-               <p className="invalid-date-msg">
-    <FaInfoCircle className="icon-green" />
-    No progress available for this date.
-  </p>
+              <p className="invalid-date-msg">
+                <FaInfoCircle className="icon-green" />
+                No progress available for this date.
+              </p>
             ) : (
               <>
                 {locked ? (

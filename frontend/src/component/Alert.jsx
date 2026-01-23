@@ -22,7 +22,7 @@ const colorMap = {
   info: "#3b82f6",
 };
 
-const Alert = ({ type = "info", message, autoClose = false, duration = 6000, onClose }) => {
+const Alert = ({ type = "info", message, autoClose = false, duration = 4000, onClose }) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -50,10 +50,7 @@ const Alert = ({ type = "info", message, autoClose = false, duration = 6000, onC
 
       <button
         className="alert-close"
-        onClick={() => {
-          setVisible(false);
-          onClose?.();
-        }}
+        onClick={onClose}
         style={{ color: colorMap[type] }}
       >
         <FaTimes />
