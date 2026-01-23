@@ -16,6 +16,7 @@ import {
   updateDailyProgress,
 } from "../../api/dailyProgress.js";
 import { useAlert } from "../../context/alertContext.jsx";
+import SavedDailyProgress from "../../component/SavedDailyProgress.jsx";
 import {
   onlyPositiveNumbers,
   onlyLettersAllowEmpty,
@@ -818,7 +819,13 @@ export default function DailyProgress() {
             ) : (
               <>
                 {locked ? (
-                  <p className="done">{successMessage} </p>
+                  <>
+    <p className="done">{successMessage}</p>
+
+    <SavedDailyProgress
+      date={selectedDateStr}
+    />
+  </>
                 ) : (
                   <>
                     {/* Body Metrics */}

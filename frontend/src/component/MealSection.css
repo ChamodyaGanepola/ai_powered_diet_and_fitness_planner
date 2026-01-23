@@ -38,3 +38,32 @@
 .meal-card.dinner {
   background: linear-gradient(135deg, #e8f8ef, #c8eed9);
 }
+.meal-card.skipped {
+  border: 1px solid #ff4d4f;
+  background: #fff5f5;
+}
+
+.skipped-badge {
+  margin-left: 10px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #ff4d4f;
+  background: #ffecec;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skipped-text {
+  color: #ff4d4f;
+  font-weight: 600;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skipped-icon {
+  font-size: 14px;
+}

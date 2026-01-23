@@ -1,0 +1,48 @@
+.saved-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+}
+
+/* Make saved workouts and meal cards responsive */
+.saved-workouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+/* SavedDailyProgress.css */
+.meal-skipped,
+.workout-skipped {
+  border: 1px solid #ff4d4f;
+  background: #fff5f5;
+  padding: 16px;
+  border-radius: 12px;
+  color: #ff4d4f;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center; /* center the message */
+}
+
+.skipped-icon {
+  font-size: 18px;
+}
+ 
+/* Mobile */
+@media (max-width: 600px) {
+  .meal-skipped,
+  .workout-skipped {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+/* Mobile spacing */
+@media (max-width: 600px) {
+  .saved-progress {
+    gap: 14px;
+    padding: 8px;
+  }
+}

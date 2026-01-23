@@ -17,10 +17,10 @@ export default function MealPlanCard({ plan, index, showHeader = true }) {
         )}
 
         <div className="macros">
-          <span>{plan.totalCalories || 1655} kcal</span>
-          <span>{plan.totalProtein || 77}g protein</span>
-          <span>{plan.totalFat || 46}g fat</span>
-          <span>{plan.totalCarbs || 233}g carbs</span>
+          <span>{plan.totalCalories || 0} kcal</span>
+          <span>{plan.totalProtein || 0}g protein</span>
+          <span>{plan.totalFat || 0}g fat</span>
+          <span>{plan.totalCarbs || 0}g carbs</span>
         </div>
       </div>
 

@@ -1,0 +1,57 @@
+.calories-summary-card {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Responsive: stack on mobile */
+@media (max-width: 600px) {
+  .calories-summary-card {
+    flex-direction: column;
+  }
+}
+
+.calories {
+  flex: 1;
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.icon-taken {
+  color: #ff9800;
+  font-size: 22px;
+}
+
+.icon-burned {
+  color: #2e7d32; /* green */
+  font-size: 22px;
+}
+
+.value {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.label {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Mobile text resize */
+@media (max-width: 600px) {
+  .calories {
+    padding: 12px;
+  }
+
+  .value {
+    font-size: 18px;
+  }
+
+  .label {
+    font-size: 11px;
+  }
+}
