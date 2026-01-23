@@ -20,6 +20,7 @@ import Loading from "../../component/Loading";
 import PageHeader from "../../component/PageHeader.jsx";
 import ProgressPercentage from "../../component/ProgressPercentage.jsx";
 import { MdDashboard } from "react-icons/md";
+import { FaWeight, FaFire, FaUtensils, FaDumbbell } from "react-icons/fa";
 export default function Dashboard() {
   const { user } = useAuth();
 
@@ -229,10 +230,10 @@ export default function Dashboard() {
     );
   }
 
+
   return (
     <div className="dashboard-root">
       <main className="dashboard-main">
-        {/* ===== ROW 1: HEADER ===== */}
         <div className="dashboard-header">
           <PageHeader
             icon={<MdDashboard />}
@@ -241,44 +242,45 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* ===== ROW 2: GRID ===== */}
-        <div className="dashboard-top-grid">
-          {/* COLUMN 1 */}
+        {/* ===== GRID ===== */}
+        <div className="dashboard-grid">
+          {/* ROW 1 */}
           <div className="progress-col">
             <ProgressPercentage />
           </div>
 
-          {/* COLUMN 2 */}
           <div className="stats-col">
             <StatCard
-              icon="⚖️"
-              title="Initial Weight"
-              value={`${initialWeight ?? "--"} kg`}
-              className="pink"
-            />
-            <StatCard
-              icon="💪"
-              title="Current Weight"
-              value={`${latest?.weight ?? "--"} kg`}
-              className="blue"
-            />
-
-            <StatCard
-              icon="🍽️"
-              title="Calories Taken"
-              value={totalCaloriesTaken || "--"}
+              title={`Hey ${user?.username}!, Your Up-to-date stats`}
               className="green"
-            />
-
-            <StatCard
-              icon="🔥"
-              title="Calories Burned"
-              value={totalCaloriesBurned || "--"}
-              className="orange"
+              stats={[
+                {
+                  key: "initialWeight",
+                  label: "Initial Weight",
+                  value: initialWeight ? `${initialWeight} kg` : null,
+                  icon: <FaWeight />,
+                },
+                {
+                  key: "currentWeight",
+                  label: "Current Weight",
+                  value: latest?.weight ? `${latest.weight} kg` : null,
+                  icon: <FaDumbbell />,
+                },
+                {
+                  key: "caloriesTaken",
+                  label: "Calories Taken",
+                  value: totalCaloriesTaken ? totalCaloriesTaken : null,
+                  icon: <FaUtensils />,
+                },
+                {
+                  key: "caloriesBurned",
+                  label: "Calories Burned",
+                  value: totalCaloriesBurned ? totalCaloriesBurned : null,
+                  icon: <FaFire />,
+                },
+              ]}
             />
           </div>
-
-          {/* COLUMN 3 */}
 
           <div className="calendar-col">
             <ProgressCalendar
@@ -290,41 +292,32 @@ export default function Dashboard() {
               completedWorkouts={completedDates.workout}
             />
           </div>
+
+          {/* ROW 2 */}
+          <div className="adherence-col">
+            <ActivityPanel
+              title="Adherence"
+              subtitle="Meal + Workout adherence combined"
+              type="adherence"
+              progressStatus={{
+                meal: progressMealPlanExists,
+                workout: progressWorkoutPlanExists,
+              }}
+            />
+          </div>
+
+          <div className="calories-col">
+            <ActivityPanel
+              title="Calories"
+              subtitle="Taken vs Burned"
+              type="calories"
+              progressStatus={{
+                meal: progressMealPlanExists,
+                workout: progressWorkoutPlanExists,
+              }}
+            />
+          </div>
         </div>
-
-        {/* ===== ROW 3: GRAPHS ===== */}
-
-        <section className="activities">
-          <ActivityPanel
-            title="Workout Adherence"
-            subtitle="Workout plan progress"
-            type="workout"
-            progressStatus={{
-              meal: progressMealPlanExists,
-              workout: progressWorkoutPlanExists,
-            }}
-          />
-
-          <ActivityPanel
-            title="Meal Adherence"
-            subtitle="Meal plan progress"
-            type="meal"
-            progressStatus={{
-              meal: progressMealPlanExists,
-              workout: progressWorkoutPlanExists,
-            }}
-          />
-
-          <ActivityPanel
-            title="Calories"
-            subtitle="Taken vs Burned"
-            type="calories"
-            progressStatus={{
-              meal: progressMealPlanExists,
-              workout: progressWorkoutPlanExists,
-            }}
-          />
-        </section>
       </main>
     </div>
   );

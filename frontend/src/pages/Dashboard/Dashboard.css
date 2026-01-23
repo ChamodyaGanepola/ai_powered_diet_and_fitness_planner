@@ -1,141 +1,140 @@
-/* ================= ROOT ================= */
 .dashboard-root {
   width: 100%;
-  min-height: 100vh;
   display: flex;
-  padding-top: 80px;
-  padding-bottom: 40px;
-   background: #e5efe9;
-}
+  flex-direction: column;
+  box-sizing: border-box;
+   padding: 80px 12px 10px;
 
-.dashboard-main {
- width: 100%;
- background: #e5efe9;
- padding-right: 80px;
- padding-left: 40px;
+  min-height: calc(100vh - 64px - 64px);
   background: #e5efe9;
 }
 
-/* ================= HEADER ================= */
-.dashboard-header {
-  margin-bottom: 20px;
-}
-
-/* ================= TOP GRID ================= */
-.dashboard-top-grid {
+.dashboard-grid {
   display: grid;
   grid-template-columns: 220px 1fr 360px;
-  grid-template-rows: repeat(2, auto);
   gap: 16px;
-
+  column-gap: 44px;
+  align-items: stretch;
   grid-template-areas:
     "progress stats calendar"
-    "progress stats calendar";
+    "progress adherence calories";
+  grid-auto-rows: auto;
 }
 
 
+.dashboard-grid > div {
+  height: 100%;
+}
+
+.progress-col,
+.stats-col,
+.calendar-col,
+.adherence-col,
+.calories-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-col > * ,
+.stats-col > * ,
+.calendar-col > * ,
+.adherence-col > * ,
+.calories-col > * {
+  flex: 1;
+}
+
+.dashboard-grid > div {
+  height: 100%;
+}
+
+.progress-col,
+.stats-col,
+.calendar-col,
+.adherence-col,
+.calories-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.progress-col > * ,
+.stats-col > * ,
+.calendar-col > * ,
+.adherence-col > * ,
+.calories-col > * {
+  flex: 1;
+}
+
+
+.dashboard-main {
+  width: 100%;
+  padding: 80px 12px 10px;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+
+/* GRID AREAS */
 .progress-col {
   grid-area: progress;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .stats-col {
   grid-area: stats;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
 }
 
 .calendar-col {
   grid-area: calendar;
-  display: flex;
-   justify-content: center;
-  align-items: center;
 }
 
-
-/* Calendar compact */
-.calendar-col .calendar-wrapper {
-  max-width: 340px;
-  padding: 8px;
+.adherence-col {
+  grid-area: adherence;
 }
 
-.calendar-col .calendar-cell {
-  width: 22px;
-  height: 22px;
-  font-size: 10px;
-  
+.calories-col {
+  grid-area: calories;
 }
 
-.calendar-col .calendar-header-day {
-  font-size: 9px;
-}
-
-.calendar-col .month-title {
-  font-size: 12px;
-}
-
-
+/* ACTIVITIES */
 .activities {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 116px; /* consistent gap */
-  
+  gap: 22px;
 }
 
-/* ===== Container & Layout ===== */
-.app-container {
-  margin: 0 auto;
-  padding: 32px;
-  background: #e5efe9;
-  min-height: 100vh;
-  
+.dashboard-grid {
+  grid-auto-rows: auto;
 }
-/* Simple message without card */
-.simple-message {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 1.2rem;
-  color: #1f2937;
+
+@media (min-width: 1025px) {
+  .dashboard-grid {
+    grid-auto-rows: 1fr;
+  }
 }
-/* ================= TABLET ================= */
+
 @media (max-width: 1024px) {
-  .dashboard-top-grid {
-    grid-template-columns: 200px 1fr 300px;
-  }
-
-.activities {
+  .dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 114px;
+    grid-template-areas:
+      "progress stats"
+      "calendar calendar"
+      "adherence calories";
+    grid-auto-rows: auto;
   }
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 900px) {
-  .dashboard-main {
-    padding: 16px;
-  }
-
-  .dashboard-top-grid {
+@media (max-width: 600px) {
+  .dashboard-grid {
     grid-template-columns: 1fr;
     grid-template-areas:
       "progress"
       "stats"
-      "activities"
-      "calendar";
-    gap: 12px;
-  }
-
-  .stats-col {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .activities {
-    grid-template-columns: 1fr;
-    gap: 12px;
+      "calendar"
+      "adherence"
+      "calories";
+    grid-auto-rows: auto;
   }
 }
+
