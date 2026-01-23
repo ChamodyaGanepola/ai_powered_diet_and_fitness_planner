@@ -8,6 +8,7 @@ import {
   getDailyProgressByDate,
   getCompletedProgressDates,
   checkDailyProgressForUser,
+  getDailyProgressRange,
 } from "../../api/dailyProgress";
 import { getProfileByUserId } from "../../api/userProfileApi";
 import { getLatestMealPlan } from "../../api/mealPlanApi";
@@ -128,21 +129,17 @@ export default function Dashboard() {
         const endDate = finalEnd && finalEnd < today ? finalEnd : today;
 
         /** ================= DAILY PROGRESS ================= */
-        const days = [];
 
-        for (
-          let d = new Date(startDate);
-          d <= endDate;
-          d.setDate(d.getDate() + 1)
-        ) {
-          const dateStr = d.toISOString().split("T")[0];
-          const res = await getDailyProgressByDate(dateStr);
+        const startStr = startDate.toISOString().split("T")[0];
+        const endStr = endDate.toISOString().split("T")[0];
 
-          days.push({
-            date: dateStr,
-            progress: res?.progress || null,
-          });
-        }
+        const rangeRes = await getDailyProgressRange(startStr, endStr);
+
+        const days = (rangeRes?.progress || []).map((p) => ({
+          date: new Date(p.date).toISOString().split("T")[0],
+          progress: p,
+        }));
+        console.log("days", days);
 
         /** ================= TOTALS ================= */
         const lastValidProgress =
@@ -249,9 +246,8 @@ export default function Dashboard() {
           {/* COLUMN 1 */}
           <div className="progress-col">
             <ProgressPercentage />
-            
           </div>
-          
+
           {/* COLUMN 2 */}
           <div className="stats-col">
             <StatCard
@@ -283,48 +279,19 @@ export default function Dashboard() {
           </div>
 
           {/* COLUMN 3 */}
-          
-         
-            <div className="calendar-col">
-              <ProgressCalendar
-                mealStart={activeMealPlan.startDate}
-                mealEnd={activeMealPlan.endDate}
-                workoutStart={activeWorkoutPlan.startDate}
-                workoutEnd={activeWorkoutPlan.endDate}
-                completedMeals={completedDates.meal}
-                completedWorkouts={completedDates.workout}
-              />
-             
-            
-             <div className="plan-card">
-    <h3>Hi, {user?.username}!</h3>
 
-    {!lastProgress ? (
-      <p>No recent progress found.</p>
-    ) : (
-      <>
-        <p className="card-date">
-          Last progress: {new Date(lastProgress.date).toDateString()}
-        </p>
-
-        <div className="meal-summary">
-          <p><b>Breakfast:</b> {lastProgress.mealSummary.Breakfast}</p>
-          <p><b>Lunch:</b> {lastProgress.mealSummary.Lunch}</p>
-          <p><b>Snack:</b> {lastProgress.mealSummary.Snack}</p>
-          <p><b>Dinner:</b> {lastProgress.mealSummary.Dinner}</p>
+          <div className="calendar-col">
+            <ProgressCalendar
+              mealStart={activeMealPlan.startDate}
+              mealEnd={activeMealPlan.endDate}
+              workoutStart={activeWorkoutPlan.startDate}
+              workoutEnd={activeWorkoutPlan.endDate}
+              completedMeals={completedDates.meal}
+              completedWorkouts={completedDates.workout}
+            />
+          </div>
         </div>
 
-        <div className="workout-summary">
-          <p><b>Workout:</b> {lastProgress.workoutSummary.join(", ")}</p>
-        </div>
-      </>
-    )}
-  </div>
- </div>
-
-    </div>
-          
-        
         {/* ===== ROW 3: GRAPHS ===== */}
 
         <section className="activities">

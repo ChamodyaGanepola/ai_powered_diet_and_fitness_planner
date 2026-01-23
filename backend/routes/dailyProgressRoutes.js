@@ -2,7 +2,7 @@ import express from "express";
 import {
   getDailyProgress,
   saveDailyProgress,
-  resetPlanDatesIfNoProgress, getCompletedProgressDates, checkDailyProgressForUser, updateDailyProgress, getAllProgressForUser, 
+  resetPlanDatesIfNoProgress, getCompletedProgressDates, checkDailyProgressForUser, updateDailyProgress, getAllProgressForUser, getDailyProgressRange,
 } from "../controllers/dailyProgressController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
@@ -17,4 +17,6 @@ router.get("/completed-dates", authMiddleware, getCompletedProgressDates);
 router.get("/checkProgress", authMiddleware, checkDailyProgressForUser);
 router.put("/daily", authMiddleware, updateDailyProgress);
 router.get("/all", authMiddleware ,  getAllProgressForUser);
+router.get("/range", authMiddleware, getDailyProgressRange);
+
 export default router;

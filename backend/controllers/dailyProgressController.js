@@ -271,6 +271,59 @@ export const getDailyProgress = async (req, res) => {
 };
 
 
+export const getDailyProgressRange = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { start, end } = req.query;
+    console.log("start", start);
+    console.log("end", end);
+    if (!user_id || !start || !end) {
+      return res.status(400).json({ success: false, message: "user_id, start and end are required" });
+    }
+
+    const startUTC = toUTCDate(start);
+    const endUTC = toUTCDate(end);
+    endUTC.setUTCDate(endUTC.getUTCDate() + 1); // include end date
+
+    const mealPlan = await MealPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
+    const workoutPlan = await WorkoutPlan.findOne({ user_id, status: "active" }).sort({ createdAt: -1 });
+
+    const query = {
+      user_id,
+      date: { $gte: startUTC, $lt: endUTC },
+    };
+
+    if (mealPlan && workoutPlan) {
+      query.$or = [
+        { mealplan_id: mealPlan._id },
+        { workoutplan_id: workoutPlan._id },
+      ];
+    } else if (mealPlan) {
+      query.mealplan_id = mealPlan._id;
+    } else if (workoutPlan) {
+      query.workoutplan_id = workoutPlan._id;
+    }
+
+    const progress = await DailyProgress.find(query)
+      .select({
+        date: 1,
+        mealAdherenceScore: 1,
+        workoutAdherenceScore: 1,
+        totalCaloriesTaken: 1,
+        totalCaloriesBurned: 1,
+        weight: 1,
+        completed: 1,
+        meals: 1,
+        workouts: 1,
+      })
+      .sort({ date: 1 });
+
+    res.json({ success: true, progress });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to fetch progress range", error: err.message });
+  }
+};
 
 export const resetPlanDatesIfNoProgress = async (req, res) => {
   try {

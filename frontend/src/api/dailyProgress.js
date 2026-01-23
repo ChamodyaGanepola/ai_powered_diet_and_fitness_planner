@@ -19,6 +19,15 @@ export const getAllProgressForUser = async () => {
   const res = await axios.get(`${API_URL}/all`, getAuthHeader());
   return res.data;
 };
+export const getDailyProgressRange = async (startStr, endStr) => {
+  const res = await axios.get(`${API_URL}/range`, {
+    params: { start: startStr, end: endStr },
+    ...getAuthHeader(),
+  });
+
+  return res.data;
+};
+
 
 export const createDailyProgress = async (
   date,
