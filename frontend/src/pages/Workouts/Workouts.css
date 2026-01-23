@@ -15,24 +15,53 @@
 }
 
 
-.app-container {
-  margin: 0 auto;
-  padding: 32px;
+
+/* DAY GRID WRAPPER */
+.day-grid {
+  display: grid;.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
   background: #e5efe9;
   min-height: 100vh;
 }
 
-
+.empty-state {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+}
 
 .simple-message {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #1f2937;
+  margin-bottom: 14px;
+  line-height: 1.5;
+
+  /* Prevent breaking words */
+  word-break: keep-all;
+  white-space: normal;
 }
-/* DAY GRID WRAPPER */
-.day-grid {
-  display: grid;
+
+
+
+
+.generate-btn {
+  background: linear-gradient(135deg, #01280d, #295339);
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.feedback-section {
+  margin-top: 22px;
+  text-align: left;
+}
+
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin-top: 30px;

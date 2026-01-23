@@ -16,12 +16,13 @@ import {
   updateDailyProgress,
 } from "../../api/dailyProgress.js";
 import { useAlert } from "../../context/alertContext.jsx";
+import { createNotification } from "../../api/notificationApi.js";
 import SavedDailyProgress from "../../component/SavedDailyProgress.jsx";
 import {
   onlyPositiveNumbers,
   onlyLettersAllowEmpty,
 } from "../../utils/validation.js";
-import { createNotification } from "../../api/notificationApi.js";
+
 import {
   FaChartLine,
   FaDumbbell,

@@ -14,9 +14,12 @@ import { submitPlanFeedback } from "../../api/planFeedbackApi.js";
 import FeedbackList from "../../component/FeedbackList.jsx";
 import Loading from "../../component/Loading";
 import { FaTrash } from "react-icons/fa";
+import { useAlert } from "../../context/alertContext.jsx";
+import { createNotification } from "../../api/notificationApi.js";
 
 export default function DietPlan() {
   const { user } = useAuth();
+  const { showAlert } = useAlert();
   const navigate = useNavigate();
 
   const [profileExists, setProfileExists] = useState(true);
@@ -120,7 +123,15 @@ export default function DietPlan() {
         mealPlan_id: activeMealPlanId,
         reason,
       });
-
+      await createNotification(
+        `Hi ${user.username}, you marked your current active meal plan as not suitable due to "${reason}" 😢`,
+      );
+      showAlert({
+        type: "error",
+        message: `${user.username}, you marked your current active meal plan as not suitable.`,
+        autoClose: true,
+        duration: 6000,
+      });
       fetchMealPlans(); // refresh plans
     } catch (err) {
       console.error(err);
@@ -137,29 +148,62 @@ export default function DietPlan() {
     }
   };
 
-  if (loading) {return <Loading text="Loading Meal Plan..." />};
+  if (loading) {
+    return <Loading text="Loading Meal Plan..." />;
+  }
 
   if (!profileExists) {
     return (
       <div className="app-container">
-        <p className="simple-message">
-          Hey {user.username}, first create your profile. Redirecting to home...
-        </p>
-      </div>
-    );
-  } else if (mealPlans.length === 0) {
-    return (
-      <div className="app-container">
-        <p className="simple-message">
-          No active meal plan available. You can generate one based on your
-          profile.
-          <button className="generate-btn" onClick={handleGenerateMealPlan}>
-            Generate Meal Plan
-          </button>
-        </p>
+        <div className="empty-state">
+          <p className="simple-message">
+            Hey {user.username}, first create your profile. Redirecting to
+            home...
+          </p>
+        </div>
       </div>
     );
   }
+  else if (mealPlans.length === 0) {
+  return (
+    <div className="app-container">
+      <div className="empty-state">
+        <p className="simple-message">
+          No active meal plan available. You can generate one based on your profile.
+        </p>
+
+        <button className="generate-btn" onClick={handleGenerateMealPlan}>
+          Generate Meal Plan
+        </button>
+
+        {/* Meal Feedback Section */}
+        <div className="feedback-section">
+          <div
+            className="feedback-header-toggle"
+            onClick={() => setShowFeedbackList((prev) => !prev)}
+          >
+            <span className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}>
+              ▾
+            </span>
+
+            <h2 className="feedback-title">
+              Your Previous Meal Plan Feedback.
+            </h2>
+          </div>
+
+          {/* Collapsible content */}
+          <div className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}>
+            <FeedbackList
+              userId={user.id}
+              userProfileId={userProfileId}
+              type="meal"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="diet-page">
@@ -186,6 +230,7 @@ export default function DietPlan() {
           Delete Meal Plan
         </button>
       </div>
+      
       {/* Meal Feedback Section */}
       <div className="feedback-section">
         <div

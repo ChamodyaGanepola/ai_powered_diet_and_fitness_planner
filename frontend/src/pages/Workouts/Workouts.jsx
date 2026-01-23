@@ -16,8 +16,12 @@ import FeedbackList from "../../component/FeedbackList.jsx";
 import PageHeader from "../../component/PageHeader";
 import Loading from "../../component/Loading.jsx";
 import { FaDumbbell } from "react-icons/fa";
+import { useAlert } from "../../context/alertContext.jsx";
+import { createNotification } from "../../api/notificationApi.js";
+
 export default function Workout() {
   const { user } = useAuth();
+  const { showAlert } = useAlert();
   const navigate = useNavigate();
 
   const [profileExists, setProfileExists] = useState(true);
@@ -139,14 +143,22 @@ export default function Workout() {
         workoutPlan_id: activePlanId,
         reason,
       });
-
+      await createNotification(
+        `Hi ${user.username}, you marked your current active meal plan as not suitable due to "${reason}" 😢`,
+      );
+      showAlert({
+        type: "error",
+        message: `${user.username}, you marked your current active meal plan as not suitable.`,
+        autoClose: true,
+        duration: 3000,
+      });
       fetchWorkoutPlans();
     } catch (err) {
       console.error(err);
     }
   };
 
-if (loading) return <Loading text="Loading dashboard..." />;
+  if (loading) return <Loading text="Loading dashboard..." />;
 
   if (!profileExists) {
     return (
@@ -157,44 +169,72 @@ if (loading) return <Loading text="Loading dashboard..." />;
       </div>
     );
   } else if (plans.length === 0) {
-    return (
+   return (
       <div className="app-container">
-        <p className="simple-message">
-          No active workout  plan available. You can generate one based on your
+        <div className="empty-state">
+          <p className="simple-message">
+            No active workout plan available. You can generate one based on your
           profile.
+          </p>
+  
           <button className="generate-btn" onClick={handleGenerateWorkoutPlan}>
             Generate Meal Plan
           </button>
-        </p>
+  
+          {/* Meal Feedback Section */}
+          <div className="feedback-section">
+            <div
+              className="feedback-header-toggle"
+              onClick={() => setShowFeedbackList((prev) => !prev)}
+            >
+              <span className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}>
+                ▾
+              </span>
+  
+              <h2 className="feedback-title">
+                Your Previous Workout Plan Feedback.
+              </h2>
+            </div>
+  
+            {/* Collapsible content */}
+            <div className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}>
+              <FeedbackList
+                userId={user.id}
+                userProfileId={userProfileId}
+                type="workout"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
+  
 
   return (
-   <div className="workouts-page">
-    <div className="workouts-inner">
-      <PageHeader
-              icon={<FaDumbbell />}
-              title="Your Workout Plan"
-              subtitle="Keep going, you’re doing great!"
-            />
-      
-          <div className="day-grid">
-            {plans.map((plan) =>
-              groupByDay(plan.workouts || []).map(({ day, workouts }) => (
-                <section key={day} className="day-section">
-                  <h3 className="day-title">{day}</h3>
-                  <div className="workouts-grid">
-                    {workouts.map((w) => (
-                      <WorkoutCard key={w._id} workout={w} />
-                    ))}
-                  </div>
-                </section>
-              )),
-            )}
-          </div>
-    
-   
+    <div className="workouts-page">
+      <div className="workouts-inner">
+        <PageHeader
+          icon={<FaDumbbell />}
+          title="Your Workout Plan"
+          subtitle="Keep going, you’re doing great!"
+        />
+
+        <div className="day-grid">
+          {plans.map((plan) =>
+            groupByDay(plan.workouts || []).map(({ day, workouts }) => (
+              <section key={day} className="day-section">
+                <h3 className="day-title">{day}</h3>
+                <div className="workouts-grid">
+                  {workouts.map((w) => (
+                    <WorkoutCard key={w._id} workout={w} />
+                  ))}
+                </div>
+              </section>
+            )),
+          )}
+        </div>
+
         <div className="delete-plan-wrapper">
           <button
             className="delete-button"
@@ -205,8 +245,7 @@ if (loading) return <Loading text="Loading dashboard..." />;
             Delete Workout Plan
           </button>
         </div>
-    
-   
+
         <div className="feedback-section">
           <div
             className="feedback-header-toggle"
@@ -233,15 +272,14 @@ if (loading) return <Loading text="Loading dashboard..." />;
             />
           </div>
         </div>
-   
 
-      <PlanFeedbackModal
-        open={showFeedback}
-        onCancel={() => setShowFeedback(false)}
-        onConfirm={confirmWorkoutFeedback}
-        title="Why is this workout plan not suitable?"
-      />
-    </div>
+        <PlanFeedbackModal
+          open={showFeedback}
+          onCancel={() => setShowFeedback(false)}
+          onConfirm={confirmWorkoutFeedback}
+          title="Why is this workout plan not suitable?"
+        />
+      </div>
     </div>
   );
 }

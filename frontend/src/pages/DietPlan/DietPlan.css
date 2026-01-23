@@ -21,22 +21,49 @@
   
 }
 
-/* ===== Container & Layout ===== */
 .app-container {
-  margin: 0 auto;
-  padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
   background: #e5efe9;
   min-height: 100vh;
-  
+}
+
+.empty-state {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+}
+
+.simple-message {
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin-bottom: 14px;
+  line-height: 1.5;
+
+  /* Prevent breaking words */
+  word-break: keep-all;
+  white-space: normal;
+}
+
+
+.generate-btn {
+  background: linear-gradient(135deg, #01280d, #295339);
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 
 
-.simple-message {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 1.2rem;
-  color: #1f2937;
+
+.feedback-section {
+  margin-top: 22px;
+  text-align: left;
 }
 
 
@@ -55,16 +82,6 @@
   max-width: 600px;
 }
 
-/* Button */
-.generate-btn {
-  background: linear-gradient(135deg, #01280d, #295339);
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
 
 .generate-btn:hover {
   opacity: 0.95;
@@ -99,9 +116,9 @@
 .feedback-section {
   margin-top: 48px;
     width: 100%;
-  max-width: 1400px;      /* ✅ ideal for dashboards */
+  max-width: 1400px;      /*  ideal for dashboards */
   margin: 0 auto;        /* center */
-    background: #e5efe9;
+  background: #e5efe9;
   padding: 80px 32px 40px;
   box-sizing: border-box;
 }
@@ -117,7 +134,7 @@
 .feedback-title {
   font-size: 22px;
   font-weight: 700;
-  color: #1e3a8a;
+  color: #151515;
 }
 
 .feedback-arrow {
