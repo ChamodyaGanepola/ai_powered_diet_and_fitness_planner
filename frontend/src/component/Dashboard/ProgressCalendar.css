@@ -1,12 +1,17 @@
 .calendar-wrapper {
-  background: #fff;
-  padding: 14px;
+  background: linear-gradient(90deg, #a3ffb8, #6be29a);
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
   width: 100%;
-  max-width: 520px;
+  max-width: 100%;
+  min-width: 0;
   margin: 0 auto;
+  padding: 0; /* IMPORTANT */
+}
+
+
+.calendar-inner {
+  padding: 18px; /* padding applied here */
 }
 
 .calendar-header {
@@ -19,6 +24,7 @@
 .month-title {
   font-weight: 700;
   font-size: 14px;
+ 
 }
 
 .nav-btn {
@@ -60,27 +66,28 @@
 
 /* Start / End circle */
 .calendar-cell.start {
-  border: 2px solid #3b82f6; /* blue circle */
+  border: 3px solid #3b82f6; /* blue circle */
   border-radius: 50%;
   background: #eef2ff;
 }
 
 .calendar-cell.end {
-  border: 2px solid #ef4444; /* red circle */
+  border: 3px solid #ef4444; /* red circle */
   border-radius: 50%;
   background: #ffe4e6;
 }
 
 /* Today highlight */
 .calendar-cell.today {
-  background: #bfdbfe;
-  color: #1e40af;
+  background: #6fa9f0;
+  color: #ececed;
 }
 
 /* Past days missed */
 .calendar-cell.past {
-  background: #fef3c7; /* soft yellow */
-  color: #92400e;
+  background: #f9ee5d; /* soft yellow */
+  color: #0e0d0d;
+  
 }
 
 /* Tick mark */

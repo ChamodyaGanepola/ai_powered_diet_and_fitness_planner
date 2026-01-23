@@ -109,7 +109,8 @@ const Home = () => {
           </div>
 
           <div className="feature-image-wrap">
-            <img src={mealPlanImage} alt="Diet Plan" />
+            <img src={mealPlanImage} alt="Diet Plan" loading="lazy" />
+
           </div>
         </div>
 
@@ -122,7 +123,7 @@ const Home = () => {
           </div>
 
           <div className="feature-image-wrap">
-            <img src={workoutImage} alt="Workout Plan" />
+           <img src={workoutImage} alt="Workout Plan" loading="lazy" />
           </div>
         </div>
 
@@ -138,7 +139,7 @@ const Home = () => {
           </div>
 
           <div className="feature-image-wrap">
-            <img src={progressImage} alt="Progress" />
+           <img src={progressImage} alt="Progress" loading="lazy" />
           </div>
         </div>
       </section>

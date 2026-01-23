@@ -194,7 +194,32 @@ export default function Dashboard() {
   };
   const lastProgress = getLastProgressSummary();
 
-  if (loading) return <Loading text="Loading dashboard..." />;
+  if (loading) {
+  return (
+    <div className="dashboard-root">
+      <main className="dashboard-main">
+        <div className="dashboard-grid">
+          <div className="progress-col">
+            <Loading text="Loading progress..." />
+          </div>
+          <div className="stats-col">
+            <Loading text="Loading stats..." />
+          </div>
+          <div className="calendar-col">
+            <Loading text="Loading calender..." />
+          </div>
+          <div className="adherence-col">
+            <Loading text="Loading adherence graph..." />
+          </div>
+          <div className="calories-col">
+            <Loading text="Loading calories graph..." />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 
   if (!profileExists) {
     return (
@@ -234,19 +259,19 @@ export default function Dashboard() {
   return (
     <div className="dashboard-root">
       <main className="dashboard-main">
-        <div className="dashboard-header">
+       
           <PageHeader
             icon={<MdDashboard />}
             title={`Hey ${user?.username}!`}
             subtitle="Let's start living healthy from today"
           />
-        </div>
+      
 
         {/* ===== GRID ===== */}
         <div className="dashboard-grid">
           {/* ROW 1 */}
           <div className="progress-col">
-            <ProgressPercentage />
+            <ProgressPercentage  />
           </div>
 
           <div className="stats-col">

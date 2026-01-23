@@ -4,7 +4,7 @@ import { getWorkoutPlanDetails } from "../api/workoutPlan";
 import { getCompletedProgressDates } from "../api/dailyProgress";
 import ProgressCircle from "./ProgressCircle";
 import "./ProgressPercentage.css";
-
+import Loading from "./Loading";
 const ProgressPercentage = () => {
   const [mealProgress, setMealProgress] = useState(null);
   const [workoutProgress, setWorkoutProgress] = useState(null);
@@ -87,7 +87,7 @@ const ProgressPercentage = () => {
   }, []);
 
   if (error) return <div>{error}</div>;
-  if (!mealProgress || !workoutProgress) return <div>Loading...</div>;
+  if (!mealProgress || !workoutProgress) return <Loading text="Loading progress..." />;
 
   return (
     <div className="progress-container">

@@ -81,6 +81,7 @@ const todayStr = toDateStr(today);   // <-- IMPORTANT
 
   return (
     <div className="calendar-wrapper">
+      <div className="calendar-inner">
       <div className="calendar-header">
         <button onClick={prevMonth} disabled={index === 0} className="nav-btn">
           ←
@@ -187,6 +188,7 @@ const todayStr = toDateStr(today);   // <-- IMPORTANT
               </div>
             );
           })}
+      </div>
       </div>
     </div>
   );
