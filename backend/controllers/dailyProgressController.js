@@ -36,63 +36,122 @@ const getPlannedMealsFull = async (mealPlanId) => {
 };
 
 /* Check if meals deviate */
-const isMealPlanDeviated = (plannedMeals, actualMeals) => {
-  if (!plannedMeals || !actualMeals) return true;
-  if (plannedMeals.length !== actualMeals.length) return true;
-
-  for (const actualMeal of actualMeals) {
-    const plannedMeal = plannedMeals.find(m => m.mealType === actualMeal.mealType);
-    if (!plannedMeal) return true; // meal type missing in plan
-
-    const plannedFoods = plannedMeal.foods || [];
-    const actualFoods = actualMeal.items || [];
-
-    // Check each food in actual meal
-    for (const consumed of actualFoods) {
-      const match = plannedFoods.find(
-        f =>
-          f.name === consumed.name &&
-          Number(f.calories) === Number(consumed.calories) &&
-          Number(f.protein) === Number(consumed.protein) &&
-          Number(f.fat) === Number(consumed.fat) &&
-          f.unit === consumed.unit
-      );
-      if (!match) return true; // consumed food does not match plan
-    }
-
-    // Optional: check if user missed any planned food
-    if (plannedFoods.length !== actualFoods.length) return true;
+const calculateMealAdherenceScore = (
+  plannedMeals,
+  actualMeals,
+  recommendedCalories,
+  totalCaloriesTaken
+) => {
+  if (!plannedMeals || plannedMeals.length === 0) {
+    return { score: null, deviated: false };
   }
 
-  return false; // everything matches
+  if (!actualMeals || actualMeals.length === 0) {
+    return { score: 0, deviated: true };
+  }
+
+  let adheredMealTypes = 0;
+  let consideredMealTypes = plannedMeals.length; // ALL planned meals
+
+  for (const plannedMeal of plannedMeals) {
+    const actualMeal = actualMeals.find(
+      (m) => m.mealType === plannedMeal.mealType
+    );
+
+    // If meal not logged or empty → deviation
+    if (!actualMeal || !actualMeal.items || actualMeal.items.length === 0) {
+      continue;
+    }
+
+    const allowedFoodNames = plannedMeal.foods.map((f) =>
+      f.name.trim().toLowerCase()
+    );
+
+    const allItemsValid = actualMeal.items.every((item) =>
+      allowedFoodNames.includes(item.name.trim().toLowerCase())
+    );
+
+    if (allItemsValid) adheredMealTypes++;
+  }
+
+  let adherenceScore = Math.round(
+    (adheredMealTypes / consideredMealTypes) * 100
+  );
+
+  // Calorie penalty
+  if (recommendedCalories && totalCaloriesTaken > recommendedCalories) {
+    const excessPercent =
+      (totalCaloriesTaken - recommendedCalories) / recommendedCalories;
+
+    const penalty = Math.min(excessPercent * 100, adherenceScore);
+    adherenceScore = Math.max(0, Math.round(adherenceScore - penalty));
+  }
+
+  return {
+    score: adherenceScore,
+    deviated: adherenceScore < 100,
+  };
 };
+
+
 
 /* Get planned workouts full */
 const getPlannedWorkoutsFull = async (workoutPlanId) => {
   return await Exercise.find({ workoutplan_id: workoutPlanId });
 };
 
-/* Check if workouts deviate */
-const isWorkoutPlanDeviated = (plannedExercises, actualExercises) => {
-  if (!plannedExercises || !actualExercises) return true;
-  if (plannedExercises.length !== actualExercises.length) return true;
-
-  for (const actual of actualExercises) {
-    const planned = plannedExercises.find(p => 
-      p.day.toLowerCase() === actual.day.toLowerCase() &&
-      p.name.trim() === actual.name.trim() &&
-      Number(p.sets) === Number(actual.sets) &&
-      p.reps.trim() === actual.reps.trim() &&
-      Number(p.restTime) === Number(actual.restTime)
-    );
-
-    if (!planned) return true; // mismatch found
-  }
-
-  return false; // everything matches
+const getDayName = (date) => {
+  const d = new Date(date);
+  const day = d.getUTCDay(); // safe UTC
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return days[day];
 };
 
 
+const calculateWorkoutAdherence = (plannedExercises, actualExercises, date) => {
+  if (!plannedExercises || plannedExercises.length === 0) {
+    return { score: null, deviated: false };
+  }
+
+  const dayName = getDayName(date);
+
+  const plannedForDay = plannedExercises.filter(
+    (e) => e.day.toLowerCase() === dayName.toLowerCase()
+  );
+
+  if (plannedForDay.length === 0) {
+    return { score: null, deviated: false };
+  }
+
+  if (!actualExercises || actualExercises.length === 0) {
+    return { score: 0, deviated: true };
+  }
+
+  let matched = 0;
+  let extraFound = false;
+
+  for (const actual of actualExercises) {
+    const match = plannedForDay.find(p => {
+      const nameMatch =
+        p.name.trim().toLowerCase() === actual.name.trim().toLowerCase();
+      const setsMatch = Number(p.sets) === Number(actual.sets);
+      const repsMatch = p.reps.trim() === actual.reps.trim();
+
+      const restMatch =
+        p.restTime == null ? true : Number(p.restTime) === Number(actual.restTime);
+
+      return nameMatch && setsMatch && repsMatch && restMatch;
+    });
+
+    if (match) matched++;
+    else extraFound = true;
+  }
+
+  const score = Math.round((matched / plannedForDay.length) * 100);
+  const deviated = extraFound || matched !== plannedForDay.length;
+
+  return { score, deviated };
+};
 
 /* Get planned workouts full */
 export const getAllProgressForUser = async (req, res) => {
@@ -166,23 +225,54 @@ export const saveDailyProgress = async (req, res) => {
     if (!mealPlan && !workoutPlan) {
       return res.status(400).json({ message: "No active meal or workout plan found" });
     }
+    // Clean meals: remove skipped (empty) meals
+    const cleanedMeals = (meals || []).filter(
+      (m) => Array.isArray(m.items) && m.items.length > 0
+    );
 
-    // Calculate calories only if meals/workouts exist
-    const totalCaloriesTaken = (meals || []).reduce((sum, meal) => {
+    // Calculate calories only if meals exist
+    const totalCaloriesTaken = cleanedMeals.reduce((sum, meal) => {
       const mealTotal = (meal.items || []).reduce((s, item) => s + (Number(item.calories) || 0), 0);
       return sum + mealTotal;
     }, 0);
 
     const totalCaloriesBurned = (workouts || []).reduce((sum, w) => sum + (Number(w.caloriesBurned) || 0), 0);
 
+    // Calculate calories only if meals/workouts exist
+
+
     const plannedMeals = mealPlan ? await getPlannedMealsFull(mealPlan._id) : [];
     const plannedWorkouts = workoutPlan ? await getPlannedWorkoutsFull(workoutPlan._id) : [];
 
-    const deviatedMealPlan = meals ? isMealPlanDeviated(plannedMeals, meals) : false;
-    const deviatedWorkoutPlan = workouts ? isWorkoutPlanDeviated(plannedWorkouts, workouts) : false;
+    let mealAdherenceScore = null;
+    let deviatedMealPlan = false;
 
-    const mealAdherenceScore = meals ? (deviatedMealPlan ? 0 : 100) : null;
-    const workoutAdherenceScore = workouts ? (deviatedWorkoutPlan ? 0 : 100) : null;
+    if (cleanedMeals && plannedMeals.length > 0) {
+      const recommendedCalories = plannedMeals.reduce((sum, meal) => {
+        return sum + meal.foods.reduce((s, f) => s + Number(f.calories || 0), 0);
+      }, 0);
+
+      const mealResult = calculateMealAdherenceScore(
+        plannedMeals,
+        cleanedMeals,
+        recommendedCalories,
+        totalCaloriesTaken
+      );
+
+      mealAdherenceScore = mealResult.score;
+      deviatedMealPlan = mealResult.deviated;
+    }
+
+    const workoutResult = calculateWorkoutAdherence(
+      plannedWorkouts,
+      workouts,
+      dayStr
+
+    );
+
+    const workoutAdherenceScore = workoutResult.score;
+    const deviatedWorkoutPlan = workoutResult.deviated;
+
 
     const progress = await DailyProgress.findOneAndUpdate(
       { user_id, date: dayStr },
@@ -192,7 +282,7 @@ export const saveDailyProgress = async (req, res) => {
         weight,
         bodyFatPercentage,
         measurements,
-        meals: meals || [],
+        meals: cleanedMeals,
         workouts: workouts || [],
         totalCaloriesTaken,
         totalCaloriesBurned,
@@ -347,18 +437,18 @@ export const resetPlanDatesIfNoProgress = async (req, res) => {
     // CHECK progress separately for each plan
     const mealProgressExists = mealPlan
       ? await DailyProgress.exists({
-          user_id,
-          mealplan_id: mealPlan._id,
-          completed: true,
-        })
+        user_id,
+        mealplan_id: mealPlan._id,
+        completed: true,
+      })
       : false;
 
     const workoutProgressExists = workoutPlan
       ? await DailyProgress.exists({
-          user_id,
-          workoutplan_id: workoutPlan._id,
-          completed: true,
-        })
+        user_id,
+        workoutplan_id: workoutPlan._id,
+        completed: true,
+      })
       : false;
 
     // If BOTH have progress => cannot reset anything
@@ -605,7 +695,7 @@ export const updateDailyProgress = async (req, res) => {
       workouts,
     } = req.body;
 
-    const existing = await DailyProgress.findOne({ userId, date });
+    const existing = await DailyProgress.findOne({ user_id: userId, date });
 
     if (!existing) {
       return res.status(404).json({

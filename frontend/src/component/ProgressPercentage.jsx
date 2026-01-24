@@ -19,15 +19,14 @@ const ProgressPercentage = () => {
     end.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
-    const totalDays =
-      Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
     const completedSet = new Set(
       completedDates.map((d) => {
         const dd = new Date(d);
         dd.setHours(0, 0, 0, 0);
         return dd.getTime();
-      })
+      }),
     );
 
     let completedDays = 0;
@@ -63,20 +62,25 @@ const ProgressPercentage = () => {
 
         const completedDates = await getCompletedProgressDates();
 
-        const mealProg = calculateProgress(
-          mealRes.mealPlan.startDate,
-          mealRes.mealPlan.endDate,
-          completedDates.mealCompletedDates
-        );
+        if (mealRes?.mealPlan) {
+          setMealProgress(
+            calculateProgress(
+              mealRes.mealPlan.startDate,
+              mealRes.mealPlan.endDate,
+              completedDates.mealCompletedDates,
+            ),
+          );
+        }
 
-        const workoutProg = calculateProgress(
-          workoutRes.workoutPlan.startDate,
-          workoutRes.workoutPlan.endDate,
-          completedDates.workoutCompletedDates
-        );
-
-        setMealProgress(mealProg);
-        setWorkoutProgress(workoutProg);
+        if (workoutRes?.workoutPlan) {
+          setWorkoutProgress(
+            calculateProgress(
+              workoutRes.workoutPlan.startDate,
+              workoutRes.workoutPlan.endDate,
+              completedDates.workoutCompletedDates,
+            ),
+          );
+        }
       } catch (err) {
         console.error(err);
         setError("Failed to load progress");
@@ -87,54 +91,55 @@ const ProgressPercentage = () => {
   }, []);
 
   if (error) return <div>{error}</div>;
-  if (!mealProgress || !workoutProgress) return <Loading text="Loading progress..." />;
+  if (!mealProgress && !workoutProgress)
+    return <Loading text="Loading progress..." />;
 
   return (
     <div className="progress-container">
 
-      {/* MEAL */}
-      <div className="progress-block">
-        <h3 className="progress-title">Meal Plan</h3>
-        <ProgressCircle progress={mealProgress.progressPercent} />
-
-        <div className="progress-info">
-          <div className="info-card">
-            <p className="label">Total</p>
-            <p className="value">{mealProgress.totalDays}</p>
-          </div>
-          <div className="info-card">
-            <p className="label">Completed</p>
-            <p className="value">{mealProgress.completedDays}</p>
-          </div>
-          <div className="info-card">
-            <p className="label">Remaining</p>
-            <p className="value">{mealProgress.remainingDays}</p>
-          </div>
+  {mealProgress && (
+    <div className="progress-block">
+      <h3 className="progress-title">Meal Plan</h3>
+      <ProgressCircle progress={mealProgress.progressPercent} />
+      <div className="progress-info">
+        <div className="info-card">
+          <p className="label">Total</p>
+          <p className="value">{mealProgress.totalDays}</p>
+        </div>
+        <div className="info-card">
+          <p className="label">Completed</p>
+          <p className="value">{mealProgress.completedDays}</p>
+        </div>
+        <div className="info-card">
+          <p className="label">Remaining</p>
+          <p className="value">{mealProgress.remainingDays}</p>
         </div>
       </div>
-
-      {/* WORKOUT */}
-      <div className="progress-block">
-        <h3 className="progress-title">Workout Plan</h3>
-        <ProgressCircle progress={workoutProgress.progressPercent} />
-
-        <div className="progress-info">
-          <div className="info-card">
-            <p className="label">Total</p>
-            <p className="value">{workoutProgress.totalDays}</p>
-          </div>
-          <div className="info-card">
-            <p className="label">Completed</p>
-            <p className="value">{workoutProgress.completedDays}</p>
-          </div>
-          <div className="info-card">
-            <p className="label">Remaining</p>
-            <p className="value">{workoutProgress.remainingDays}</p>
-          </div>
-        </div>
-      </div>
-
     </div>
+  )}
+
+  {workoutProgress && (
+    <div className="progress-block">
+      <h3 className="progress-title">Workout Plan</h3>
+      <ProgressCircle progress={workoutProgress.progressPercent} />
+      <div className="progress-info">
+        <div className="info-card">
+          <p className="label">Total</p>
+          <p className="value">{workoutProgress.totalDays}</p>
+        </div>
+        <div className="info-card">
+          <p className="label">Completed</p>
+          <p className="value">{workoutProgress.completedDays}</p>
+        </div>
+        <div className="info-card">
+          <p className="label">Remaining</p>
+          <p className="value">{workoutProgress.remainingDays}</p>
+        </div>
+      </div>
+    </div>
+  )}
+
+</div>
   );
 };
 

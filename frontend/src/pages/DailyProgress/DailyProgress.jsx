@@ -352,10 +352,11 @@ export default function DailyProgress() {
   const handleWorkoutSelection = (idx) => {
     const newWorkouts = workouts.map((w, i) => ({
       ...w,
-      selected: i === idx,
+      selected: i === idx ? !w.selected : w.selected,
     }));
     setWorkouts(newWorkouts);
   };
+  
 
   const handleWorkoutChange = (idx, key, value) => {
     const newWorkouts = [...workouts];
@@ -409,10 +410,10 @@ export default function DailyProgress() {
   };
 
   const getPayloadWorkouts = () => {
-    const selectedWorkout = workouts.find((w) => w.selected);
+    const selectedWorkouts = workouts.filter((w) => w.selected);
 
-    if (selectedWorkout) {
-      return [selectedWorkout];
+    if (selectedWorkouts.length > 0) {
+      return selectedWorkouts;
     }
 
     if (confirmedSkipsRef.current.workouts) {
@@ -441,11 +442,11 @@ export default function DailyProgress() {
         `✔ Progress saved successfully for ${selectedDateStr}!`,
       );
       showAlert({
-          type: "success",
-          message: `✔ Progress saved successfully for ${selectedDateStr}!`,
-          autoClose: true,
-          duration: 3000,
-        });
+        type: "success",
+        message: `✔ Progress saved successfully for ${selectedDateStr}!`,
+        autoClose: true,
+        duration: 3000,
+      });
       try {
         await createNotification(
           `Hi ${user.username}! 🌟 Progress saved for ${selectedDateStr}. Keep going!!`,
@@ -523,7 +524,6 @@ export default function DailyProgress() {
           !isPositiveNumber(selectedItem.fat) ||
           !isPositiveNumber(selectedItem.carbohydrates)
         ) {
-          
           showAlert({
             type: "error",
             message: `${meal.mealType}: All macros must be filled and > 0.`,
@@ -538,39 +538,42 @@ export default function DailyProgress() {
     // Workout validation + skip confirm
     const selectedWorkout = workouts.find((w) => w.selected);
 
-    if (!selectedWorkout && !confirmedSkipsRef.current.workouts) {
-      setConfirmData({
-        message: "Are you sure you didn’t complete any workouts today?",
-        onConfirm: async () => {
-          setConfirmedSkips((prev) => {
-            const updated = { ...prev, workouts: true };
-            confirmedSkipsRef.current = updated;
-            return updated;
-          });
+    const selectedWorkouts = workouts.filter((w) => w.selected);
 
-          await submitDay();
-        },
+if (selectedWorkouts.length === 0 && !confirmedSkipsRef.current.workouts) {
+  setConfirmData({
+    message: "Are you sure you didn’t complete any workouts today?",
+    onConfirm: async () => {
+      setConfirmedSkips((prev) => {
+        const updated = { ...prev, workouts: true };
+        confirmedSkipsRef.current = updated;
+        return updated;
       });
-      return;
-    }
 
-    if (selectedWorkout) {
-      if (isEmpty(selectedWorkout.name)) {
-          showAlert({
-            type: "error",
-            message: "Workout name is required.",
-            autoClose: true,
-            duration: 3000,
-          });
+      await submitDay();
+    },
+  });
+  return;
+}
+
+    // validate all selected workouts
+    for (const workout of selectedWorkouts) {
+      if (isEmpty(workout.name)) {
+        showAlert({
+          type: "error",
+          message: "Workout name is required.",
+          autoClose: true,
+          duration: 3000,
+        });
         return;
       }
-      if (!isPositiveNumber(selectedWorkout.caloriesBurned)) {
+      if (!isPositiveNumber(workout.caloriesBurned)) {
         showAlert({
-            type: "error",
-            message: "Workout calories must be filled and > 0.",
-            autoClose: true,
-            duration: 3000,
-          });
+          type: "error",
+          message: "Workout calories must be filled and > 0.",
+          autoClose: true,
+          duration: 3000,
+        });
         return;
       }
     }
@@ -821,12 +824,10 @@ export default function DailyProgress() {
               <>
                 {locked ? (
                   <>
-    <p className="done">{successMessage}</p>
+                    <p className="done">{successMessage}</p>
 
-    <SavedDailyProgress
-      date={selectedDateStr}
-    />
-  </>
+                    <SavedDailyProgress date={selectedDateStr} />
+                  </>
                 ) : (
                   <>
                     {/* Body Metrics */}
@@ -1039,8 +1040,7 @@ export default function DailyProgress() {
                           <div key={idx} className="workout-card">
                             <div className="workout-item">
                               <input
-                                type="radio"
-                                name="workout"
+                                type="checkbox"
                                 checked={w.selected || false}
                                 onChange={() => handleWorkoutSelection(idx)}
                               />

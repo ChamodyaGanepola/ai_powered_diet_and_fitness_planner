@@ -70,6 +70,7 @@ export default function Dashboard() {
         setActiveMealPlan(mealPlan);
         setActiveWorkoutPlan(workoutPlan);
 
+        // Redirect ONLY if both plans are missing
         if (!mealPlan && !workoutPlan) {
           setTimeout(() => (window.location.href = "/home"), 3000);
           return;
@@ -92,14 +93,21 @@ export default function Dashboard() {
           meal: completedRes?.mealCompletedDates || [],
           workout: completedRes?.workoutCompletedDates || [],
         });
-
+        console.log(
+          "completedRes?.mealCompletedDates",
+          completedRes?.mealCompletedDates,
+        );
+         console.log(
+          "completedRes?.workoutCompletedDates",
+          completedRes?.workoutCompletedDates,
+        );
         /** ================= DATE RANGE ================= */
         const mealStart = mealPlan?.startDate
           ? new Date(mealPlan.startDate)
           : null;
 
         const mealEnd = mealPlan?.endDate ? new Date(mealPlan.endDate) : null;
-
+        console.log("mealEnd", mealEnd);
         const workoutStart = workoutPlan?.startDate
           ? new Date(workoutPlan.startDate)
           : null;
@@ -195,31 +203,30 @@ export default function Dashboard() {
   const lastProgress = getLastProgressSummary();
 
   if (loading) {
-  return (
-    <div className="dashboard-root">
-      <main className="dashboard-main">
-        <div className="dashboard-grid">
-          <div className="progress-col">
-            <Loading text="Loading progress..." />
+    return (
+      <div className="dashboard-root">
+        <main className="dashboard-main">
+          <div className="dashboard-grid">
+            <div className="progress-col">
+              <Loading text="Loading progress..." />
+            </div>
+            <div className="stats-col">
+              <Loading text="Loading stats..." />
+            </div>
+            <div className="calendar-col">
+              <Loading text="Loading calender..." />
+            </div>
+            <div className="adherence-col">
+              <Loading text="Loading adherence graph..." />
+            </div>
+            <div className="calories-col">
+              <Loading text="Loading calories graph..." />
+            </div>
           </div>
-          <div className="stats-col">
-            <Loading text="Loading stats..." />
-          </div>
-          <div className="calendar-col">
-            <Loading text="Loading calender..." />
-          </div>
-          <div className="adherence-col">
-            <Loading text="Loading adherence graph..." />
-          </div>
-          <div className="calories-col">
-            <Loading text="Loading calories graph..." />
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-}
-
+        </main>
+      </div>
+    );
+  }
 
   if (!profileExists) {
     return (
@@ -237,41 +244,22 @@ export default function Dashboard() {
         </p>
       </div>
     );
-  } else if (activeWorkoutPlan && !activeMealPlan) {
-    return (
-      <div className="app-container">
-        <p className="simple-message">
-          No active meal plan found. Redirecting to meal plan...
-        </p>
-      </div>
-    );
-  } else if (activeMealPlan && !activeWorkoutPlan) {
-    return (
-      <div className="app-container">
-        <p className="simple-message">
-          No active workout plan found. Redirecting to workout plan...
-        </p>
-      </div>
-    );
   }
-
 
   return (
     <div className="dashboard-root">
       <main className="dashboard-main">
-       
-          <PageHeader
-            icon={<MdDashboard />}
-            title={`Hey ${user?.username}!`}
-            subtitle="Let's start living healthy from today"
-          />
-      
+        <PageHeader
+          icon={<MdDashboard />}
+          title={`Hey ${user?.username}!`}
+          subtitle="Let's start living healthy from today"
+        />
 
         {/* ===== GRID ===== */}
         <div className="dashboard-grid">
           {/* ROW 1 */}
           <div className="progress-col">
-            <ProgressPercentage  />
+            <ProgressPercentage />
           </div>
 
           <div className="stats-col">
@@ -309,10 +297,10 @@ export default function Dashboard() {
 
           <div className="calendar-col">
             <ProgressCalendar
-              mealStart={activeMealPlan.startDate}
-              mealEnd={activeMealPlan.endDate}
-              workoutStart={activeWorkoutPlan.startDate}
-              workoutEnd={activeWorkoutPlan.endDate}
+              mealStart={activeMealPlan?.startDate || null}
+              mealEnd={activeMealPlan?.endDate || null}
+              workoutStart={activeWorkoutPlan?.startDate || null}
+              workoutEnd={activeWorkoutPlan?.endDate || null}
               completedMeals={completedDates.meal}
               completedWorkouts={completedDates.workout}
             />
@@ -325,8 +313,8 @@ export default function Dashboard() {
               subtitle="Meal + Workout adherence combined"
               type="adherence"
               progressStatus={{
-                meal: progressMealPlanExists,
-                workout: progressWorkoutPlanExists,
+                meal: activeMealPlan ? progressMealPlanExists : null,
+                workout: activeWorkoutPlan ? progressWorkoutPlanExists : null,
               }}
             />
           </div>
