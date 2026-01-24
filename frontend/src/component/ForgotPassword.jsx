@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { forgotPassword } from "../api/authApi";
+import { validateEmail } from "../utils/validation";
 import "./ForgotPassword.css";
 
 const ForgotPassword = () => {
@@ -10,6 +11,11 @@ const ForgotPassword = () => {
   const handleSubmit = async () => {
     if (!email) {
       setMessage("Please enter your email");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setMessage("Please enter a valid email address");
       return;
     }
 

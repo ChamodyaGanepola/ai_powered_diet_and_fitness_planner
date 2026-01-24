@@ -139,11 +139,11 @@ export default function DailyProgress() {
       setPlansChecked(false);
 
       const profileRes = await getProfileByUserId();
-      if (!profileRes || !profileRes._id) {
+      if (!profileRes) {
         setProfileExists(false);
         setTimeout(() => {
           window.location.href = "/home";
-        }, 3000);
+        }, 2000);
         return;
       }
 

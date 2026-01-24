@@ -14,8 +14,6 @@ export const createNotificationHandler = async (req, res) => {
             user_id,
             message,
         });
-
-
         //  Emit real-time event to the specific user room
         io.to(`user-${user_id}`).emit(`notification-${user_id}`, notification);
 

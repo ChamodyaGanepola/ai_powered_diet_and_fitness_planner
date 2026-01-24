@@ -51,9 +51,9 @@ export default function Dashboard() {
         /** ================= PROFILE ================= */
         const profile = await getProfileByUserId();
 
-        if (!profile?._id) {
+        if (!profile) {
           setProfileExists(false);
-          setTimeout(() => (window.location.href = "/home"), 3000);
+          setTimeout(() => (window.location.href = "/home"), 2000);
           return;
         }
 

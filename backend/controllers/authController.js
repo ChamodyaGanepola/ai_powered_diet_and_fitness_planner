@@ -90,12 +90,39 @@ exports.forgotPassword = async (req, res) => {
     const resetLink = `http://localhost:3000/reset-password/${token}`;
 
     await transporter.sendMail({
+      from: process.env.EMAIL_USER, 
       to: user.email,
-      subject: "Reset your password",
+      subject: "HealthPilot - Password Reset Request",
       html: `
-        <p>You requested a password reset.</p>
-        <a href="${resetLink}">Reset Password</a>
-        <p>This link expires in 15 minutes.</p>
+        <div style="font-family: Arial, sans-serif; color: #1f2937;">
+          <h2 style="color: #2d6a4f;">HealthPilot Password Reset</h2>
+          <p>Hi <strong>${user.username}</strong>,</p>
+          <p>You recently requested to reset your password for your <strong>HealthPilot</strong> account.</p>
+          
+          <p>
+            Click the button below to reset your password:
+          </p>
+
+          <a href="${resetLink}" 
+             style="
+               display: inline-block;
+               padding: 12px 18px;
+               margin: 10px 0;
+               background: #295339;
+               color: #fff;
+               text-decoration: none;
+               border-radius: 8px;
+             ">
+            Reset Password
+          </a>
+
+          <p style="margin-top: 10px;">
+            This link will expire in <strong>15 minutes</strong>.
+          </p>
+
+          <p>If you did not request this, you can safely ignore this email.</p>
+          <p>Thanks,<br/>The HealthPilot Team</p>
+        </div>
       `
     });
 
@@ -104,6 +131,7 @@ exports.forgotPassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 // RESET PASSWORD

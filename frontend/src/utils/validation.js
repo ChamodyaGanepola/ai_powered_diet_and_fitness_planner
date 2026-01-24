@@ -11,9 +11,11 @@ export const validatePassword = (password) => {
 };
 
 export const validateUsername = (username) => {
-  const re = /^[a-zA-Z0-9]{3,}$/;
-  return re.test(username);
+  const re = /^[a-zA-Z0-9 ]{3,}$/;
+  return re.test(username.trim());
 };
+
+
 export const validateAge = (age) => age >= 13 && age <= 120;
 export const validateWeight = (weight) => weight > 0;
 export const validateHeight = (height) => height > 0;

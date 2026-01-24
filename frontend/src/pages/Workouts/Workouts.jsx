@@ -40,10 +40,10 @@ export default function Workout() {
     try {
       const res = await getProfileByUserId();
 
-      if (!res || !res._id) {
+      if (!res) {
         setProfileExists(false);
         setLoading(false);
-        setTimeout(() => navigate("/home"), 3000);
+        setTimeout(() => navigate("/home"), 2000);
         return;
       }
 

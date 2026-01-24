@@ -18,6 +18,7 @@ import { createNotification } from "../../api/notificationApi.js";
 import PageLayout from "../../layouts/PageLayout.jsx";
 import "./Profile.css";
 import { useAuth } from "../../context/authContext.jsx";
+import { useNavigate } from "react-router-dom";
 import Loading from "../../component/Loading.jsx";
 const Profile = () => {
   const { user, markProfileUpdated } = useAuth();
@@ -25,7 +26,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchProfile();
   }, [user?.id]);
@@ -40,17 +41,22 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     if (!user?.id) return;
+
     setLoading(true);
     try {
       const data = await getProfileByUserId();
-      if (!data?._id) {
-        setProfile(false);
-        setTimeout(() => (window.location.href = "/home"), 3000);
+
+      if (!data) {
+        setProfile(null);
+        setTimeout(() => {
+          navigate("/home", { replace: true });
+        }, 2000);
+        return;
       }
+
       setProfile(data);
-      console.log("Fetched profile data in Profile page:", data);
-    } catch {
-      setProfile(null);
+    } catch (err) {
+      console.error("Fetch profile failed", err);
     } finally {
       setLoading(false);
     }
@@ -74,9 +80,11 @@ const Profile = () => {
       await createNotification(
         `Hi ${user.username}, your user profile details have been deleted successfully.! 😢`,
       );
+      // close modal & redirect
       setTimeout(() => {
         setShowConfirm(false);
-        setSuccessMsg("");
+        setProfile(null);
+        navigate("/home");
       }, 1500);
     } catch (err) {
       console.error("Profile delete failed", err);
@@ -98,7 +106,9 @@ const Profile = () => {
     }
   };
 
-   if (loading) {return <Loading text="Loading Profile..." />};
+  if (loading) {
+    return <Loading text="Loading Profile..." />;
+  }
 
   if (!profile) {
     return (
@@ -113,83 +123,83 @@ const Profile = () => {
   return (
     <>
       <div className="profile-page">
-         <div className="profile-layout-inner">
-        <div className="profile-layout">
-          {/* HEADER */}
-          <div className="profile-header">
-            <div className="avatar-wrapper">{renderAvatar()}</div>
-            <h2>{user?.username}</h2>
-            <p>{user?.email}</p>
+        <div className="profile-layout-inner">
+          <div className="profile-layout">
+            {/* HEADER */}
+            <div className="profile-header">
+              <div className="avatar-wrapper">{renderAvatar()}</div>
+              <h2>{user?.username}</h2>
+              <p>{user?.email}</p>
 
-            <button
-              className="delete-profile-btn"
-              onClick={() => setShowConfirm(true)}
-            >
-               <FaTrash />
-              Delete Profile Details
-            </button>
-          </div>
-
-          {/* CARDS (NO profile-grid wrapper) */}
-          <ProfileItem
-            icon={<FaBirthdayCake />}
-            label="Age"
-            value={`${profile.age} yrs`}
-          />
-          <ProfileItem
-            icon={<FaWeight />}
-            label="Weight"
-            value={`${profile.weight} kg`}
-          />
-          <ProfileItem
-            icon={<FaRulerVertical />}
-            label="Height"
-            value={`${profile.height} cm`}
-          />
-          <ProfileItem
-            icon={<FaBullseye />}
-            label="Fitness Goal"
-            value={profile.fitnessGoal}
-          />
-          <ProfileItem
-            icon={<FaRunning />}
-            label="Activity Level"
-            value={profile.activityLevel}
-          />
-
-          {/* BMI CARD */}
-          <div className="bmi-card">
-            <div className="bmi-card-left">
-              <div className="bmi-value">
-                <FaHeart /> BMI {profile.bmi}
-              </div>
-              <div className="bmi-category">
-                BMI Category {profile.bmiCategory}
-              </div>
+              <button
+                className="delete-profile-btn"
+                onClick={() => setShowConfirm(true)}
+              >
+                <FaTrash />
+                Delete Profile Details
+              </button>
             </div>
 
-            <div className="bmi-card-right">
-              <div className="bmi-scale">
-                <span>Underweight</span>
-                <span>Normal</span>
-                <span>Overweight</span>
-                <span>Obese</span>
+            {/* CARDS (NO profile-grid wrapper) */}
+            <ProfileItem
+              icon={<FaBirthdayCake />}
+              label="Age"
+              value={`${profile.age} yrs`}
+            />
+            <ProfileItem
+              icon={<FaWeight />}
+              label="Weight"
+              value={`${profile.weight} kg`}
+            />
+            <ProfileItem
+              icon={<FaRulerVertical />}
+              label="Height"
+              value={`${profile.height} cm`}
+            />
+            <ProfileItem
+              icon={<FaBullseye />}
+              label="Fitness Goal"
+              value={profile.fitnessGoal}
+            />
+            <ProfileItem
+              icon={<FaRunning />}
+              label="Activity Level"
+              value={profile.activityLevel}
+            />
+
+            {/* BMI CARD */}
+            <div className="bmi-card">
+              <div className="bmi-card-left">
+                <div className="bmi-value">
+                  <FaHeart /> BMI {profile.bmi}
+                </div>
+                <div className="bmi-category">
+                  BMI Category {profile.bmiCategory}
+                </div>
               </div>
 
-              <div className="bmi-bar">
-                <div
-                  className={`bmi-progress ${getBMIClass(profile.bmiCategory)}`}
-                  style={{ width: `${getBMIPercentage(profile.bmi)}%` }}
-                />
-              </div>
+              <div className="bmi-card-right">
+                <div className="bmi-scale">
+                  <span>Underweight</span>
+                  <span>Normal</span>
+                  <span>Overweight</span>
+                  <span>Obese</span>
+                </div>
 
-              <p className="bmi-note">
-                BMI shows your body weight relative to your height.
-              </p>
+                <div className="bmi-bar">
+                  <div
+                    className={`bmi-progress ${getBMIClass(profile.bmiCategory)}`}
+                    style={{ width: `${getBMIPercentage(profile.bmi)}%` }}
+                  />
+                </div>
+
+                <p className="bmi-note">
+                  BMI shows your body weight relative to your height.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-  </div>
         {/* PROFILE SECTIONS */}
         <div className="profile-sections-row">
           <Section
@@ -209,7 +219,6 @@ const Profile = () => {
               profile.workoutPreferences ? [profile.workoutPreferences] : []
             }
           />
-        
         </div>
       </div>
 

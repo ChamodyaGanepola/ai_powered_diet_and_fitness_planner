@@ -147,7 +147,7 @@ export const getAllProgressForUser = async (req, res) => {
 };
 
 
-/* --------------------------- SAVE DAILY PROGRESS --------------------------- */
+//SAVE DAILY PROGRESS  
 export const saveDailyProgress = async (req, res) => {
   try {
     const { date, weight, bodyFatPercentage, measurements, meals, workouts } = req.body;

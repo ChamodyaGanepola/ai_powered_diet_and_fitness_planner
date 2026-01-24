@@ -16,8 +16,17 @@ const getAuthHeader = () => {
 
 // Get user profile by user id
 export const getProfileByUserId = async () => {
-  const res = await axios.get(`${API_URL}`, getAuthHeader());
-  return res.data;
+  try {
+    const res = await axios.get(API_URL, getAuthHeader());
+    return res.data;
+  } catch (err) {
+    // profile does not exist
+    if (err.response?.status === 404) {
+      return null;
+    }
+    //  real error
+    throw err;
+  }
 };
 
 // Create new profile

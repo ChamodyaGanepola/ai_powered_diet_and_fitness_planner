@@ -41,7 +41,7 @@ export default function DietPlan() {
       console.log("Profile check response:", res);
 
       // ✅ Correct check for your API structure
-      if (!res || !res._id) {
+      if (!res) {
         setUserProfileId(null);
         setProfileExists(false);
         setLoading(false);

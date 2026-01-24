@@ -135,7 +135,6 @@ OUTPUT FORMAT (STRICT):
 `;
 
 
-
     // Call AI
     const aiRaw = await generateWorkoutPlan(prompt);
 

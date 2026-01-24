@@ -37,7 +37,7 @@ const cleanAIResponse = (str) => {
 export const createMealPlan = async (req, res) => {
 
   try {
-    const user_id = req.user.id; // from authMiddleware
+    const user_id = req.user.id;
 
     if (!user_id) {
       return res.status(401).json({ success: false, message: "user_id is required" });
