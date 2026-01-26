@@ -65,7 +65,17 @@
 }
 
 /* Start / End circle */
+.calendar-cell.both-start {
+   border: 3px solid #3b82f6; /* blue circle */
+  border-radius: 50%;
+  background: #eef2ff;
+}
 
+.calendar-cell.both-end {
+  border: 3px solid #ef4444; /* red circle */
+  border-radius: 50%;
+  background: #ffe4e6;
+}
 .calendar-cell.meal-start {
   border: 3px solid #3b82f6; /* blue circle */
   border-radius: 50%;

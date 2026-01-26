@@ -136,7 +136,9 @@ export default function ProgressCalendar({
               const isWorkoutStart =
                 dateStr === toDateStr(effectiveWorkoutStart);
               const isWorkoutEnd = dateStr === toDateStr(effectiveWorkoutEnd);
-
+              // Handle same day for both
+              const isBothStart = isMealStart && isWorkoutStart;
+              const isBothEnd = isMealEnd && isWorkoutEnd;
               const isPastFromStart =
                 date >= start && date < today && !mealDone && !workoutDone;
 
@@ -144,31 +146,37 @@ export default function ProgressCalendar({
                 <div
                   key={dateStr}
                   className={`calendar-cell
-                  ${isPastFromStart ? "past" : ""}
-                  ${isToday ? "today" : ""}
-                   ${isMealStart ? "meal-start" : ""}
-          ${isMealEnd ? "meal-end" : ""}
-          ${isWorkoutStart ? "workout-start" : ""}
-          ${isWorkoutEnd ? "workout-end" : ""}
+                       ${isPastFromStart ? "past" : ""}
+          ${isToday ? "today" : ""}
+          ${isBothStart ? "both-start" : ""}
+          ${isBothEnd ? "both-end" : ""}
+          ${!isBothStart && isMealStart ? "meal-start" : ""}
+          ${!isBothEnd && isMealEnd ? "meal-end" : ""}
+          ${!isBothStart && isWorkoutStart ? "workout-start" : ""}
+          ${!isBothEnd && isWorkoutEnd ? "workout-end" : ""}
                 `}
                   data-tooltip={
-                    isMealStart
-                      ? "Meal Plan Start"
-                      : isMealEnd
-                        ? "Meal Plan End"
-                        : isWorkoutStart
-                          ? "Workout Plan Start"
-                          : isWorkoutEnd
-                            ? "Workout Plan End"
-                            : completedType === "both"
-                              ? "Meal + Workout Completed"
-                              : completedType === "meal"
-                                ? "Meal Completed"
-                                : completedType === "workout"
-                                  ? "Workout Completed"
-                                  : isPastFromStart
-                                    ? "Missed Day"
-                                    : "Not Completed"
+                    isBothStart
+                      ? "Meal + Workout Start"
+                      : isBothEnd
+                        ? "Meal + Workout End"
+                        : isMealStart
+                          ? "Meal Plan Start"
+                          : isMealEnd
+                            ? "Meal Plan End"
+                            : isWorkoutStart
+                              ? "Workout Plan Start"
+                              : isWorkoutEnd
+                                ? "Workout Plan End"
+                                : completedType === "both"
+                                  ? "Meal + Workout Completed"
+                                  : completedType === "meal"
+                                    ? "Meal Completed"
+                                    : completedType === "workout"
+                                      ? "Workout Completed"
+                                      : isPastFromStart
+                                        ? "Missed Day"
+                                        : "Not Completed"
                   }
                 >
                   {i + 1}
