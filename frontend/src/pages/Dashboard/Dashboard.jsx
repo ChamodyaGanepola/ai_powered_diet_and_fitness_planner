@@ -97,7 +97,7 @@ export default function Dashboard() {
           "completedRes?.mealCompletedDates",
           completedRes?.mealCompletedDates,
         );
-         console.log(
+        console.log(
           "completedRes?.workoutCompletedDates",
           completedRes?.workoutCompletedDates,
         );
@@ -313,9 +313,13 @@ export default function Dashboard() {
               subtitle="Meal + Workout adherence combined"
               type="adherence"
               progressStatus={{
-                meal: activeMealPlan ? progressMealPlanExists : null,
-                workout: activeWorkoutPlan ? progressWorkoutPlanExists : null,
+                meal: progressMealPlanExists,
+                workout: progressWorkoutPlanExists,
               }}
+              mealStart={activeMealPlan?.startDate}
+              mealEnd={activeMealPlan?.endDate}
+              workoutStart={activeWorkoutPlan?.startDate}
+              workoutEnd={activeWorkoutPlan?.endDate}
             />
           </div>
 
@@ -328,6 +332,10 @@ export default function Dashboard() {
                 meal: progressMealPlanExists,
                 workout: progressWorkoutPlanExists,
               }}
+              mealStart={activeMealPlan?.startDate}
+              mealEnd={activeMealPlan?.endDate}
+              workoutStart={activeWorkoutPlan?.startDate}
+              workoutEnd={activeWorkoutPlan?.endDate}
             />
           </div>
         </div>

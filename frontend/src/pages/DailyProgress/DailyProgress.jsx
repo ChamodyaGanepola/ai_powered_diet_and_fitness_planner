@@ -221,6 +221,15 @@ export default function DailyProgress() {
     }
   };
   useEffect(() => {
+    // Reset skips when the user switches date
+    setConfirmedSkips({
+      meals: {},
+      workouts: false,
+    });
+    confirmedSkipsRef.current = {
+      meals: {},
+      workouts: false,
+    };
     loadDailyProgressForDate(selectedDate);
   }, [selectedDate]);
   useEffect(() => {
@@ -279,7 +288,6 @@ export default function DailyProgress() {
         setMealCompletedDates(completedRes.mealCompletedDates || []);
         setWorkoutCompletedDates(completedRes.workoutCompletedDates || []);
       }
-     
     } catch (err) {
       console.error(err);
     } finally {
@@ -495,6 +503,18 @@ export default function DailyProgress() {
   };
 
   const submitDay = async () => {
+    const isMealApplicable =
+      planMealStartDate &&
+      planMealEndDate &&
+      selectedDateStr >= planMealStartDate &&
+      selectedDateStr <= planMealEndDate;
+
+    const isWorkoutApplicable =
+      planWorkoutStartDate &&
+      planWorkoutEndDate &&
+      selectedDateStr >= planWorkoutStartDate &&
+      selectedDateStr <= planWorkoutEndDate;
+
     // Body metrics validation
     if (
       isEmpty(weight) ||
@@ -518,7 +538,11 @@ export default function DailyProgress() {
     for (const meal of meals) {
       const selectedItem = meal.items.find((i) => i.selected);
 
-      if (!selectedItem && !confirmedSkipsRef.current.meals[meal.mealType]) {
+      if (
+        isMealApplicable &&
+        !selectedItem &&
+        !confirmedSkipsRef.current.meals[meal.mealType]
+      ) {
         setConfirmData({
           message: `Are you sure you didn’t complete ${meal.mealType}?`,
           onConfirm: async () => {
@@ -530,6 +554,7 @@ export default function DailyProgress() {
               confirmedSkipsRef.current = updated;
               return updated;
             });
+
             await submitDay();
           },
         });
@@ -568,7 +593,11 @@ export default function DailyProgress() {
 
     const selectedWorkouts = workouts.filter((w) => w.selected);
 
-    if (selectedWorkouts.length === 0 && !confirmedSkipsRef.current.workouts) {
+    if (
+      isWorkoutApplicable &&
+      selectedWorkouts.length === 0 &&
+      !confirmedSkipsRef.current.workouts
+    ) {
       setConfirmData({
         message: "Are you sure you didn’t complete any workouts today?",
         onConfirm: async () => {

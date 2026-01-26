@@ -11,17 +11,16 @@ export default function ProgressCalendar({
 }) {
   const [index, setIndex] = useState(0);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  function toDateStr(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-function toDateStr(d) {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-const todayStr = toDateStr(today);   // <-- IMPORTANT
+  const todayStr = toDateStr(today); // <-- IMPORTANT
 
   // ------------------ normalize to date only ------------------
   const effectiveMealStart = mealStart
@@ -41,10 +40,10 @@ const todayStr = toDateStr(today);   // <-- IMPORTANT
     : effectiveMealEnd;
 
   const start = toDateOnly(
-    new Date(Math.min(effectiveMealStart, effectiveWorkoutStart))
+    new Date(Math.min(effectiveMealStart, effectiveWorkoutStart)),
   );
   const end = toDateOnly(
-    new Date(Math.max(effectiveMealEnd, effectiveWorkoutEnd))
+    new Date(Math.max(effectiveMealEnd, effectiveWorkoutEnd)),
   );
 
   const safeMeals = Array.isArray(completedMeals) ? completedMeals : [];
@@ -69,11 +68,7 @@ const todayStr = toDateStr(today);   // <-- IMPORTANT
   const daysInMonth = new Date(year, month.getMonth() + 1, 0).getDate();
 
   const prevMonth = () => setIndex((i) => Math.max(0, i - 1));
-  const nextMonth = () =>
-    setIndex((i) => Math.min(months.length - 1, i + 1));
-
-
-
+  const nextMonth = () => setIndex((i) => Math.min(months.length - 1, i + 1));
 
   function toDateOnly(d) {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -82,113 +77,119 @@ const todayStr = toDateStr(today);   // <-- IMPORTANT
   return (
     <div className="calendar-wrapper">
       <div className="calendar-inner">
-      <div className="calendar-header">
-        <button onClick={prevMonth} disabled={index === 0} className="nav-btn">
-          ←
-        </button>
+        <div className="calendar-header">
+          <button
+            onClick={prevMonth}
+            disabled={index === 0}
+            className="nav-btn"
+          >
+            ←
+          </button>
 
-        <div className="month-title">
-          {monthName} {year}
+          <div className="month-title">
+            {monthName} {year}
+          </div>
+
+          <button
+            onClick={nextMonth}
+            disabled={index === months.length - 1}
+            className="nav-btn"
+          >
+            →
+          </button>
         </div>
 
-        <button
-          onClick={nextMonth}
-          disabled={index === months.length - 1}
-          className="nav-btn"
-        >
-          →
-        </button>
-      </div>
-
-      <div className="calendar-grid">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="calendar-header-day">
-            {d}
-          </div>
-        ))}
-
-        {Array(firstDay)
-          .fill(null)
-          .map((_, i) => (
-            <div key={`empty-${i}`} className="calendar-cell empty" />
+        <div className="calendar-grid">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+            <div key={d} className="calendar-header-day">
+              {d}
+            </div>
           ))}
 
-        {Array(daysInMonth)
-          .fill(null)
-          .map((_, i) => {
-            const date = toDateOnly(new Date(year, month.getMonth(), i + 1));
-            const dateStr = toDateStr(date);
+          {Array(firstDay)
+            .fill(null)
+            .map((_, i) => (
+              <div key={`empty-${i}`} className="calendar-cell empty" />
+            ))}
 
-            const mealDone = safeMeals.includes(dateStr);
-            const workoutDone = safeWorkouts.includes(dateStr);
+          {Array(daysInMonth)
+            .fill(null)
+            .map((_, i) => {
+              const date = toDateOnly(new Date(year, month.getMonth(), i + 1));
+              const dateStr = toDateStr(date);
 
-            const completedType =
-              mealDone && workoutDone
-                ? "both"
-                : mealDone
-                ? "meal"
-                : workoutDone
-                ? "workout"
-                : "none";
+              const mealDone = safeMeals.includes(dateStr);
+              const workoutDone = safeWorkouts.includes(dateStr);
 
-            const isToday = dateStr === todayStr;
-            const isStart =
-              dateStr === toDateStr(effectiveMealStart) ||
-              dateStr === toDateStr(effectiveWorkoutStart);
-            const isEnd =
-              dateStr === toDateStr(effectiveMealEnd) ||
-              dateStr === toDateStr(effectiveWorkoutEnd);
+              const completedType =
+                mealDone && workoutDone
+                  ? "both"
+                  : mealDone
+                    ? "meal"
+                    : workoutDone
+                      ? "workout"
+                      : "none";
 
-            const isPastFromStart =
-              date >= start &&
-              date < today &&
-              !mealDone &&
-              !workoutDone;
+              const isToday = dateStr === todayStr;
+              const isMealStart = dateStr === toDateStr(effectiveMealStart);
+              const isMealEnd = dateStr === toDateStr(effectiveMealEnd);
+              const isWorkoutStart =
+                dateStr === toDateStr(effectiveWorkoutStart);
+              const isWorkoutEnd = dateStr === toDateStr(effectiveWorkoutEnd);
 
-            return (
-              <div
-                key={dateStr}
-                className={`calendar-cell
+              const isPastFromStart =
+                date >= start && date < today && !mealDone && !workoutDone;
+
+              return (
+                <div
+                  key={dateStr}
+                  className={`calendar-cell
                   ${isPastFromStart ? "past" : ""}
                   ${isToday ? "today" : ""}
-                  ${isStart ? "start" : ""}
-                  ${isEnd ? "end" : ""}
+                   ${isMealStart ? "meal-start" : ""}
+          ${isMealEnd ? "meal-end" : ""}
+          ${isWorkoutStart ? "workout-start" : ""}
+          ${isWorkoutEnd ? "workout-end" : ""}
                 `}
-                data-tooltip={
-                  isStart
-                    ? "Start Date"
-                    : isEnd
-                    ? "End Date"
-                    : completedType === "both"
-                    ? "Meal + Workout Completed"
-                    : completedType === "meal"
-                    ? "Meal Completed"
-                    : completedType === "workout"
-                    ? "Workout Completed"
-                    : isPastFromStart
-                    ? "Missed Day"
-                    : "Not Completed"
-                }
-              >
-                {i + 1}
+                  data-tooltip={
+                    isMealStart
+                      ? "Meal Plan Start"
+                      : isMealEnd
+                        ? "Meal Plan End"
+                        : isWorkoutStart
+                          ? "Workout Plan Start"
+                          : isWorkoutEnd
+                            ? "Workout Plan End"
+                            : completedType === "both"
+                              ? "Meal + Workout Completed"
+                              : completedType === "meal"
+                                ? "Meal Completed"
+                                : completedType === "workout"
+                                  ? "Workout Completed"
+                                  : isPastFromStart
+                                    ? "Missed Day"
+                                    : "Not Completed"
+                  }
+                >
+                  {i + 1}
 
-                {completedType !== "none" && (
-                  <span
-                    className={`tick ${
-                      completedType === "both"
-                        ? "both"
-                        : completedType === "meal"
-                        ? "meal"
-                        : "workout"
-                    }`}
-                  >
-                    ✔
-                  </span>
-                )}
-              </div>
-            );
-          })}
-      </div>
+                  {completedType !== "none" && (
+                    <span
+                      className={`tick ${
+                        completedType === "both"
+                          ? "both"
+                          : completedType === "meal"
+                            ? "meal"
+                            : "workout"
+                      }`}
+                    >
+                      ✔
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );

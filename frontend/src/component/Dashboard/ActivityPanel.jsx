@@ -9,11 +9,19 @@ import {
 import "./ActivityPanel.css";
 import { getAllProgressForUser } from "../../api/dailyProgress";
 import Loading from "../Loading";
+const isBetween = (date, start, end) => {
+  if (!start || !end) return false;
+  const d = new Date(date);
+  return d >= new Date(start) && d <= new Date(end);
+};
 
-export default function ActivityPanel({ title, subtitle, type, progressStatus }) {
+export default function ActivityPanel({ title, subtitle, type, progressStatus, mealStart, mealEnd, workoutStart, workoutEnd }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+console.log("meal strat", mealStart);
+console.log("meal end", mealEnd);
+console.log("workout strat", workoutStart);
+console.log("workout end", workoutEnd);
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -24,7 +32,30 @@ export default function ActivityPanel({ title, subtitle, type, progressStatus })
       }
 
       const res = await getAllProgressForUser();
-      setData(res.progress || []);
+
+const filtered = (res.progress || []).filter(p => {
+  // ADHERENCE graph
+  if (type === "adherence") {
+    return (
+      (progressStatus.meal && isBetween(p.date, mealStart, mealEnd)) ||
+      (progressStatus.workout && isBetween(p.date, workoutStart, workoutEnd))
+    );
+  }
+
+  // CALORIES graph
+  if (type === "calories") {
+    return (
+      (mealStart && mealEnd && isBetween(p.date, mealStart, mealEnd)) ||
+      (workoutStart && workoutEnd && isBetween(p.date, workoutStart, workoutEnd))
+    );
+  }
+
+  return false;
+});
+
+
+setData(filtered);
+
       setLoading(false);
     };
 
@@ -43,13 +74,20 @@ export default function ActivityPanel({ title, subtitle, type, progressStatus })
     );
   }
 
-  const chartData = data.map((d) => ({
+  
+  const chartData = data.map((d) => {
+  const isMealValid = isBetween(d.date, mealStart, mealEnd);
+  const isWorkoutValid = isBetween(d.date, workoutStart, workoutEnd);
+  
+  return {
     date: d.date.slice(5, 10),
-    meal: d.mealAdherenceScore,
-    workout: d.workoutAdherenceScore,
-    taken: d.totalCaloriesTaken,
-    burned: d.totalCaloriesBurned,
-  }));
+    meal: isMealValid ? d.mealAdherenceScore : null,
+    workout: isWorkoutValid ? d.workoutAdherenceScore : null,
+     taken: isMealValid ? d.totalCaloriesTaken : null,
+    burned: isWorkoutValid ? d.totalCaloriesBurned : null,
+  };
+});
+
 
   return (
     <div className="activity-panel">

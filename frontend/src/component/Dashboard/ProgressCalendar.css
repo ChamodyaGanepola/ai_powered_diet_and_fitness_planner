@@ -65,17 +65,31 @@
 }
 
 /* Start / End circle */
-.calendar-cell.start {
+
+.calendar-cell.meal-start {
   border: 3px solid #3b82f6; /* blue circle */
   border-radius: 50%;
   background: #eef2ff;
 }
 
-.calendar-cell.end {
+.calendar-cell.meal-end {
   border: 3px solid #ef4444; /* red circle */
   border-radius: 50%;
   background: #ffe4e6;
 }
+
+.calendar-cell.workout-start {
+ border: 3px solid #3b82f6; /* blue circle */
+  border-radius: 50%;
+  background: #eef2ff;
+}
+
+.calendar-cell.workout-end {
+ border: 3px solid #ef4444; /* red circle */
+  border-radius: 50%;
+  background: #ffe4e6;
+}
+
 
 /* Today highlight */
 .calendar-cell.today {
