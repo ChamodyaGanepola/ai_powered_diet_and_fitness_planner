@@ -21,6 +21,8 @@ export default function SavedDailyProgress({ date }) {
       try {
         const res = await getDailyProgressByDate(date);
         setProgress(res?.progress || null);
+        console.log("res", res);
+        console.log("res.progress", res.progress);
       } catch (err) {
         console.error("Failed to load saved progress", err);
       } finally {
@@ -91,12 +93,12 @@ export default function SavedDailyProgress({ date }) {
           }}
           showHeader={false}
         />
-      ) : (
+      ) : progress.mealPlan_id != null ?  (
         <div className="meal-skipped">
           <FaTimesCircle className="skipped-icon" />
           <strong>All meals skipped</strong>
         </div>
-      )}
+      ) : null}
 
       {/* Workouts */}
       {workouts.length > 0 ? (
@@ -105,12 +107,12 @@ export default function SavedDailyProgress({ date }) {
             <WorkoutCard key={i} workout={w} />
           ))}
         </div>
-      ) : (
+      ) : progress.workoutPlan_id != null ?  (
         <div className="workout-skipped">
           <FaTimesCircle className="skipped-icon" />
           <strong>Workout Skipped</strong>
         </div>
-      )}
+      ): null}
     </div>
   );
 }

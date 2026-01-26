@@ -91,6 +91,9 @@
 }
 
 
+.text-red {
+  color: red;
+}
 
 /* ===== Macro Summary (Right side display) ===== */
 .macro-summary {

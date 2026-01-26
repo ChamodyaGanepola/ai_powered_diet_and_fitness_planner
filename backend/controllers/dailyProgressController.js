@@ -286,6 +286,25 @@ export const saveDailyProgress = async (req, res) => {
 
     const workoutAdherenceScore = workoutResult.score;
     const deviatedWorkoutPlan = workoutResult.deviated;
+const dayStrDate = new Date(dayStr);
+
+let mealPlanIdToSave = null;
+if (mealPlan) {
+  const planStart = new Date(mealPlan.startDate);
+  const planEnd = new Date(mealPlan.endDate);
+  if (dayStrDate >= planStart && dayStrDate <= planEnd) {
+    mealPlanIdToSave = mealPlan._id;
+  }
+}
+
+let workoutPlanIdToSave = null;
+if (workoutPlan) {
+  const planStart = new Date(workoutPlan.startDate);
+  const planEnd = new Date(workoutPlan.endDate);
+  if (dayStrDate >= planStart && dayStrDate <= planEnd) {
+    workoutPlanIdToSave = workoutPlan._id;
+  }
+}
 
 
     const progress = await DailyProgress.findOneAndUpdate(
@@ -304,8 +323,8 @@ export const saveDailyProgress = async (req, res) => {
         workoutAdherenceScore,
         deviatedMealPlan,
         deviatedWorkoutPlan,
-        mealplan_id: mealPlan?._id,
-        workoutplan_id: workoutPlan?._id,
+        mealplan_id: mealPlanIdToSave,
+        workoutplan_id: workoutPlanIdToSave,
         completed: true,
       },
       { new: true, upsert: true }
