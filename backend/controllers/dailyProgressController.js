@@ -109,49 +109,63 @@ const getDayName = (date) => {
 
 
 const calculateWorkoutAdherence = (plannedExercises, actualExercises, date) => {
-  if (!plannedExercises || plannedExercises.length === 0) {
-    return { score: null, deviated: false };
-  }
+  console.log("===== Adherence Calculation Started =====");
+
+  if (!plannedExercises || plannedExercises.length === 0) return { score: null, deviated: false };
 
   const dayName = getDayName(date);
+  console.log("Today is:", dayName);
 
   const plannedForDay = plannedExercises.filter(
-    (e) => e.day.toLowerCase() === dayName.toLowerCase()
+    e => e.day.toLowerCase() === dayName.toLowerCase()
   );
 
-  if (plannedForDay.length === 0) {
-    return { score: null, deviated: false };
+  console.log("Planned Exercises for Today:", plannedForDay);
+  if (!plannedForDay || plannedForDay.length === 0) return { score: null, deviated: false };
+  if (!actualExercises || actualExercises.length === 0) return { score: 0, deviated: true };
+
+  // Normalize actual exercises
+  const normalizedActuals = actualExercises.map(a => ({
+    name: a.name.trim().toLowerCase(),
+    sets: Number(a.sets),
+    reps: a.reps.trim(),
+    caloriesBurned: Number(a.caloriesBurned)
+  }));
+
+  let matchedCount = 0;
+
+  for (const planned of plannedForDay) {
+    const plannedNormalized = {
+      name: planned.name.trim().toLowerCase(),
+      sets: Number(planned.sets),
+      reps: planned.reps.trim(),
+      caloriesBurned: Number(planned.caloriesBurned)
+    };
+
+    console.log("Checking Planned Exercise:", plannedNormalized);
+
+    const matchedActual = normalizedActuals.find(actual =>
+      actual.name === plannedNormalized.name &&
+      actual.sets === plannedNormalized.sets &&
+      actual.reps === plannedNormalized.reps &&
+      actual.caloriesBurned === plannedNormalized.caloriesBurned
+    );
+
+    console.log("Matched Actual:", matchedActual);
+
+    if (matchedActual) matchedCount++;
   }
 
-  if (!actualExercises || actualExercises.length === 0) {
-    return { score: 0, deviated: true };
-  }
+  const score = Math.round((matchedCount / plannedForDay.length) * 100);
+  const deviated = matchedCount !== plannedForDay.length || normalizedActuals.length !== plannedForDay.length;
 
-  let matched = 0;
-  let extraFound = false;
-
-  for (const actual of actualExercises) {
-    const match = plannedForDay.find(p => {
-      const nameMatch =
-        p.name.trim().toLowerCase() === actual.name.trim().toLowerCase();
-      const setsMatch = Number(p.sets) === Number(actual.sets);
-      const repsMatch = p.reps.trim() === actual.reps.trim();
-
-      const restMatch =
-        p.restTime == null ? true : Number(p.restTime) === Number(actual.restTime);
-
-      return nameMatch && setsMatch && repsMatch && restMatch;
-    });
-
-    if (match) matched++;
-    else extraFound = true;
-  }
-
-  const score = Math.round((matched / plannedForDay.length) * 100);
-  const deviated = extraFound || matched !== plannedForDay.length;
+  console.log("Matched Count:", matchedCount, "Score:", score, "Deviated:", deviated);
+  console.log("===== Adherence Calculation Finished =====");
 
   return { score, deviated };
 };
+
+
 
 /* Get planned workouts full */
 export const getAllProgressForUser = async (req, res) => {
