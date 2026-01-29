@@ -14,7 +14,69 @@ const toUTCDate = (d) => {
   const date = new Date(d);
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 };
+const getDatesBetween = (startDate, endDate) => {
+  const dates = [];
+  const current = new Date(startDate);
+  current.setUTCHours(0, 0, 0, 0);
 
+  const end = new Date(endDate);
+  end.setUTCHours(0, 0, 0, 0);
+
+  while (current <= end) {
+    dates.push(new Date(current));
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+
+  return dates;
+};
+export const updatePlanCompletionStatus = async (userId) => {
+  
+    if (!userId)
+      return res.status(400).json({ success: false, message: "user_id required" });
+  try {
+    const mealPlan = await MealPlan.findOne({ user_id: userId, status: "active" });
+    const workoutPlan = await WorkoutPlan.findOne({ user_id: userId, status: "active" });
+
+    // ---- MEAL PLAN ----
+    if (mealPlan) {
+      const dates = getDatesBetween(mealPlan.startDate, mealPlan.endDate);
+
+      const completedCount = await DailyProgress.countDocuments({
+        user_id: userId,
+        mealplan_id: mealPlan._id,
+        completed: true,
+        date: { $gte: mealPlan.startDate, $lte: mealPlan.endDate },
+      });
+
+      if (completedCount === dates.length) {
+        mealPlan.status = "completed";
+        await mealPlan.save();
+      }
+    }
+
+    // ---- WORKOUT PLAN ----
+    if (workoutPlan) {
+      const dates = getDatesBetween(workoutPlan.startDate, workoutPlan.endDate);
+
+      const completedCount = await DailyProgress.countDocuments({
+        user_id: userId,
+        workoutplan_id: workoutPlan._id,
+        completed: true,
+        date: { $gte: workoutPlan.startDate, $lte: workoutPlan.endDate },
+      });
+
+      if (completedCount === dates.length) {
+        workoutPlan.status = "completed";
+        await workoutPlan.save();
+      }
+    }
+
+    return { success: true, message: "Plan completion status updated." };
+  } catch (err) {
+    console.error(err);
+    return { success: false, message: err.message };
+  }
+};
 /* Get full planned meals */
 const getPlannedMealsFull = async (mealPlanId) => {
   const meals = await Meal.find({ mealplan_id: mealPlanId });
@@ -329,7 +391,7 @@ if (workoutPlan) {
       },
       { new: true, upsert: true }
     );
-
+    await updatePlanCompletionStatus(user_id);
     res.json({ success: true, progress });
   } catch (err) {
     res.status(500).json({ message: "Failed to save daily progress", error: err.message });

@@ -15,6 +15,12 @@ export const checkDailyProgressForUser = async () => {
   const res = await axios.get(`${API_URL}/checkProgress`, getAuthHeader());
   return res.data;
 };
+
+export const updatePlanCompletionStatus = async () => {
+  const res = await axios.get(`${API_URL}/complete`, getAuthHeader());
+  return res.data;
+};
+
 export const getAllProgressForUser = async () => {
   const res = await axios.get(`${API_URL}/all`, getAuthHeader());
   return res.data;

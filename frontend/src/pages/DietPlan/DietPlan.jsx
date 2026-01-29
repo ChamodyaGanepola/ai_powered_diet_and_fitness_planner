@@ -6,6 +6,7 @@ import {
   getLatestMealPlan,
   updateMealPlanStatus,
   createMealPlan,
+  getCompletedMealPlans,
 } from "../../api/mealPlanApi.js";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
 import "./DietPlan.css";
@@ -29,6 +30,7 @@ export default function DietPlan() {
   const [loading, setLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showFeedbackList, setShowFeedbackList] = useState(false);
+  const [completedMealPlans, setCompletedMealPlans] = useState([]);
 
   useEffect(() => {
     checkUserProfile();
@@ -71,10 +73,11 @@ export default function DietPlan() {
   const fetchMealPlans = async () => {
     setLoading(true);
     try {
-      const res = await getLatestMealPlan();
+      // 🔹 ACTIVE PLAN
+      const activeRes = await getLatestMealPlan();
 
-      if (res.success && res.mealPlan) {
-        const plan = res.mealPlan;
+      if (activeRes.success && activeRes.mealPlan) {
+        const plan = activeRes.mealPlan;
         setActiveMealPlanId(plan._id);
 
         const transformedPlan = {
@@ -98,6 +101,29 @@ export default function DietPlan() {
       } else {
         setMealPlans([]);
         setActiveMealPlanId(null);
+      }
+
+      // 🔹 COMPLETED PLANS
+      const completedRes = await getCompletedMealPlans();
+      if (completedRes.success) {
+        const transformedCompleted = completedRes.mealPlans.map((plan) => ({
+          meals: plan.meals.map((m) => ({
+            mealType: m.mealType,
+            items: m.foods.map((f) => ({
+              name: f.name,
+              calories: f.calories,
+              protein: f.protein,
+              fat: f.fat,
+              carbohydrates: f.carbohydrates,
+            })),
+          })),
+          totalCalories: plan.totalCalories,
+          totalProtein: plan.totalProtein,
+          totalCarbs: plan.totalCarbs,
+          totalFat: plan.totalFat,
+        }));
+
+        setCompletedMealPlans(transformedCompleted);
       }
     } catch (err) {
       console.error("Error fetching meal plans:", err);
@@ -164,7 +190,8 @@ export default function DietPlan() {
       </div>
     );
   }
-  else if (mealPlans.length === 0) {
+  const hasActivePlan = mealPlans.length > 0;
+  /*else if (mealPlans.length === 0) {
   return (
     <div className="app-container">
       <div className="empty-state">
@@ -176,7 +203,7 @@ export default function DietPlan() {
           Generate Meal Plan
         </button>
 
-        {/* Meal Feedback Section */}
+   
         <div className="feedback-section">
           <div
             className="feedback-header-toggle"
@@ -191,7 +218,7 @@ export default function DietPlan() {
             </h2>
           </div>
 
-          {/* Collapsible content */}
+         
           <div className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}>
             <FeedbackList
               userId={user.id}
@@ -203,34 +230,75 @@ export default function DietPlan() {
       </div>
     </div>
   );
-}
+}*/
 
   return (
     <div className="diet-page">
-      <div className="meal-plan-wrapper">
-        <div className="meal-plan-inner">
-          {mealPlans.map((plan, index) => (
-            <MealPlanCard
-              key={index}
-              plan={plan}
-              index={index}
-              showHeader={true} // show header on DietPlan page
-            />
-          ))}
+      {!hasActivePlan && (
+        <div className="meal-plan-wrapper">
+          <div className="meal-plan-inner">
+            <div className="empty-state">
+              <p>
+                No active meal plan available. You can generate one based on
+                your profile.
+              </p>
+              <button className="generate-btn" onClick={handleGenerateMealPlan}>
+                Generate Meal Plan
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+      {hasActivePlan && (
+        <>
+          <div className="meal-plan-wrapper">
+            <div className="meal-plan-inner">
+              {mealPlans.map((plan, index) => (
+                <MealPlanCard
+                  key={index}
+                  plan={plan}
+                  index={index}
+                  showHeader={true} // show header on DietPlan page
+                />
+              ))}
+            </div>
+          </div>
 
-      <div className="delete-wrapper">
-        <button
-          className="delete-button"
-          onClick={handleDeleteMealPlan}
-          disabled={loading}
-        >
-          <FaTrash />
-          Delete Meal Plan
-        </button>
-      </div>
-      
+          <div className="delete-wrapper">
+            <button
+              className="delete-button"
+              onClick={handleDeleteMealPlan}
+              disabled={loading}
+            >
+              <FaTrash />
+              Delete Meal Plan
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* COMPLETED MEAL PLANS */}
+      {completedMealPlans.length > 0 && (
+        <div className="completed-meal-section">
+          <div className="meal-plan-wrapper">
+            <div className="meal-plan-inner">
+              <h2 className="section-title">
+                Your Previous Completed Meal Plans
+              </h2>
+              {completedMealPlans.map((plan, index) => (
+                <MealPlanCard
+                  key={`completed-${index}`}
+                  plan={plan}
+                  index={index}
+                  showHeader={false}
+                  completed={true} // optional flag
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Meal Feedback Section */}
       <div className="feedback-section">
         <div

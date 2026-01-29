@@ -345,3 +345,54 @@ export const updateWorkoutPlanStatus = async (req, res) => {
     });
   }
 };
+
+export const getCompletedWorkoutPlans = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    if (!user_id) {
+      return res.status(400).json({ message: "user_id is required" });
+    }
+
+    // Get ACTIVE user profile
+    const activeProfile = await UserProfile.findOne({
+      user_id,
+      status: "active",
+    });
+
+    if (!activeProfile) {
+      return res.json({ success: true, workoutPlans: [] });
+    }
+
+    // Fetch completed workout plans for ACTIVE profile
+    const workoutPlans = await WorkoutPlan.find({
+      user_id,
+      userProfile_id: activeProfile._id,
+      status: "completed",
+    }).sort({ createdAt: -1 });
+
+    const results = [];
+
+    for (const plan of workoutPlans) {
+      const exercises = await Exercise.find({
+        workoutplan_id: plan._id,
+      });
+
+      results.push({
+        ...plan.toObject(),
+        exercises,
+      });
+    }
+
+    res.json({
+      success: true,
+      workoutPlans: results,
+    });
+  } catch (err) {
+    console.error("Get Completed Workout Plans Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch completed workout plans",
+      error: err.message,
+    });
+  }
+};

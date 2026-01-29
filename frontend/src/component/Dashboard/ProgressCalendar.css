@@ -123,15 +123,15 @@
 }
 
 .tick.meal {
-  color: #facc15; /* yellow */
+  color: #facc15;
 }
 
 .tick.workout {
-  color: #3b82f6; /* blue */
+  color: #3b82f6; 
 }
 
 .tick.both {
-  color: #16a34a; /* green */
+  color: #16a34a; 
 }
 
 /* Tooltip */

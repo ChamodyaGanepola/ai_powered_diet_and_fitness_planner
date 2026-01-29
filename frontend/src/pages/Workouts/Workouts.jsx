@@ -6,6 +6,7 @@ import {
   getLatestWorkoutPlan,
   updateWorkoutPlanStatus,
   createWorkoutPlan,
+  getCompletedWorkoutPlans,
 } from "../../api/workoutPlan.js";
 import { FaTrash } from "react-icons/fa";
 import { getProfileByUserId } from "../../api/userProfileApi.js";
@@ -31,6 +32,7 @@ export default function Workout() {
   const [loading, setLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showFeedbackList, setShowFeedbackList] = useState(false);
+  const [completedWorkoutPlans, setCompletedWorkoutPlans] = useState([]);
 
   useEffect(() => {
     checkUserProfile();
@@ -61,6 +63,7 @@ export default function Workout() {
   const fetchWorkoutPlans = async () => {
     setLoading(true);
     try {
+      // 🔹 ACTIVE PLAN (already exists)
       const res = await getLatestWorkoutPlan(user.id);
 
       if (res.success && res.workoutPlan?.length) {
@@ -81,6 +84,15 @@ export default function Workout() {
       } else {
         setPlans([]);
         setActivePlanId(null);
+      }
+
+      // 🔹 COMPLETED WORKOUT PLANS (NEW)
+      const completedRes = await getCompletedWorkoutPlans();
+
+      if (completedRes.success) {
+        setCompletedWorkoutPlans(completedRes.workoutPlans);
+      } else {
+        setCompletedWorkoutPlans([]);
       }
     } catch (err) {
       console.error(err);
@@ -144,11 +156,11 @@ export default function Workout() {
         reason,
       });
       await createNotification(
-        `Hi ${user.username}, you marked your current active meal plan as not suitable due to "${reason}" 😢`,
+        `Hi ${user.username}, you marked your current active workout plan as not suitable due to "${reason}" 😢`,
       );
       showAlert({
         type: "error",
-        message: `${user.username}, you marked your current active meal plan as not suitable.`,
+        message: `${user.username}, you marked your current active workoutplan as not suitable.`,
         autoClose: true,
         duration: 3000,
       });
@@ -168,7 +180,9 @@ export default function Workout() {
         </p>
       </div>
     );
-  } else if (plans.length === 0) {
+  }
+  const hasActivePlan = plans.length > 0;
+  /*else if (plans.length === 0) {
    return (
       <div className="app-container">
         <div className="empty-state">
@@ -178,10 +192,10 @@ export default function Workout() {
           </p>
   
           <button className="generate-btn" onClick={handleGenerateWorkoutPlan}>
-            Generate Meal Plan
+            Generate Workout Plan
           </button>
   
-          {/* Meal Feedback Section */}
+       
           <div className="feedback-section">
             <div
               className="feedback-header-toggle"
@@ -196,7 +210,7 @@ export default function Workout() {
               </h2>
             </div>
   
-            {/* Collapsible content */}
+           
             <div className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}>
               <FeedbackList
                 userId={user.id}
@@ -208,11 +222,31 @@ export default function Workout() {
         </div>
       </div>
     );
-  }
-  
+  }*/
 
-  return (
-    <div className="workouts-page">
+  
+    return (
+  <div className="workouts-page">
+    {/* NO ACTIVE PLAN */}
+    {!hasActivePlan && (
+      <div className="workouts-inner">
+        <div className="empty-state">
+          <p>
+            No active workout plan available. You can generate one based on your
+            profile.
+          </p>
+          <button
+            className="generate-btn"
+            onClick={handleGenerateWorkoutPlan}
+          >
+            Generate Workout Plan
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* ACTIVE PLAN */}
+    {hasActivePlan && (
       <div className="workouts-inner">
         <PageHeader
           icon={<FaDumbbell />}
@@ -231,7 +265,7 @@ export default function Workout() {
                   ))}
                 </div>
               </section>
-            )),
+            ))
           )}
         </div>
 
@@ -245,41 +279,68 @@ export default function Workout() {
             Delete Workout Plan
           </button>
         </div>
+      </div>
+    )}
 
-        <div className="feedback-section">
-          <div
-            className="feedback-header-toggle"
-            onClick={() => setShowFeedbackList((prev) => !prev)}
-          >
-            <span
-              className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}
+    {/* COMPLETED WORKOUT PLANS */}
+    {completedWorkoutPlans.length > 0 && (
+       <div className="workouts-inner">
+      <div className="completed-workout-section">
+        <h2 className="section-title">
+          Your Previous Completed Workout Plans
+        </h2>
+        <div className="day-grid">
+        {completedWorkoutPlans.map((plan) =>
+          groupByDay(plan.exercises || []).map(({ day, workouts }) => (
+            <section
+              key={`${plan._id}-${day}`}
+              className="day-section completed"
             >
-              ▾
-            </span>
+              <h3 className="day-title">{day}</h3>
 
-            <h2 className="feedback-title">
-              Your Previous Workout Plan Feedback (Not suitable)
-            </h2>
-          </div>
-
-          <div
-            className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}
-          >
-            <FeedbackList
-              userId={user.id}
-              userProfileId={userProfileId}
-              type="workout"
-            />
-          </div>
+              <div className="workouts-grid">
+                {workouts.map((w) => (
+                  <WorkoutCard key={w._id} workout={w} completed />
+                ))}
+              </div>
+            </section>
+          ))
+        )}
         </div>
+      </div>
+      </div>
+    )}
 
-        <PlanFeedbackModal
-          open={showFeedback}
-          onCancel={() => setShowFeedback(false)}
-          onConfirm={confirmWorkoutFeedback}
-          title="Why is this workout plan not suitable?"
+    {/* FEEDBACK */}
+    <div className="feedback-section">
+      <div
+        className="feedback-header-toggle"
+        onClick={() => setShowFeedbackList((prev) => !prev)}
+      >
+        <span className={`feedback-arrow ${showFeedbackList ? "open" : ""}`}>
+          ▾
+        </span>
+
+        <h2 className="feedback-title">
+          Your Previous Workout Plan Feedback (Not suitable)
+        </h2>
+      </div>
+
+      <div className={`feedback-content ${showFeedbackList ? "show" : "hide"}`}>
+        <FeedbackList
+          userId={user.id}
+          userProfileId={userProfileId}
+          type="workout"
         />
       </div>
     </div>
-  );
+
+    <PlanFeedbackModal
+      open={showFeedback}
+      onCancel={() => setShowFeedback(false)}
+      onConfirm={confirmWorkoutFeedback}
+      title="Why is this workout plan not suitable?"
+    />
+  </div>
+);
 }

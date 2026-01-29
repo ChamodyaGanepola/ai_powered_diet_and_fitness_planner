@@ -126,8 +126,22 @@ export default function DailyProgress() {
     );
   };
 
-  const isDateWithinPlan = (date) => {
-    return isMealDateValid(date) || isWorkoutDateValid(date);
+  const isDateWithinPlan = (dateStr) => {
+    const date = new Date(dateStr);
+
+    const mealValid =
+      planMealStartDate &&
+      planMealEndDate &&
+      date >= new Date(planMealStartDate) &&
+      date <= new Date(planMealEndDate);
+
+    const workoutValid =
+      planWorkoutStartDate &&
+      planWorkoutEndDate &&
+      date >= new Date(planWorkoutStartDate) &&
+      date <= new Date(planWorkoutEndDate);
+
+    return mealValid || workoutValid; // true if either plan includes the date
   };
 
   useEffect(() => {
@@ -147,9 +161,38 @@ export default function DailyProgress() {
         return;
       }
 
-      const mealRes = await getLatestMealPlan();
-      const workoutRes = await getLatestWorkoutPlan();
-      const workoutDetails = await getWorkoutPlanDetails();
+      let mealRes = null;
+      try {
+        mealRes = await getLatestMealPlan();
+      } catch (err) {
+        if (err.response?.status === 404) {
+          mealRes = null; // no meal plan
+        } else {
+          throw err;
+        }
+      }
+
+      let workoutRes = null;
+      try {
+        workoutRes = await getLatestWorkoutPlan();
+      } catch (err) {
+        if (err.response?.status === 404) {
+          workoutRes = null; // no workout plan
+        } else {
+          throw err;
+        }
+      }
+
+      let workoutDetails = null;
+      try {
+        workoutDetails = await getWorkoutPlanDetails();
+      } catch (err) {
+        if (err.response?.status === 404) {
+          workoutDetails = null; // no workout details
+        } else {
+          throw err;
+        }
+      }
 
       const mealExists = !!mealRes?.mealPlan;
       const workoutExists = !!workoutRes?.workoutPlan;
@@ -158,7 +201,9 @@ export default function DailyProgress() {
       setWorkoutPlanExists(workoutExists);
       setPlansChecked(true);
 
+      // Redirect if no plans
       if (!mealExists && !workoutExists) {
+        console.log("No active plans found. Redirecting to home...");
         setTimeout(() => (window.location.href = "/home"), 3000);
       }
 
@@ -169,6 +214,7 @@ export default function DailyProgress() {
           Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
         setMealPlanDurationDays(durationDays);
       }
+
       if (workoutExists) {
         const start = new Date(workoutDetails.workoutPlan.startDate);
         const end = new Date(workoutDetails.workoutPlan.endDate);
@@ -177,7 +223,7 @@ export default function DailyProgress() {
         setWorkoutPlanDurationDays(durationDays);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Unexpected error:", err);
     } finally {
       initDailyProgress();
     }
@@ -273,12 +319,12 @@ export default function DailyProgress() {
     setLoading(true);
     try {
       const res = await checkDailyProgressForUser();
-      if (res.mealPlan.progressExists === true) {
+      if (res.mealPlan && res.mealPlan.progressExists === true) {
         setPlanMealStartDate(formatDateUTC(res.mealPlan.startDate));
         setPlanMealEndDate(formatDateUTC(res.mealPlan.endDate));
       }
 
-      if (res.workoutPlan.progressExists === true) {
+      if (res.workoutPlan && res.workoutPlan.progressExists === true) {
         setPlanWorkoutStartDate(formatDateUTC(res.workoutPlan.startDate));
         setPlanWorkoutEndDate(formatDateUTC(res.workoutPlan.endDate));
       }

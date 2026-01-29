@@ -406,32 +406,52 @@ export const getNotSuitableMealPlans = async (req, res) => {
 ---------------------------- */
 export const getCompletedMealPlans = async (req, res) => {
   try {
-    const user_id = req.user.id; // from authMiddleware
-    if (!user_id)
+    const user_id = req.user.id;
+    if (!user_id) {
       return res.status(400).json({ message: "user_id is required" });
+    }
 
+    // get ACTIVE profile only
+    const activeProfile = await UserProfile.findOne({
+      user_id,
+      status: "active",
+    });
+
+    if (!activeProfile) {
+      return res.json({ success: true, mealPlans: [] });
+    }
+
+    // only completed plans for active profile
     const mealPlans = await MealPlan.find({
       user_id,
+      userProfile_id: activeProfile._id,
       status: "completed",
     }).sort({ createdAt: -1 });
 
     const results = [];
+
     for (const plan of mealPlans) {
       const meals = await Meal.find({ mealplan_id: plan._id });
       const mealWithItems = [];
+
       for (const m of meals) {
         const foods = await FoodItem.find({ meal_id: m._id });
         mealWithItems.push({ ...m.toObject(), foods });
       }
+
       results.push({ ...plan.toObject(), meals: mealWithItems });
     }
 
     res.json({ success: true, mealPlans: results });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to fetch completed meal plans", error: err.message });
+    res.status(500).json({
+      message: "Failed to fetch completed meal plans",
+      error: err.message,
+    });
   }
 };
+
 
 
 
