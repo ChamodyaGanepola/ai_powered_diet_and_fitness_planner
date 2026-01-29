@@ -1,8 +1,8 @@
-const UserProfile = require("../models/UserProfile");
-const { calculateBMI, getBMICategory } = require("../utils/bmi");
+import UserProfile from "../models/UserProfile.js";
+import { calculateBMI, getBMICategory } from "../utils/bmi.js";
 
 // Create profile
-exports.createProfile = async (req, res) => {
+export const createProfile = async (req, res) => {
   try {
     console.log("Request body:", req.user.id, req.user.role);
     const user_id = req.user.id; // from authMiddleware
@@ -65,7 +65,7 @@ exports.createProfile = async (req, res) => {
 };
 
 // Update profile (creates a new active profile)
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const user_id = req.user.id; // from authMiddleware
     const updateData = req.body;
@@ -119,7 +119,7 @@ exports.updateProfile = async (req, res) => {
 };
 
 // Get profile by user_id (only active)
-exports.getProfileByUserId = async (req, res) => {
+export const getProfileByUserId = async (req, res) => {
   try {
     const user_id = req.user.id; // from authMiddleware
     console.log("Fetching profile for user ID:", user_id);
@@ -140,7 +140,7 @@ exports.getProfileByUserId = async (req, res) => {
 
 
 // Delete profile by user_id
-exports.deleteProfile = async (req, res) => {
+export const deleteProfile = async (req, res) => {
   try {
     const user_id = req.user.id; // from authMiddleware
 

@@ -1,7 +1,7 @@
-const User = require("../models/User");
+import User from "../models/User.js";
 
 // CREATE USER
-exports.createUser = async (req, res) => {
+export const  createUser = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
 
@@ -51,7 +51,7 @@ exports.createUser = async (req, res) => {
 };
 
 // GET ALL USERS (WITHOUT PASSWORD)
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.status(200).json(users);

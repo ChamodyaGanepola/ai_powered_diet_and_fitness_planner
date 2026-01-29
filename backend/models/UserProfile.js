@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userProfileSchema = new mongoose.Schema({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -28,4 +28,5 @@ const userProfileSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const UserProfile = mongoose.model("UserProfile", userProfileSchema);
-module.exports = UserProfile;
+
+export default UserProfile;

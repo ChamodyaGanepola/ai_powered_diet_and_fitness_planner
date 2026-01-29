@@ -21,4 +21,4 @@ function getBMICategory(bmi) {
   return "Unknown";
 }
 
-module.exports = { calculateBMI, getBMICategory };
+export { calculateBMI, getBMICategory };
